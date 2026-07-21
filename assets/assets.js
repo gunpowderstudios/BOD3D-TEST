@@ -33,3 +33,23 @@ window.ASSET_PATHS = {
   "Mirror Monster": "assets/monsters/mirrormonster.png",
   "Dragon": "assets/monsters/dragon.png"
 };
+
+// BOD3D-TEST: keep the loading-screen logo repository-relative so this build
+// works from /BOD3D-TEST/ as well as from a local checkout.
+(function fixLoadingScreenLogoPath(){
+  function applyLogoPath(){
+    const logo = document.getElementById('heroSelectLogo');
+    if (!logo) return;
+    const testLogoPath = './assets/ui/bod3d-logo.png?v=test-logo-fix-1';
+    if (!logo.src.includes('/BOD3D-TEST/assets/ui/bod3d-logo.png')) {
+      logo.style.display = '';
+      logo.src = testLogoPath;
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyLogoPath, { once: true });
+  } else {
+    applyLogoPath();
+  }
+})();
