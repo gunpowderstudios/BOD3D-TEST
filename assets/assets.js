@@ -129,6 +129,9 @@ window.ASSET_PATHS = {
   function boot(){
     window.__BOD_DUNGEON_AMBIENCE_MUTED__=false;
     updateVersionLabel();
+    // Legacy code creates the small under-logo version label slightly later.
+    // Correct it once after that setup has completed; no observer or loop.
+    setTimeout(updateVersionLabel, 750);
     if(!installButton()){
       let tries=0;
       const timer=setInterval(()=>{
