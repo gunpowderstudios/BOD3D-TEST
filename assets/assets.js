@@ -33,3 +33,30 @@ window.ASSET_PATHS = {
   "Mirror Monster": "assets/monsters/mirrormonster.png",
   "Dragon": "assets/monsters/dragon.png"
 };
+
+// TEST-only: the LIVE build may reference the loading-screen logo through the
+// /BOD3D/ site path. Force the TEST build to use its own repository-relative
+// copy without changing any other game behaviour.
+(function fixTestLoadingLogo(){
+  function apply(){
+    const logo = document.getElementById('heroSelectLogo');
+    if (!logo) return false;
+    logo.style.display = '';
+    logo.src = './assets/ui/bod3d-logo.png';
+    return true;
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ()=>{
+      if (apply()) return;
+      let tries = 0;
+      const timer = setInterval(()=>{
+        if (apply() || ++tries >= 50) clearInterval(timer);
+      },100);
+    }, {once:true});
+  } else if (!apply()) {
+    let tries = 0;
+    const timer = setInterval(()=>{
+      if (apply() || ++tries >= 50) clearInterval(timer);
+    },100);
+  }
+})();
