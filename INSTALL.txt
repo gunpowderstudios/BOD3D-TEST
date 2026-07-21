@@ -1,4 +1,0 @@
-Replace the matching files in your local BOD3D-TEST repository.
-Keep all other files and assets.
-Commit: Fix staging logo and scroll paths (v11.22)
-Push origin, then hard-refresh the test site.
