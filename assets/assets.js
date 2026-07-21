@@ -68,66 +68,75 @@ window.ASSET_PATHS = {
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});
   else apply();
-  // The legacy start-screen code may populate its version label slightly later.
   setTimeout(apply,1000);
 })();
 
-// v11.23 TEST: mute only dungeon-sounds.mp3. Other effects and music are untouched.
+// v11.23 TEST: mute only dungeon-sounds.mp3. Other sounds are untouched.
 (function installDungeonAmbienceToggle(){
   let muted=false;
-  let button=null;
 
-  function findDungeonAudio(){
-    const audios=[...document.querySelectorAll('audio')];
-    return audios.find(audio=>{
-      const src=(audio.currentSrc||audio.src||audio.getAttribute('src')||'').toLowerCase();
-      return src.includes('dungeon-sounds.mp3');
-    })||null;
+  // The dungeon ambience is created with new Audio(), so it may never appear as
+  // an <audio> element in the DOM. Intercept play() only for this exact MP3.
+  if(!HTMLMediaElement.prototype.__bodDungeonMutePatched){
+    const originalPlay=HTMLMediaElement.prototype.play;
+    HTMLMediaElement.prototype.play=function(){
+      const src=String(this.currentSrc||this.src||'');
+      if(window.__BOD_DUNGEON_AMBIENCE_MUTED__ && /(?:^|\/)dungeon-sounds\.mp3(?:\?|$)/i.test(src)){
+        try{this.pause();}catch(_){ }
+        return Promise.resolve();
+      }
+      return originalPlay.apply(this,arguments);
+    };
+    HTMLMediaElement.prototype.__bodDungeonMutePatched=true;
   }
 
-  function applyMute(){
-    const audio=findDungeonAudio();
-    if(audio)audio.muted=muted;
-    if(button){
-      button.textContent=muted?'🔇':'🔊';
-      button.title=muted?'Dungeon ambience off':'Dungeon ambience on';
-      button.setAttribute('aria-label',button.title);
-    }
+  function updateButton(button){
+    button.textContent=muted?'🔇':'🔊';
+    button.title=muted?'Dungeon ambience off — click to turn on':'Dungeon ambience on — click to turn off';
+    button.setAttribute('aria-label',button.title);
+    button.setAttribute('aria-pressed',muted?'true':'false');
   }
 
   function install(){
     if(document.getElementById('dungeonSoundToggle'))return true;
     const fullscreen=document.getElementById('fullscreenBtn');
     if(!fullscreen||!fullscreen.parentNode)return false;
-    button=document.createElement('button');
+
+    const style=document.createElement('style');
+    style.id='dungeonSoundToggleStyles';
+    style.textContent=`
+      #dungeonSoundToggle{position:absolute;top:10px;right:50px;z-index:66;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:5px;background:var(--cream);color:var(--ink);box-shadow:2px 2px 0 #000;font:700 18px/1 Arial,sans-serif;pointer-events:auto;cursor:pointer}
+      #dungeonSoundToggle:hover{background:#fff1c9}
+      #topbar{right:92px!important}
+    `;
+    document.head.appendChild(style);
+
+    const button=document.createElement('button');
     button.id='dungeonSoundToggle';
     button.type='button';
-    button.textContent='🔊';
-    button.title='Dungeon ambience on';
-    button.setAttribute('aria-label',button.title);
-    button.style.cssText='position:absolute;top:10px;right:52px;z-index:65;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:5px;background:var(--cream);color:var(--ink);box-shadow:2px 2px 0 #000;font:700 18px/1 Arial,sans-serif;pointer-events:auto';
+    updateButton(button);
     button.addEventListener('click',event=>{
       event.preventDefault();
       event.stopPropagation();
       muted=!muted;
-      applyMute();
+      window.__BOD_DUNGEON_AMBIENCE_MUTED__=muted;
+      if(muted){
+        window.stopDungeonAmbience?.();
+      }else{
+        window.startDungeonAmbience?.();
+      }
+      updateButton(button);
     });
-    fullscreen.parentNode.insertBefore(button,fullscreen);
+    fullscreen.insertAdjacentElement('beforebegin',button);
     return true;
   }
 
   function start(){
+    window.__BOD_DUNGEON_AMBIENCE_MUTED__=false;
     if(!install()){
       let tries=0;
-      const timer=setInterval(()=>{if(install()||++tries>=50)clearInterval(timer);},100);
+      const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);
     }
-    // dungeon-sounds.mp3 can be created after the button, so briefly keep its
-    // mute state in sync without touching any other Audio object.
-    let checks=0;
-    const sync=setInterval(()=>{
-      applyMute();
-      if(++checks>=50)clearInterval(sync);
-    },100);
   }
 
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
