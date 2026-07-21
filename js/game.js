@@ -1,4 +1,4 @@
-const VERSION='v11.21';
+const VERSION='v11.22';
 
 const CHARACTERS=[
  {id:'sirrus',name:'Sirrus the Fighter',glyph:'⚔',desc:'Skilled warrior and renowned blade-master.',maxHealth:10,maxAp:5,baseDice:2,baseMod:2,special:'Lethal Blow',specialDesc:'Once per game you may double your combat roll result.'},
@@ -3077,4 +3077,5 @@ death=function(){window.BODDice3D?.clear?.();return deathWithoutDiceCleanup.appl
 const newGameWithoutDiceCleanup=newGame;
 newGame=function(){window.BODDice3D?.clear?.();return newGameWithoutDiceCleanup.apply(this,arguments);};
 renderCharSelect();
+
 

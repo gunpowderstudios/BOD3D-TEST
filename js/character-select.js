@@ -3,8 +3,8 @@
  if(!logo)return;
 
  const candidates=[
-  './assets/ui/bod3D-logo.png?v=10.58',
-  'assets/ui/bod3D-logo.png?v=10.58'
+  './assets/ui/bod3d-logo.png?v=10.58',
+  'assets/ui/bod3d-logo.png?v=10.58'
  ];
  let candidateIndex=0;
 
@@ -19,10 +19,11 @@
    logo.src=candidates[candidateIndex];
   }else{
    console.error(
-    'BOD3D logo could not be found. Expected GitHub file: assets/ui/bod3D-logo.png'
+    'BOD3D logo could not be found. Expected GitHub file: assets/ui/bod3d-logo.png'
    );
    logo.style.display='none';
   }
  });
 })();
+
 

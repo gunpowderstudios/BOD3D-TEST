@@ -559,7 +559,7 @@ body.threeMode.lightingOn #viewport::after{
   width:min(760px,94vw);
   max-width:760px;
   margin:0 auto;
-  background:transparent url('./assets/ui/scroll.png') center/100% 100% no-repeat;
+  background:transparent url('../assets/ui/scroll.png') center/100% 100% no-repeat;
   color:#000;
   border:0;
   box-shadow:none;
@@ -1547,4 +1547,5 @@ body.combatActive #viewport.dragging{cursor:grabbing!important;}
   .dpadBtn[data-action="move"]{background:#f7e9c1}
   .dpadBtn:disabled{opacity:.32}
 }
+
 

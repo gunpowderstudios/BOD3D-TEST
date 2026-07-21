@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Bag of Dungeon 3D v11.21</title>
+<title>Bag of Dungeon 3D v11.22</title>
 
 <!--
 8BITBOD
@@ -151,7 +151,7 @@ Changes:
 <!-- v10.55: Loading screen now uses the blank external backdrop at assets/ui/loading-screen.jpg and displays assets/ui/bod3d-logo.png as a separate responsive logo. The logo scales independently on desktop, mobile and landscape screens instead of being enlarged and cropped with the background. Loading-screen character sizing and every hero/monster scale on the game board remain unchanged. -->
 <!-- v10.56: Corrected the loading-screen logo reference to the exact GitHub-relative path ./assets/ui/bod3d-logo.png and added a version query/preload to bypass cached broken-image or prior 404 responses. No model sizing or loading-screen layout changes. -->
 <!-- v10.57: Added a resilient loading-logo path resolver. It first requests the exact required path assets/ui/bod3d-logo.png, then automatically checks common GitHub case/folder variants if that request returns 404. The browser console now reports the path that successfully loaded or a clear missing-file error. No model, board or selector sizing changes. -->
-<!-- v10.58: Corrected the loading-screen logo filename casing to the exact GitHub asset name bod3D-logo.png. The project URL remains /BOD3D/ and the logo now loads from ./assets/ui/bod3D-logo.png. No loading-screen, hero-preview, board-model or gameplay sizing changes. -->
+<!-- v10.58: Corrected the loading-screen logo filename casing to the exact GitHub asset name bod3d-logo.png. The project URL remains /BOD3D/ and the logo now loads from ./assets/ui/bod3d-logo.png. No loading-screen, hero-preview, board-model or gameplay sizing changes. -->
 <!-- v10.59: Reworked desktop/laptop combat into a wide lower-screen tray. Hero and monster cards sit side by side, with dice, combat log and action buttons in a separate right-hand column. Added shallow-screen compression so combat controls remain visible on laptop browser windows. Mobile combat behaviour is unchanged. -->
 <!-- v10.60: Added a complete combat interaction lock. While combat is active, the board, 3D models, tiles, dropped items, movement and camera controls ignore taps and clicks. Monster and item inspection functions now have defensive combat guards, including Three.js canvas actions. Any existing modal is closed when combat begins. Normal interaction is restored automatically when combat ends. -->
 <!-- v10.62: Added optional character-sheet slot symbols from assets/ui/. Left and Right Hand display hand-symbol.png plus spell-symbol.png; Armour uses armour.png; Boots uses boots.png; Attire uses attire.png; Companions can use companions.png. Missing PNGs hide automatically, so the UI remains usable before artwork is uploaded. -->
@@ -193,7 +193,7 @@ Changes:
 <body class="lightingOn">
 
 <div id="charSelect" style="--loading-backdrop:url('assets/ui/loading-screen.jpg')">
-  <img id="heroSelectLogo" class="heroSelectLogo" src="assets/ui/bod3D-logo.png?v=10.58" alt="Bag of Dungeon" decoding="async">
+  <img id="heroSelectLogo" class="heroSelectLogo" src="assets/ui/bod3d-logo.png?v=10.58" alt="Bag of Dungeon" decoding="async">
   
 <script src="js/character-select.js?v=11.21"></script>
 
@@ -235,7 +235,7 @@ Changes:
     <div id="brandHeader">
       <img class="brandLogo" src="assets/ui/logo.png" alt="Gunpowder Studios" onerror="this.style.display='none'">
       <div class="brand3DTitle">3D</div>
-      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.21</div>
+      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.22</div>
     </div>
     <div class="box" id="stats"></div>
     <div class="box" id="inventory"></div>
@@ -498,4 +498,5 @@ Changes:
 <!-- moved to js/dice.js --><!-- v10.52: Rebuilt the opening character selector as a cinematic hero carousel using the supplied embedded dungeon backdrop. One live GLB hero is shown at a time with previous/next arrows, keyboard navigation, a 3-second 180-degree turn, one-second pause and return turn. Stats, description, special ability, progress dots and Enter the Dungeon button update with the selected hero. Silhouette artwork remains as an automatic fallback if a GLB cannot load. -->
 <!-- v10.52: Refined cinematic hero selector. Removed the duplicate HTML logo/3D overlay so only the logo built into the supplied backdrop remains. Reduced hero model scale, pulled the preview camera back, changed rotation to a seamless continuous 360-degree turn, and tightened the layout for phones and short landscape screens. -->
 <!-- v10.52: Smoothed hero browsing. Character changes now fade and slide deliberately, wait for the next GLB to finish loading, restart rotation facing forward, and lock the arrows during the transition. Rapid tapping queues only the final next/previous request instead of loading several heroes at once. Added one-character-per-gesture mobile swiping with a deliberate horizontal threshold. -->
+
 

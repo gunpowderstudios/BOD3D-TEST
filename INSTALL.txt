@@ -1,10 +1,4 @@
-BOD3D TEST v11.21 — STRUCTURAL UPDATE
-
-1. Open your local BOD3D-TEST repository folder.
-2. Copy index.html, AGENTS.md, and the css and js folders from this package into it.
-3. Keep all existing assets and other folders in BOD3D-TEST.
-4. In GitHub Desktop, commit with: Refactor game into CSS and JavaScript files (v11.21)
-5. Push origin.
-6. Test https://gunpowderstudios.github.io/BOD3D-TEST/
-
-This update reorganises the existing v11.20 code without intentionally changing gameplay.
+Replace the matching files in your local BOD3D-TEST repository.
+Keep all other files and assets.
+Commit: Fix staging logo and scroll paths (v11.22)
+Push origin, then hard-refresh the test site.
