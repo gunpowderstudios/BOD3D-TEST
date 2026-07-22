@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.39 — sequential rewards, Lethal Blow and direct warning-scroll fix
+// BOD3D-TEST v11.40 — sequential rewards, Lethal Blow and responsive warning scroll
 (function(){
-  const VERSION='v11.39';
+  const VERSION='v11.40';
 
   function syncVersion(){
     document.title='Bag of Dungeon 3D '+VERSION;
@@ -11,7 +11,7 @@
   function loadLethalBlow(){
     if(document.querySelector('script[data-bod-lethal-blow]'))return;
     const script=document.createElement('script');
-    script.src='assets/lethal-blow.js?v=11.39';
+    script.src='assets/lethal-blow.js?v=11.40';
     script.dataset.bodLethalBlow='1';
     document.head.appendChild(script);
   }
@@ -20,7 +20,7 @@
     if(document.querySelector('link[data-bod-warning-scroll]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/warning-scroll.css?v=11.39';
+    link.href='css/warning-scroll.css?v=11.40';
     link.dataset.bodWarningScroll='1';
     document.head.appendChild(link);
   }
