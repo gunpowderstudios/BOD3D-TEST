@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.43 — responsive warning scroll with simpler typography */
+/* BOD3D-TEST v11.49 — responsive warning scroll with improved mobile readability */
 #modal:has(.testerWarningScroll){padding:clamp(12px,2.5vw,32px)!important;overflow:hidden!important}
 #modal .card:has(.testerWarningScroll){position:relative!important;width:auto!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
 #modal .card:has(.testerWarningScroll)>h2{display:none!important}
@@ -9,4 +9,18 @@
 .testerWarningScroll>div:first-child{font-size:clamp(24px,2.3vw,34px)!important;font-weight:700!important;line-height:1.05!important;margin:0 0 1.1em!important}
 .testerWarningScroll b,.testerWarningScroll strong{font-weight:700!important}
 @media(max-height:760px) and (min-width:901px){.testerWarningScroll{width:min(680px,calc(100vw - 56px),calc((100dvh - 52px) * 1.58))!important;max-height:calc(100dvh - 52px)!important;padding:12% 15.5% 20% 18.5%!important;font-size:13px!important;line-height:1.28!important}.testerWarningScroll>div:first-child{font-size:24px!important;margin-bottom:.8em!important}#modal .card:has(.testerWarningScroll)>#modalButtons{bottom:10.5%!important}#modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:38px!important;padding:7px 13px!important;font-size:13px!important}}
-@media(max-width:900px){#modal:has(.testerWarningScroll){padding:10px!important;overflow:auto!important}.testerWarningScroll{width:min(96vw,calc((100dvh - 30px) * 1.58))!important;max-height:calc(100dvh - 30px)!important;padding:12% 14.5% 22% 18%!important;font-size:clamp(12px,3vw,16px)!important;line-height:1.3!important}.testerWarningScroll>div:first-child{font-size:clamp(21px,5.5vw,28px)!important;margin-bottom:.8em!important}#modal .card:has(.testerWarningScroll)>#modalButtons{bottom:10%!important;width:66%!important}#modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:48px!important;font-size:16px!important}}
+@media(max-width:900px){
+ #modal:has(.testerWarningScroll){padding:4px 6px max(8px,env(safe-area-inset-bottom))!important;overflow:visible!important;align-items:flex-start!important}
+ #modal .card:has(.testerWarningScroll){margin-top:clamp(64px,12dvh,118px)!important;transform:translateY(-7dvh)!important}
+ .testerWarningScroll{width:min(98vw,calc((100dvh - 150px) * 1.58))!important;max-height:calc(100dvh - 150px)!important;padding:12.5% 15% 27% 18.5%!important;font-size:clamp(17px,4.35vw,21px)!important;line-height:1.34!important;justify-content:center!important}
+ .testerWarningScroll>*{margin:.36em 0!important}
+ .testerWarningScroll>div:first-child{font-size:clamp(25px,6.4vw,34px)!important;line-height:1.05!important;margin:0 0 .65em!important}
+ #modal .card:has(.testerWarningScroll)>#modalButtons{bottom:4.5%!important;width:72%!important}
+ #modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:58px!important;padding:12px 14px!important;font-size:clamp(18px,4.5vw,22px)!important;line-height:1.05!important}
+}
+@media(max-width:430px){
+ #modal .card:has(.testerWarningScroll){margin-top:58px!important;transform:translateY(-6dvh)!important}
+ .testerWarningScroll{width:99vw!important;max-height:calc(100dvh - 138px)!important;padding:12% 14.5% 28% 18%!important;font-size:clamp(16px,4.55vw,19px)!important;line-height:1.32!important}
+ .testerWarningScroll>div:first-child{font-size:clamp(23px,6.2vw,29px)!important}
+ #modal .card:has(.testerWarningScroll)>#modalButtons{bottom:4%!important;width:70%!important}
+}
