@@ -6,7 +6,7 @@ window.ASSET_PATHS={
 
 (function fixTestLoadingLogo(){function apply(){const logo=document.getElementById('heroSelectLogo');if(!logo)return false;logo.style.display='';logo.src='./assets/ui/bod3d-logo.png';return true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(apply())return;let tries=0;const timer=setInterval(()=>{if(apply()||++tries>=50)clearInterval(timer);},100);},{once:true});else if(!apply()){let tries=0;const timer=setInterval(()=>{if(apply()||++tries>=50)clearInterval(timer);},100);}})();
 
-(function syncTestVersion(){const version='v11.28';function apply(){document.title='Bag of Dungeon 3D '+version;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=version;['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=version;});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();setTimeout(apply,1000);})();
+(function syncTestVersion(){const version='v11.29';function apply(){document.title='Bag of Dungeon 3D '+version;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=version;['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=version;});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();setTimeout(apply,1000);})();
 
 (function installDungeonAmbienceToggle(){let muted=false;if(!HTMLMediaElement.prototype.__bodDungeonMutePatched){const originalPlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){const src=String(this.currentSrc||this.src||'');if(window.__BOD_DUNGEON_AMBIENCE_MUTED__&&/(?:^|\/)dungeon-sounds\.mp3(?:\?|$)/i.test(src)){try{this.pause();}catch(_){}return Promise.resolve();}return originalPlay.apply(this,arguments);};HTMLMediaElement.prototype.__bodDungeonMutePatched=true;}function updateButton(button){button.textContent=muted?'🔇':'🔊';button.title=muted?'Dungeon ambience off — click to turn on':'Dungeon ambience on — click to turn off';button.setAttribute('aria-label',button.title);button.setAttribute('aria-pressed',muted?'true':'false');}function install(){if(document.getElementById('dungeonSoundToggle'))return true;const fullscreen=document.getElementById('fullscreenBtn');if(!fullscreen||!fullscreen.parentNode)return false;const style=document.createElement('style');style.id='dungeonSoundToggleStyles';style.textContent='#dungeonSoundToggle{position:absolute;top:10px;right:50px;z-index:66;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:5px;background:var(--cream);color:var(--ink);box-shadow:2px 2px 0 #000;font:700 18px/1 Arial,sans-serif;pointer-events:auto;cursor:pointer}#dungeonSoundToggle:hover{background:#fff1c9}#topbar{right:92px!important}';document.head.appendChild(style);const button=document.createElement('button');button.id='dungeonSoundToggle';button.type='button';updateButton(button);button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();muted=!muted;window.__BOD_DUNGEON_AMBIENCE_MUTED__=muted;if(muted)window.stopDungeonAmbience?.();else window.startDungeonAmbience?.();updateButton(button);});fullscreen.insertAdjacentElement('beforebegin',button);return true;}function start(){window.__BOD_DUNGEON_AMBIENCE_MUTED__=false;if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();})();
 
@@ -47,12 +47,10 @@ window.ASSET_PATHS={
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(install())return;let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
 })();
 
-// v11.28 TEST: mirror the character card's current Health as red hearts.
 (function installHealthHud(){
  function install(){
-  let hud=document.getElementById('livesHud');
-  const main=document.getElementById('main');if(!main)return false;
-  if(!document.getElementById('livesHudStyles')){const style=document.createElement('style');style.id='livesHudStyles';style.textContent='#livesHud{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:67;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px;max-width:min(360px,60vw);min-height:24px;padding:3px 8px;border-radius:12px;background:rgba(0,0,0,.42);pointer-events:none;user-select:none}#livesHud .lifeHeart{font-size:17px;line-height:1;color:#e3262e;text-shadow:0 1px 2px #000,0 0 4px rgba(227,38,46,.45)}#livesHud .emptyHeart{opacity:.24}#livesHud .noLives{font:700 11px/1 Alegreya Sans,Arial,sans-serif;color:#bbb;letter-spacing:.08em;text-transform:uppercase}@media(max-width:700px){#livesHud{top:8px;max-width:70vw;padding:3px 7px;gap:1px}#livesHud .lifeHeart{font-size:15px}}body.combatActive #livesHud{z-index:1005}';document.head.appendChild(style);}
+  let hud=document.getElementById('livesHud');const main=document.getElementById('main');if(!main)return false;
+  if(!document.getElementById('livesHudStyles')){const style=document.createElement('style');style.id='livesHudStyles';style.textContent='#livesHud{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:67;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:2px;max-width:min(360px,60vw);min-height:24px;padding:3px 8px;border-radius:12px;background:rgba(0,0,0,.42);pointer-events:none;user-select:none}#livesHud .lifeHeart{font-size:17px;line-height:1;color:#e3262e;text-shadow:0 1px 2px #000,0 0 4px rgba(227,38,46,.45)}#livesHud .emptyHeart{opacity:.24}@media(max-width:700px){#livesHud{top:8px;max-width:70vw;padding:3px 7px;gap:1px}#livesHud .lifeHeart{font-size:15px}}body.combatActive #livesHud{z-index:1005}';document.head.appendChild(style);}
   if(!hud){hud=document.createElement('div');hud.id='livesHud';hud.setAttribute('aria-live','polite');main.appendChild(hud);}
   function update(){if(typeof state==='undefined'||!state||!state.player){hud.style.display='none';return;}hud.style.display='flex';const health=Math.max(0,Math.floor(Number(state.player.health)||0));const maxHealth=Math.max(health,Math.floor(Number(state.player.maxHealth)||health));hud.innerHTML=Array.from({length:maxHealth},(_,i)=>'<span class="lifeHeart'+(i<health?'':' emptyHeart')+'" aria-hidden="true">♥</span>').join('');hud.setAttribute('aria-label',health+' of '+maxHealth+' health remaining');}
   update();setInterval(update,120);return true;
@@ -60,61 +58,45 @@ window.ASSET_PATHS={
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
 })();
 
-// v11.27 TEST: exploration is free; AP is reserved for combat actions only.
 (function installCombatOnlyAP(){
  function install(){
-  if(window.__bodCombatOnlyAPInstalled)return true;
-  if(typeof move!=='function'||typeof startPlace!=='function')return false;
-  window.__bodCombatOnlyAPInstalled=true;
-
-  const originalMove=move;
-  move=function(){
-   if(!state?.player)return originalMove.apply(this,arguments);
-   const before=state.player.ap;
-   if(before<1)state.player.ap=1;
-   const result=originalMove.apply(this,arguments);
-   state.player.ap=before;
-   if(typeof render==='function')render();
-   return result;
-  };
-
-  const originalStartPlace=startPlace;
-  startPlace=function(){
-   if(!state?.player)return originalStartPlace.apply(this,arguments);
-   const before=state.player.ap;
-   if(before<1)state.player.ap=1;
-   const result=originalStartPlace.apply(this,arguments);
-   state.player.ap=before;
-   return result;
-  };
-
-  const placeButton=document.getElementById('placeBtn');
-  if(placeButton&&placeButton.onclick&&!placeButton.__bodFreePlacementPatched){
-   const originalPlace=placeButton.onclick;
-   placeButton.onclick=function(){
-    const before=state?.player?.ap;
-    const result=originalPlace.apply(this,arguments);
-    if(state?.player&&Number.isFinite(before))state.player.ap=before;
-    if(typeof render==='function')render();
-    return result;
-   };
-   placeButton.__bodFreePlacementPatched=true;
-  }
-
-  const style=document.createElement('style');
-  style.id='combatOnlyAPStyles';
-  style.textContent='#mobileRestBtn{display:none!important}body:not(.combatActive) #controls button[data-action="rest"],body:not(.combatActive) #controls .restBtn,body:not(.combatActive) #controls button[id*="rest" i]{display:none!important}';
-  document.head.appendChild(style);
-
-  const hideRestButtons=()=>{
-   document.querySelectorAll('button').forEach(button=>{
-    const label=((button.id||'')+' '+(button.className||'')+' '+(button.textContent||'')).toLowerCase();
-    if(/\brest\b/.test(label)&&!button.closest('#combat'))button.style.setProperty('display','none','important');
-   });
-  };
-  hideRestButtons();
-  new MutationObserver(hideRestButtons).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
-  return true;
+  if(window.__bodCombatOnlyAPInstalled)return true;if(typeof move!=='function'||typeof startPlace!=='function')return false;window.__bodCombatOnlyAPInstalled=true;
+  const originalMove=move;move=function(){if(!state?.player)return originalMove.apply(this,arguments);const before=state.player.ap;if(before<1)state.player.ap=1;const result=originalMove.apply(this,arguments);state.player.ap=before;if(typeof render==='function')render();return result;};
+  const originalStartPlace=startPlace;startPlace=function(){if(!state?.player)return originalStartPlace.apply(this,arguments);const before=state.player.ap;if(before<1)state.player.ap=1;const result=originalStartPlace.apply(this,arguments);state.player.ap=before;return result;};
+  const placeButton=document.getElementById('placeBtn');if(placeButton&&placeButton.onclick&&!placeButton.__bodFreePlacementPatched){const originalPlace=placeButton.onclick;placeButton.onclick=function(){const before=state?.player?.ap;const result=originalPlace.apply(this,arguments);if(state?.player&&Number.isFinite(before))state.player.ap=before;if(typeof render==='function')render();return result;};placeButton.__bodFreePlacementPatched=true;}
+  const style=document.createElement('style');style.id='combatOnlyAPStyles';style.textContent='#mobileRestBtn{display:none!important}body:not(.combatActive) #controls button[data-action="rest"],body:not(.combatActive) #controls .restBtn,body:not(.combatActive) #controls button[id*="rest" i]{display:none!important}';document.head.appendChild(style);
+  const hideRestButtons=()=>{document.querySelectorAll('button').forEach(button=>{const label=((button.id||'')+' '+(button.className||'')+' '+(button.textContent||'')).toLowerCase();if(/\brest\b/.test(label)&&!button.closest('#combat'))button.style.setProperty('display','none','important');});};hideRestButtons();new MutationObserver(hideRestButtons).observe(document.documentElement,{subtree:true,childList:true,characterData:true});return true;
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
+})();
+
+// v11.29 TEST: more readable, touch-friendly popup and start-screen formatting.
+(function installResponsiveReadableUI(){
+ const style=document.createElement('style');style.id='responsiveReadableUI';style.textContent=`
+ .chooseHeroBtn{min-height:54px;padding:14px 28px!important;font-size:clamp(18px,1.5vw,22px)!important;line-height:1.15!important;border-radius:8px!important}
+ #modal .card,#placement .card{width:min(620px,calc(100vw - 32px));max-height:min(82vh,760px);overflow-y:auto;padding:clamp(22px,3vw,34px)!important}
+ #modal .card h2,#placement .card h2{font-size:clamp(25px,2.4vw,34px)!important;line-height:1.1!important;margin-bottom:16px!important}
+ #modal .desc,#placement .desc{font-size:clamp(17px,1.45vw,20px)!important;line-height:1.48!important}
+ #modal .btnrow,#placement .btnrow{gap:10px!important;margin-top:20px!important}
+ #modal .btnrow button,#placement .btnrow button{min-height:50px;padding:12px 18px!important;font-size:17px!important;line-height:1.2!important}
+ @media(max-width:700px){
+  .chooseHeroBtn{width:min(92vw,420px)!important;min-height:62px;padding:17px 24px!important;font-size:22px!important;margin-top:14px!important}
+  #heroInfoPanel{padding-bottom:max(18px,env(safe-area-inset-bottom))!important}
+  #modal,#placement{align-items:flex-start!important;padding:clamp(18px,5vh,42px) 10px max(18px,env(safe-area-inset-bottom))!important;overflow-y:auto!important}
+  #modal .card,#placement .card{width:calc(100vw - 20px)!important;min-height:48vh;max-height:calc(100dvh - 36px)!important;padding:24px 20px 26px!important;border-radius:10px!important}
+  #modal .card h2,#placement .card h2{font-size:29px!important;line-height:1.08!important;margin-bottom:17px!important}
+  #modal .desc,#placement .desc,#modalBody{font-size:19px!important;line-height:1.5!important;white-space:pre-line}
+  #modal .btnrow,#placement .btnrow{display:grid!important;grid-template-columns:1fr!important;gap:11px!important;margin-top:22px!important}
+  #modal .btnrow button,#placement .btnrow button{width:100%!important;min-height:56px!important;padding:14px 16px!important;font-size:19px!important;font-weight:700!important;border-radius:7px!important}
+  #placement .preview{min-height:150px!important}
+ }
+ @media(max-width:700px) and (orientation:landscape){
+  #modal,#placement{padding-top:8px!important}
+  #modal .card,#placement .card{min-height:0;max-height:calc(100dvh - 16px)!important;padding:18px 20px!important}
+  #modal .card h2,#placement .card h2{font-size:25px!important;margin-bottom:10px!important}
+  #modal .desc,#placement .desc,#modalBody{font-size:17px!important;line-height:1.35!important}
+  #modal .btnrow,#placement .btnrow{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;margin-top:12px!important}
+  #modal .btnrow button,#placement .btnrow button{min-height:48px!important;font-size:17px!important;padding:10px 12px!important}
+ }
+ `;document.head.appendChild(style);
 })();
