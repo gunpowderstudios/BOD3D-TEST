@@ -1,13 +1,14 @@
-// BOD3D-TEST v11.43 — rewards, clearer Lethal Blow, warning scroll, mobile drawer and desktop HUD
+// BOD3D-TEST v11.44 — rewards, icon Lethal Blow, responsive dark combat, warning scroll, mobile drawer and desktop HUD
 (function(){
-  const VERSION='v11.43';
+  const VERSION='v11.44';
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
   function loadScriptOnce(selector,src,datasetName){if(document.querySelector(selector))return;const script=document.createElement('script');script.src=src;script.dataset[datasetName]='1';document.head.appendChild(script);}
   function loadStyleOnce(selector,href,datasetName){if(document.querySelector(selector))return;const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset[datasetName]='1';document.head.appendChild(link);}
-  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.43','bodLethalBlow');}
-  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.43','bodMobileSheetFix');}
-  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.43','bodWarningScroll');}
-  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.43','bodDesktopHud');}
+  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.44','bodLethalBlow');}
+  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.44','bodMobileSheetFix');}
+  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.44','bodWarningScroll');}
+  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.44','bodDesktopHud');}
+  function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css?v=11.44','bodDarkCombat');}
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
@@ -21,7 +22,7 @@
     awardItem=function(item){const drawn=item||drawItem();if(!drawn){if(typeof log==='function')log('No items left in the item deck.','system');return false;}rewardQueue.push(drawn);if(!delivering)setTimeout(deliverNext,40);return true;};
     return true;
   }
-  function start(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadLethalBlow();loadMobileSheetFix();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadLethalBlow();loadMobileSheetFix();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
+  function start(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadLethalBlow();loadMobileSheetFix();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadLethalBlow();loadMobileSheetFix();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   setTimeout(syncVersion,900);
 })();
