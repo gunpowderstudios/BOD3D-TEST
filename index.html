@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Bag of Dungeon 3D v11.22</title>
+<title>Bag of Dungeon 3D v11.23</title>
 
 <!--
 8BITBOD
@@ -190,7 +190,7 @@ Changes:
 <!-- v11.02: Fixed movement regression caused by the non-module movement code calling clearDice3D() outside its module scope. Dice clearing is now exposed safely through window.BOD3D and movement calls it defensively. Version labels updated to v11.02. -->
 <!-- v11.02: Restored a clearly visible build number directly beneath the 3D logo in the sidebar. Updated permanent dice defaults to Floor Offset 0.03 while retaining Duration 1050, Drop Height 2.5, Bounce 1 1, Bounce 2 0.02, Bounce 3 0.06, Separation 0.55 and Spacing 0.9. Dice tuning storage namespace bumped so the new floor offset is not overridden by an older saved 0.20 value. -->
 <!-- v11.21: Moved Inventory and Backpack above Companions on the character panel. -->
-<!-- v11.22: Fixed full Map view by reading tile coordinates from the dungeon keys; combat framing now tilts 20 degrees farther overhead so dice faces are easier to read. -->
+<!-- v11.23: Fixed full Map view by reading tile coordinates from the dungeon keys; combat framing now tilts 20 degrees farther overhead so dice faces are easier to read. -->
 </head>
 <body class="lightingOn">
 
@@ -236,7 +236,7 @@ Changes:
     <div id="brandHeader">
       <img class="brandLogo" src="assets/ui/logo.png" alt="Gunpowder Studios" onerror="this.style.display='none'">
       <div class="brand3DTitle">3D</div>
-      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.22</div>
+      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.23</div>
     </div>
     <div class="box" id="stats"></div>
     <div class="box" id="inventory"></div>
