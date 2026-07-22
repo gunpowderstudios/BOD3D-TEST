@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.41 — sequential rewards, Lethal Blow, warning scroll and mobile drawer fix
+// BOD3D-TEST v11.42 — rewards, Lethal Blow, warning scroll, mobile drawer and clean desktop HUD
 (function(){
-  const VERSION='v11.41';
+  const VERSION='v11.42';
 
   function syncVersion(){
     document.title='Bag of Dungeon 3D '+VERSION;
@@ -16,21 +16,29 @@
     document.head.appendChild(script);
   }
 
+  function loadStyleOnce(selector,href,datasetName){
+    if(document.querySelector(selector))return;
+    const link=document.createElement('link');
+    link.rel='stylesheet';
+    link.href=href;
+    link.dataset[datasetName]='1';
+    document.head.appendChild(link);
+  }
+
   function loadLethalBlow(){
-    loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.41','bodLethalBlow');
+    loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.42','bodLethalBlow');
   }
 
   function loadMobileSheetFix(){
-    loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.41','bodMobileSheetFix');
+    loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.42','bodMobileSheetFix');
   }
 
   function loadWarningScrollStyles(){
-    if(document.querySelector('link[data-bod-warning-scroll]'))return;
-    const link=document.createElement('link');
-    link.rel='stylesheet';
-    link.href='css/warning-scroll.css?v=11.41';
-    link.dataset.bodWarningScroll='1';
-    document.head.appendChild(link);
+    loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.42','bodWarningScroll');
+  }
+
+  function loadDesktopHudStyles(){
+    loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.42','bodDesktopHud');
   }
 
   function installRewards(){
@@ -94,6 +102,7 @@
   function start(){
     syncVersion();
     loadWarningScrollStyles();
+    loadDesktopHudStyles();
     loadLethalBlow();
     loadMobileSheetFix();
     if(installRewards())return;
@@ -101,6 +110,7 @@
     const timer=setInterval(()=>{
       syncVersion();
       loadWarningScrollStyles();
+      loadDesktopHudStyles();
       loadLethalBlow();
       loadMobileSheetFix();
       if(installRewards()||++attempts>240)clearInterval(timer);
