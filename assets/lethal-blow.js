@@ -30,15 +30,17 @@
         const pending=combat.pendingDiceRoll;
         const critical=isCritical(pending.pr.rolls);
         const normalDice=critical?pending.pr.total*2:pending.pr.total;
-        const normalTotal=normalDice+pCombatMod();
+        const modifier=pCombatMod();
+        const normalTotal=normalDice+modifier;
         const doubledTotal=normalTotal*2;
 
         state.player.flags.usedSpecial=true;
         combat.lethalBlowDisplay={normalTotal,doubledTotal};
 
-        // The existing resolver calculates: critical dice total + combat modifier.
-        // Adjust the stored roll total so its final result equals doubledTotal.
-        pending.pr={...pending.pr,total:doubledTotal-pCombatMod()};
+        // The existing resolver doubles the stored dice total again on a critical.
+        // Reverse that step here so its final calculated total is exactly doubledTotal.
+        const resolverDiceTotal=(doubledTotal-modifier)/(critical?2:1);
+        pending.pr={...pending.pr,total:resolverDiceTotal};
 
         playSound('critical');
         playCurrentTileEffect?.('critical',1000);
