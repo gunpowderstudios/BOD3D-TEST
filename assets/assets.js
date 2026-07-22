@@ -6,7 +6,7 @@ window.ASSET_PATHS={
 
 (function fixTestLoadingLogo(){function apply(){const logo=document.getElementById('heroSelectLogo');if(!logo)return false;logo.style.display='';logo.src='./assets/ui/bod3d-logo.png';return true;}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(apply())return;let tries=0;const timer=setInterval(()=>{if(apply()||++tries>=50)clearInterval(timer);},100);},{once:true});else if(!apply()){let tries=0;const timer=setInterval(()=>{if(apply()||++tries>=50)clearInterval(timer);},100);}})();
 
-(function syncTestVersion(){const version='v11.26';function apply(){document.title='Bag of Dungeon 3D '+version;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=version;['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=version;});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();setTimeout(apply,1000);})();
+(function syncTestVersion(){const version='v11.27';function apply(){document.title='Bag of Dungeon 3D '+version;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=version;['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=version;});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();setTimeout(apply,1000);})();
 
 (function installDungeonAmbienceToggle(){let muted=false;if(!HTMLMediaElement.prototype.__bodDungeonMutePatched){const originalPlay=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){const src=String(this.currentSrc||this.src||'');if(window.__BOD_DUNGEON_AMBIENCE_MUTED__&&/(?:^|\/)dungeon-sounds\.mp3(?:\?|$)/i.test(src)){try{this.pause();}catch(_){}return Promise.resolve();}return originalPlay.apply(this,arguments);};HTMLMediaElement.prototype.__bodDungeonMutePatched=true;}function updateButton(button){button.textContent=muted?'🔇':'🔊';button.title=muted?'Dungeon ambience off — click to turn on':'Dungeon ambience on — click to turn off';button.setAttribute('aria-label',button.title);button.setAttribute('aria-pressed',muted?'true':'false');}function install(){if(document.getElementById('dungeonSoundToggle'))return true;const fullscreen=document.getElementById('fullscreenBtn');if(!fullscreen||!fullscreen.parentNode)return false;const style=document.createElement('style');style.id='dungeonSoundToggleStyles';style.textContent='#dungeonSoundToggle{position:absolute;top:10px;right:50px;z-index:66;width:34px;height:34px;padding:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--ink);border-radius:5px;background:var(--cream);color:var(--ink);box-shadow:2px 2px 0 #000;font:700 18px/1 Arial,sans-serif;pointer-events:auto;cursor:pointer}#dungeonSoundToggle:hover{background:#fff1c9}#topbar{right:92px!important}';document.head.appendChild(style);const button=document.createElement('button');button.id='dungeonSoundToggle';button.type='button';updateButton(button);button.addEventListener('click',event=>{event.preventDefault();event.stopPropagation();muted=!muted;window.__BOD_DUNGEON_AMBIENCE_MUTED__=muted;if(muted)window.stopDungeonAmbience?.();else window.startDungeonAmbience?.();updateButton(button);});fullscreen.insertAdjacentElement('beforebegin',button);return true;}function start(){window.__BOD_DUNGEON_AMBIENCE_MUTED__=false;if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();})();
 
@@ -47,30 +47,72 @@ window.ASSET_PATHS={
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(install())return;let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
 })();
 
-// v11.26 TEST: small always-visible lives hearts at the top of the black game area.
 (function installLivesHud(){
  function install(){
   if(document.getElementById('livesHud'))return true;
-  const main=document.getElementById('main');
-  if(!main)return false;
-  const style=document.createElement('style');
-  style.id='livesHudStyles';
-  style.textContent='#livesHud{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:67;display:flex;align-items:center;gap:4px;min-height:24px;padding:3px 8px;border-radius:12px;background:rgba(0,0,0,.42);pointer-events:none;user-select:none}#livesHud .lifeHeart{font-size:18px;line-height:1;color:#e3262e;text-shadow:0 1px 2px #000,0 0 4px rgba(227,38,46,.45)}#livesHud .noLives{font:700 11px/1 Alegreya Sans,Arial,sans-serif;color:#bbb;letter-spacing:.08em;text-transform:uppercase}@media(max-width:700px){#livesHud{top:8px;padding:3px 7px;gap:3px}#livesHud .lifeHeart{font-size:16px}}body.combatActive #livesHud{z-index:1005}';
-  document.head.appendChild(style);
-  const hud=document.createElement('div');
-  hud.id='livesHud';
-  hud.setAttribute('aria-live','polite');
-  hud.setAttribute('aria-label','Lives remaining');
-  main.appendChild(hud);
-  function update(){
-   if(typeof state==='undefined'||!state||!state.player){hud.style.display='none';return;}
-   hud.style.display='flex';
-   const lives=Math.max(0,Number(state.player.lives)||0);
-   hud.innerHTML=lives?Array.from({length:lives},()=>'<span class="lifeHeart" aria-hidden="true">♥</span>').join(''):'<span class="noLives">No lives</span>';
-   hud.setAttribute('aria-label',lives+' '+(lives===1?'life':'lives')+' remaining');
+  const main=document.getElementById('main');if(!main)return false;
+  const style=document.createElement('style');style.id='livesHudStyles';style.textContent='#livesHud{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:67;display:flex;align-items:center;gap:4px;min-height:24px;padding:3px 8px;border-radius:12px;background:rgba(0,0,0,.42);pointer-events:none;user-select:none}#livesHud .lifeHeart{font-size:18px;line-height:1;color:#e3262e;text-shadow:0 1px 2px #000,0 0 4px rgba(227,38,46,.45)}#livesHud .noLives{font:700 11px/1 Alegreya Sans,Arial,sans-serif;color:#bbb;letter-spacing:.08em;text-transform:uppercase}@media(max-width:700px){#livesHud{top:8px;padding:3px 7px;gap:3px}#livesHud .lifeHeart{font-size:16px}}body.combatActive #livesHud{z-index:1005}';document.head.appendChild(style);
+  const hud=document.createElement('div');hud.id='livesHud';hud.setAttribute('aria-live','polite');hud.setAttribute('aria-label','Lives remaining');main.appendChild(hud);
+  function update(){if(typeof state==='undefined'||!state||!state.player){hud.style.display='none';return;}hud.style.display='flex';const lives=Math.max(0,Number(state.player.lives)||0);hud.innerHTML=lives?Array.from({length:lives},()=>'<span class="lifeHeart" aria-hidden="true">♥</span>').join(''):'<span class="noLives">No lives</span>';hud.setAttribute('aria-label',lives+' '+(lives===1?'life':'lives')+' remaining');}
+  update();setInterval(update,150);return true;
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
+})();
+
+// v11.27 TEST: exploration is free; AP is reserved for combat actions only.
+(function installCombatOnlyAP(){
+ function install(){
+  if(window.__bodCombatOnlyAPInstalled)return true;
+  if(typeof move!=='function'||typeof startPlace!=='function')return false;
+  window.__bodCombatOnlyAPInstalled=true;
+
+  const originalMove=move;
+  move=function(){
+   if(!state?.player)return originalMove.apply(this,arguments);
+   const before=state.player.ap;
+   if(before<1)state.player.ap=1;
+   const result=originalMove.apply(this,arguments);
+   state.player.ap=before;
+   if(typeof render==='function')render();
+   return result;
+  };
+
+  const originalStartPlace=startPlace;
+  startPlace=function(){
+   if(!state?.player)return originalStartPlace.apply(this,arguments);
+   const before=state.player.ap;
+   if(before<1)state.player.ap=1;
+   const result=originalStartPlace.apply(this,arguments);
+   state.player.ap=before;
+   return result;
+  };
+
+  const placeButton=document.getElementById('placeBtn');
+  if(placeButton&&placeButton.onclick&&!placeButton.__bodFreePlacementPatched){
+   const originalPlace=placeButton.onclick;
+   placeButton.onclick=function(){
+    const before=state?.player?.ap;
+    const result=originalPlace.apply(this,arguments);
+    if(state?.player&&Number.isFinite(before))state.player.ap=before;
+    if(typeof render==='function')render();
+    return result;
+   };
+   placeButton.__bodFreePlacementPatched=true;
   }
-  update();
-  setInterval(update,150);
+
+  const style=document.createElement('style');
+  style.id='combatOnlyAPStyles';
+  style.textContent='#mobileRestBtn{display:none!important}body:not(.combatActive) #controls button[data-action="rest"],body:not(.combatActive) #controls .restBtn,body:not(.combatActive) #controls button[id*="rest" i]{display:none!important}';
+  document.head.appendChild(style);
+
+  const hideRestButtons=()=>{
+   document.querySelectorAll('button').forEach(button=>{
+    const label=((button.id||'')+' '+(button.className||'')+' '+(button.textContent||'')).toLowerCase();
+    if(/\brest\b/.test(label)&&!button.closest('#combat'))button.style.setProperty('display','none','important');
+   });
+  };
+  hideRestButtons();
+  new MutationObserver(hideRestButtons).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
   return true;
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}},{once:true});else if(!install()){let tries=0;const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);}
