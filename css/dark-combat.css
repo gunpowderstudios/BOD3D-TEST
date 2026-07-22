@@ -1,0 +1,218 @@
+/* BOD3D-TEST v11.44 — black / white / red responsive combat UI */
+body.combatActive #combat{
+  background:rgba(0,0,0,.18)!important;
+  padding:0!important;
+  align-items:stretch!important;
+  justify-content:stretch!important;
+  pointer-events:none!important;
+}
+body.combatActive #combat .combatCard{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  margin:0!important;
+  padding:18px 24px 22px!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(0,0,0,.86) 22%,#000 58%)!important;
+  color:#fff!important;
+  overflow:visible!important;
+  pointer-events:auto!important;
+}
+body.combatActive #combatTitle{display:none!important}
+body.combatActive .combatWideLayout{
+  display:grid!important;
+  grid-template-columns:minmax(190px,280px) minmax(360px,1fr) minmax(190px,280px)!important;
+  gap:26px!important;
+  align-items:end!important;
+}
+body.combatActive .combatGrid{
+  display:contents!important;
+}
+body.combatActive .fighter{
+  min-height:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  text-align:left!important;
+  overflow:visible!important;
+}
+body.combatActive .fighter:first-child{grid-column:1;grid-row:1}
+body.combatActive .fighter:last-child{grid-column:3;grid-row:1}
+body.combatActive .bigGlyph{display:none!important}
+body.combatActive #heroCombatName,
+body.combatActive #monsterName{
+  display:block!important;
+  margin-bottom:8px!important;
+  color:#fff!important;
+  font-size:clamp(18px,1.5vw,25px)!important;
+  line-height:1.05!important;
+  text-transform:uppercase!important;
+  letter-spacing:.025em!important;
+}
+body.combatActive #heroCombatStats,
+body.combatActive #monsterCombatStats{
+  color:#fff!important;
+  font-family:"Alegreya Sans",Arial,sans-serif!important;
+  font-size:clamp(15px,1.12vw,19px)!important;
+  line-height:1.32!important;
+}
+body.combatActive #heroCombatStats .hearts,
+body.combatActive #monsterCombatStats .hearts,
+body.combatActive .combatHearts{
+  color:#e32636!important;
+  font-size:clamp(17px,1.45vw,23px)!important;
+  line-height:1.12!important;
+  text-shadow:0 1px 4px #000!important;
+}
+body.combatActive .combatResolution{
+  grid-column:2!important;
+  grid-row:1!important;
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+}
+body.combatActive .diceTray{
+  min-height:54px!important;
+  width:100%!important;
+  margin:0 0 8px!important;
+  padding:5px!important;
+  border:0!important;
+  background:transparent!important;
+  color:#fff!important;
+}
+body.combatActive .die{
+  background:#050505!important;
+  color:#fff!important;
+  border:2px solid #fff!important;
+  box-shadow:none!important;
+}
+body.combatActive .combatLog{
+  width:100%!important;
+  min-height:30px!important;
+  margin:0 0 10px!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+  color:#fff!important;
+  font-family:"Alegreya Sans",Arial,sans-serif!important;
+  font-size:clamp(14px,1vw,17px)!important;
+  line-height:1.25!important;
+  text-align:center!important;
+}
+body.combatActive #combatBtns{
+  position:relative!important;
+  display:flex!important;
+  flex-wrap:wrap!important;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:12px!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+body.combatActive #combatBtns button{
+  flex:1 1 210px!important;
+  max-width:310px!important;
+  min-height:58px!important;
+  padding:12px 18px!important;
+  border:1px solid #ff7b84!important;
+  border-radius:5px!important;
+  background:linear-gradient(#c71624,#9e0e19)!important;
+  color:#fff!important;
+  box-shadow:none!important;
+  font-family:"Alegreya Sans",Arial,sans-serif!important;
+  font-size:clamp(17px,1.3vw,22px)!important;
+  font-weight:800!important;
+  text-transform:uppercase!important;
+}
+body.combatActive #combatBtns button:hover:not(:disabled){background:linear-gradient(#df2633,#b31420)!important}
+body.combatActive #combatBtns button:disabled{opacity:.38!important}
+body.combatActive #combatBtns .lethalIconBtn{
+  flex:0 0 58px!important;
+  width:58px!important;
+  max-width:58px!important;
+  min-width:58px!important;
+  min-height:58px!important;
+  padding:0!important;
+  border:2px solid #e5c46b!important;
+  border-radius:50%!important;
+  background:#050505!important;
+  color:#fff!important;
+  font-size:29px!important;
+}
+body.combatActive #combatBtns .lethalIconBtn.armed{
+  background:#a70e1a!important;
+  box-shadow:0 0 18px rgba(227,38,54,.8)!important;
+}
+body.combatActive #combatBtns .lethalIconBtn.used{opacity:.25!important}
+body.combatActive .lethalBlowStatus{
+  flex:1 0 100%!important;
+  width:100%!important;
+  color:#e8cf86!important;
+  font-family:"Alegreya Sans",Arial,sans-serif!important;
+  font-size:14px!important;
+  text-align:center!important;
+  order:10!important;
+}
+
+@media(max-width:900px){
+  body.combatActive #combat{overflow:auto!important;background:rgba(0,0,0,.38)!important}
+  body.combatActive #combat .combatCard{
+    position:relative!important;
+    min-height:100dvh!important;
+    padding:max(58px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom))!important;
+    background:linear-gradient(to bottom,rgba(0,0,0,.18),#000 42%)!important;
+    overflow:auto!important;
+  }
+  body.combatActive .combatWideLayout{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px 14px!important;
+    align-items:start!important;
+  }
+  body.combatActive .fighter:first-child{grid-column:1;grid-row:1}
+  body.combatActive .fighter:last-child{grid-column:2;grid-row:1}
+  body.combatActive .combatResolution{grid-column:1/-1!important;grid-row:2!important;margin-top:auto!important}
+  body.combatActive #heroCombatName,
+  body.combatActive #monsterName{font-size:17px!important}
+  body.combatActive #heroCombatStats,
+  body.combatActive #monsterCombatStats{font-size:14px!important;line-height:1.25!important}
+  body.combatActive .combatLog{font-size:14px!important}
+  body.combatActive #combatBtns{display:grid!important;grid-template-columns:1fr 1fr auto!important;gap:8px!important}
+  body.combatActive #combatBtns button{width:100%!important;max-width:none!important;min-width:0!important;min-height:54px!important;font-size:17px!important}
+  body.combatActive #combatBtns .lethalIconBtn{width:54px!important;min-width:54px!important;max-width:54px!important;min-height:54px!important}
+  body.combatActive .lethalBlowStatus{grid-column:1/-1!important}
+}
+
+@media(max-width:560px){
+  body.combatActive #combat .combatCard{padding-left:10px!important;padding-right:10px!important}
+  body.combatActive .combatWideLayout{grid-template-columns:1fr 1fr!important;gap:9px!important}
+  body.combatActive #heroCombatName,
+  body.combatActive #monsterName{font-size:15px!important}
+  body.combatActive #heroCombatStats,
+  body.combatActive #monsterCombatStats{font-size:12px!important}
+  body.combatActive #combatBtns{grid-template-columns:1fr!important}
+  body.combatActive #combatBtns button{min-height:56px!important}
+  body.combatActive #combatBtns .lethalIconBtn{justify-self:center!important;width:54px!important}
+  body.combatActive .lethalBlowStatus{grid-column:1!important}
+}
+
+@media(max-width:900px) and (orientation:landscape){
+  body.combatActive #combat .combatCard{min-height:100dvh!important;padding-top:44px!important}
+  body.combatActive .combatWideLayout{grid-template-columns:minmax(150px,1fr) minmax(280px,1.7fr) minmax(150px,1fr)!important;align-items:end!important}
+  body.combatActive .fighter:first-child{grid-column:1;grid-row:1}
+  body.combatActive .fighter:last-child{grid-column:3;grid-row:1}
+  body.combatActive .combatResolution{grid-column:2!important;grid-row:1!important}
+  body.combatActive #combatBtns{grid-template-columns:1fr 1fr auto!important}
+}
