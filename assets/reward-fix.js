@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.40 — sequential rewards, Lethal Blow and responsive warning scroll
+// BOD3D-TEST v11.41 — sequential rewards, Lethal Blow, warning scroll and mobile drawer fix
 (function(){
-  const VERSION='v11.40';
+  const VERSION='v11.41';
 
   function syncVersion(){
     document.title='Bag of Dungeon 3D '+VERSION;
@@ -8,19 +8,27 @@
     if(visible)visible.textContent=VERSION;
   }
 
-  function loadLethalBlow(){
-    if(document.querySelector('script[data-bod-lethal-blow]'))return;
+  function loadScriptOnce(selector,src,datasetName){
+    if(document.querySelector(selector))return;
     const script=document.createElement('script');
-    script.src='assets/lethal-blow.js?v=11.40';
-    script.dataset.bodLethalBlow='1';
+    script.src=src;
+    script.dataset[datasetName]='1';
     document.head.appendChild(script);
+  }
+
+  function loadLethalBlow(){
+    loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.41','bodLethalBlow');
+  }
+
+  function loadMobileSheetFix(){
+    loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.41','bodMobileSheetFix');
   }
 
   function loadWarningScrollStyles(){
     if(document.querySelector('link[data-bod-warning-scroll]'))return;
     const link=document.createElement('link');
     link.rel='stylesheet';
-    link.href='css/warning-scroll.css?v=11.40';
+    link.href='css/warning-scroll.css?v=11.41';
     link.dataset.bodWarningScroll='1';
     document.head.appendChild(link);
   }
@@ -87,12 +95,14 @@
     syncVersion();
     loadWarningScrollStyles();
     loadLethalBlow();
+    loadMobileSheetFix();
     if(installRewards())return;
     let attempts=0;
     const timer=setInterval(()=>{
       syncVersion();
       loadWarningScrollStyles();
       loadLethalBlow();
+      loadMobileSheetFix();
       if(installRewards()||++attempts>240)clearInterval(timer);
     },50);
   }
