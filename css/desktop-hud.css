@@ -1,0 +1,92 @@
+/* BOD3D-TEST v11.42 — cleaner laptop/desktop HUD */
+@media (min-width:901px){
+  /* Health becomes a slim vertical status column above the compass. */
+  #livesHud{
+    position:absolute!important;
+    left:auto!important;
+    right:38px!important;
+    top:auto!important;
+    bottom:132px!important;
+    transform:none!important;
+    z-index:67!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:1px!important;
+    width:24px!important;
+    max-width:none!important;
+    padding:0!important;
+    margin:0!important;
+    background:transparent!important;
+    pointer-events:none!important;
+  }
+  #livesHud .lifeHeart{
+    display:block!important;
+    width:20px!important;
+    height:18px!important;
+    font-size:18px!important;
+    line-height:18px!important;
+    text-align:center!important;
+    color:#ef333b!important;
+    text-shadow:0 1px 4px #000!important;
+  }
+  #livesHud .emptyHeart{
+    color:#4a2022!important;
+    opacity:.7!important;
+  }
+
+  /* Keep only the two everyday controls visible along the top. */
+  #zoomOut,
+  #zoomIn,
+  #centreBtn,
+  #northUpBtn,
+  #dungeonSoundToggle,
+  #fullscreenBtn{
+    display:none!important;
+  }
+
+  #topbar{
+    left:auto!important;
+    right:24px!important;
+    top:18px!important;
+    width:auto!important;
+    gap:16px!important;
+    justify-content:flex-end!important;
+    align-items:center!important;
+  }
+  #topbar .cluster{
+    width:auto!important;
+    gap:22px!important;
+    justify-content:flex-end!important;
+  }
+  #topbar .cluster:first-child{
+    display:none!important;
+  }
+  #topbar button{
+    min-width:auto!important;
+    min-height:40px!important;
+    padding:7px 5px!important;
+  }
+  #topbar button:not(#viewBtn):not(#menuBtn){
+    display:none!important;
+  }
+  #viewBtn,#menuBtn{
+    display:flex!important;
+  }
+}
+
+/* Short laptop screens need a tighter heart column. */
+@media (min-width:901px) and (max-height:760px){
+  #livesHud{
+    right:34px!important;
+    bottom:116px!important;
+    gap:0!important;
+  }
+  #livesHud .lifeHeart{
+    width:18px!important;
+    height:15px!important;
+    font-size:15px!important;
+    line-height:15px!important;
+  }
+}
