@@ -1,13 +1,22 @@
 (function(){
-  const VERSION='v11.35';
+  const VERSION='v11.36';
   function syncVersion(){
     document.title='Bag of Dungeon 3D '+VERSION;
     const visible=document.getElementById('visibleBuildVersion');
     if(visible)visible.textContent=VERSION;
   }
 
+  function loadLethalBlow(){
+    if(document.querySelector('script[data-bod-lethal-blow]'))return;
+    const script=document.createElement('script');
+    script.src='assets/lethal-blow.js?v=11.36';
+    script.dataset.bodLethalBlow='1';
+    document.head.appendChild(script);
+  }
+
   function install(){
     syncVersion();
+    loadLethalBlow();
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
     window.__bodSequentialRewardsInstalled=true;
@@ -66,6 +75,7 @@
   }
 
   function start(){
+    loadLethalBlow();
     if(install())return;
     let attempts=0;
     const timer=setInterval(()=>{if(install()||++attempts>160)clearInterval(timer);},50);
