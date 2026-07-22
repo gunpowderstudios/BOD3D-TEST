@@ -56,11 +56,13 @@ window.ASSET_PATHS = {
   }
 })();
 
-// v11.23 TEST: show the current version consistently wherever the UI exposes it.
+// v11.24 TEST: show the current version consistently wherever the UI exposes it.
 (function syncTestVersion(){
-  const version='v11.23';
+  const version='v11.24';
   function apply(){
     document.title='Bag of Dungeon 3D '+version;
+    const visible=document.getElementById('visibleBuildVersion');
+    if(visible)visible.textContent=version;
     ['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{
       const el=document.getElementById(id);
       if(el)el.textContent=version;
@@ -155,4 +157,213 @@ window.ASSET_PATHS = {
     }
   `;
   document.head.appendChild(style);
+})();
+
+// v11.24 TEST: Android/background audio lifecycle guard.
+(function installBackgroundAudioLifecycleGuard(){
+  if(HTMLMediaElement.prototype.__bodBackgroundLifecyclePatched)return;
+  const originalPlay=HTMLMediaElement.prototype.play;
+  const backgroundTracks=new Set();
+  const resumeTracks=new Set();
+
+  HTMLMediaElement.prototype.play=function(){
+    if(this.loop)backgroundTracks.add(this);
+    return originalPlay.apply(this,arguments);
+  };
+  HTMLMediaElement.prototype.__bodBackgroundLifecyclePatched=true;
+
+  function pauseBackgroundAudio(){
+    backgroundTracks.forEach(track=>{
+      if(!track.paused){
+        resumeTracks.add(track);
+        try{track.pause();}catch(_){ }
+      }
+    });
+  }
+
+  function resumeBackgroundAudio(){
+    if(document.hidden)return;
+    resumeTracks.forEach(track=>{
+      const src=String(track.currentSrc||track.src||'');
+      if(window.__BOD_DUNGEON_AMBIENCE_MUTED__ && /dungeon-sounds\.mp3/i.test(src))return;
+      originalPlay.call(track).catch(()=>{});
+    });
+    resumeTracks.clear();
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)pauseBackgroundAudio();
+    else resumeBackgroundAudio();
+  });
+  window.addEventListener('pagehide',pauseBackgroundAudio);
+  window.addEventListener('beforeunload',pauseBackgroundAudio);
+  window.addEventListener('pageshow',resumeBackgroundAudio);
+})();
+
+// v11.24 TEST: gameplay progression and Ring of Creation rules.
+(function installV1124GameplayRules(){
+  function install(){
+    if(window.__bodV1124RulesInstalled)return true;
+    if(typeof CHARACTERS==='undefined' || typeof drawItem!=='function' || typeof drawMonster!=='function' || typeof placeExitAndRing!=='function' || typeof collectRingIfSafe!=='function')return false;
+    window.__bodV1124RulesInstalled=true;
+
+    // Only Sirrus and Tamara are available on the character-selection screen.
+    const allowedHeroes=CHARACTERS.filter(hero=>hero.id==='sirrus'||hero.id==='tamara');
+    CHARACTERS.splice(0,CHARACTERS.length,...allowedHeroes);
+    if(typeof selectedCharacterIndex!=='undefined')selectedCharacterIndex=Math.min(selectedCharacterIndex,CHARACTERS.length-1);
+    if(typeof renderCharSelect==='function')renderCharSelect();
+
+    const lockedItems=new Set(['Ice Staff','Large Steel Axe']);
+    const laidTileCount=()=>{
+      if(typeof state==='undefined'||!state||!state.tiles)return 0;
+      return Object.values(state.tiles).filter(tile=>tile&&tile.kind!=='start'&&tile.kind!=='exit').length;
+    };
+
+    // Keep the two powerful items inside the deck until 20 dungeon tiles are laid.
+    drawItem=function(){
+      if(!state||!Array.isArray(state.itemDeck)||!state.itemDeck.length)return null;
+      const unlocked=laidTileCount()>=20;
+      for(let i=state.itemDeck.length-1;i>=0;i--){
+        const candidate=state.itemDeck[i];
+        if(unlocked||!lockedItems.has(candidate.name)){
+          const item=state.itemDeck.splice(i,1)[0];
+          return item?{...item}:null;
+        }
+      }
+      return null;
+    };
+
+    function ringAlreadyAssigned(){
+      if(!state)return false;
+      if(state.player?.hasRing)return true;
+      if(state.ringCarrierAssigned)return true;
+      return Object.values(state.tiles||{}).some(tile=>tile?.hasRing||tile?.monster?.carriesRing);
+    }
+
+    function assignRingToMonster(monster,tileKey=null){
+      if(!state||!monster||monster.isDragon||monster.maxHealth<10||ringAlreadyAssigned())return false;
+      monster.carriesRing=true;
+      state.ringCarrierAssigned=true;
+      state.ringActivated=true;
+      state.ringKey=tileKey;
+      state.ringNumber=null;
+      state.ringRoll=null;
+      if(typeof log==='function')log('A powerful monster somewhere in the dungeon now carries the Ring of Creation.','loot');
+      return true;
+    }
+
+    function ensureRingCarrier(){
+      if(typeof state==='undefined'||!state||laidTileCount()<20||ringAlreadyAssigned())return;
+      const candidates=Object.entries(state.tiles||{}).filter(([,tile])=>tile?.monster&&tile.monster.health>0&&!tile.monster.isDragon&&tile.monster.maxHealth>=10);
+      if(candidates.length){
+        const [tileKey,tile]=candidates[Math.floor(Math.random()*candidates.length)];
+        assignRingToMonster(tile.monster,tileKey);
+      }
+    }
+
+    const originalDrawMonster=drawMonster;
+    drawMonster=function(){
+      const monster=originalDrawMonster.apply(this,arguments);
+      if(monster&&laidTileCount()>=20&&!ringAlreadyAssigned())assignRingToMonster(monster,null);
+      return monster;
+    };
+
+    // The Exit still appears at the end, but it no longer rolls or places the Ring.
+    placeExitAndRing=function(x,y,fromTile){
+      state.exitPlaced=true;
+      let exitKey=null,placed=false;
+      for(const dir of dirOrder){
+        const d=DIRS[dir],ex=x+d.dx,ey=y+d.dy;
+        if(fromTile.opens[dir]&&!getTile(ex,ey)){
+          exitKey=key(ex,ey);
+          state.tiles[exitKey]={kind:'exit',opens:{...TILE_BASE.exit},rot:0,visited:false,monster:{name:'Red Dragon',dice:4,mod:0,maxHealth:20,health:20,glyph:'🐉',revealed:true,isDragon:true}};
+          placed=true;
+          break;
+        }
+      }
+      if(!placed){
+        for(const dir of dirOrder){
+          const d=DIRS[dir],ex=x+d.dx,ey=y+d.dy;
+          if(!getTile(ex,ey)){
+            exitKey=key(ex,ey);
+            state.tiles[exitKey]={kind:'exit',opens:{...TILE_BASE.exit},rot:0,visited:false,monster:{name:'Red Dragon',dice:4,mod:0,maxHealth:20,health:20,glyph:'🐉',revealed:true,isDragon:true}};
+            break;
+          }
+        }
+      }
+      playSound('dragon');
+      playTileEffect(exitKey,'dragon',1400);
+      log('The final dungeon tile is laid. The Exit appears and the Red Dragon guards it.','loot');
+      ensureRingCarrier();
+    };
+
+    function dropCarriedRing(monster,tile,tileKey){
+      if(!monster?.carriesRing||!tile)return false;
+      tile.hasRing=true;
+      state.ringActivated=true;
+      state.ringCarrierAssigned=true;
+      state.ringKey=tileKey;
+      log(monster.name+' drops the Ring of Creation!','loot');
+      collectRingIfSafe(tileKey);
+      return true;
+    }
+
+    const originalDropMonsterRewards=typeof dropMonsterRewardsOnTile==='function'?dropMonsterRewardsOnTile:null;
+    if(originalDropMonsterRewards){
+      dropMonsterRewardsOnTile=function(monster,tile,tileKey){
+        if(dropCarriedRing(monster,tile,tileKey))return;
+        return originalDropMonsterRewards.apply(this,arguments);
+      };
+    }
+
+    const originalRangedKill=typeof rangedKill==='function'?rangedKill:null;
+    if(originalRangedKill){
+      rangedKill=function(tile,tileKey,monster,weaponName,damage){
+        const carriesRing=!!monster?.carriesRing;
+        if(carriesRing){
+          tile.hasRing=true;
+          state.ringActivated=true;
+          state.ringCarrierAssigned=true;
+          state.ringKey=tileKey;
+          monster.isDragon=true; // suppress normal item rewards for the Ring carrier
+        }
+        const result=originalRangedKill.apply(this,arguments);
+        if(carriesRing){
+          monster.isDragon=false;
+          log(monster.name+' drops the Ring of Creation!','loot');
+        }
+        return result;
+      };
+    }
+
+    collectRingIfSafe=function(tileKey){
+      if(!state.ringActivated||state.player.hasRing||state.ringKey!==tileKey)return false;
+      if(key(state.player.x,state.player.y)!==tileKey)return false;
+      const tile=state.tiles[tileKey];
+      if(!tile||!tile.hasRing)return false;
+      const livingMonster=tile.monsterPending||(tile.monster&&tile.monster.health>0);
+      if(livingMonster)return false;
+      tile.hasRing=false;
+      state.player.hasRing=true;
+      playSound('ring');
+      playTileEffect(tileKey,'ring',1200);
+      log('You found the Ring of Creation — now get out!','loot');
+      showModal('THE RING OF CREATION','You found the Ring of Creation — now get out!',[{text:'Get Out!',cls:'green',fn:closeModal}]);
+      return true;
+    };
+
+    setInterval(ensureRingCarrier,500);
+    return true;
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>{
+      if(install())return;
+      let tries=0;
+      const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);
+    },{once:true});
+  }else if(!install()){
+    let tries=0;
+    const timer=setInterval(()=>{if(install()||++tries>=100)clearInterval(timer);},50);
+  }
 })();
