@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Bag of Dungeon 3D v11.23</title>
+<title>Bag of Dungeon 3D v11.22</title>
 
 <!--
 8BITBOD
@@ -25,9 +25,9 @@ Changelog:
 - v2.8: Fixed uploaded PNG tile rotation in placement preview and on the map.
 - v2.9: Combat log now resets to “Ready to fight!” whenever a new monster encounter begins.
 -->
-<link rel="stylesheet" href="css/main.css?v=11.23">
-<link rel="stylesheet" href="css/combat.css?v=11.23">
-<link rel="stylesheet" href="css/mobile.css?v=11.23">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/combat.css">
+<link rel="stylesheet" href="css/mobile.css">
 <!--
 8BITBOD
 Version: v3.10
@@ -236,7 +236,7 @@ Changes:
     <div id="brandHeader">
       <img class="brandLogo" src="assets/ui/logo.png" alt="Gunpowder Studios" onerror="this.style.display='none'">
       <div class="brand3DTitle">3D</div>
-      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.23</div>
+      <div id="visibleBuildVersion" style="font-size:12px;line-height:1.2;text-align:center;letter-spacing:.08em;opacity:.72;margin-top:4px;">v11.22</div>
     </div>
     <div class="box" id="stats"></div>
     <div class="box" id="inventory"></div>
@@ -344,23 +344,11 @@ Changes:
 <div id="toast"></div>
 <div id="devPanel"></div>
 
-<script src="assets/assets.js?v=11.23"></script>
-<script src="js/game.js?v=11.23"></script>
-<script src="js/combat.js?v=11.23"></script>
+<script src="assets/assets.js?v=10.52"></script>
+<script src="js/game.js"></script>
+<script src="js/combat.js"></script>
 
-<script type="module" src="js/scene3d.js?v=11.23"></script>
-<script>
-// Online-load safety: if the 3D module is blocked or stale, stop the endless
-// “Summoning adventurer…” state and show the existing PNG hero fallback.
-window.setTimeout(function(){
-  if(window.BODHeroPreview)return;
-  var loading=document.getElementById('heroPreviewLoading');
-  var fallback=document.getElementById('heroPreviewFallback');
-  if(loading)loading.classList.add('hidden');
-  if(fallback)fallback.style.display='flex';
-  console.error('BOD3D 3D module did not initialise. Check js/scene3d.js and CDN access.');
-},5000);
-</script>
+<script type="module" src="js/scene3d.js"></script>
 
 
 <div id="itemTester" aria-hidden="true">
@@ -481,7 +469,7 @@ window.setTimeout(function(){
 </div>
 
 
-<script src="js/patches.js?v=11.23"></script>
+<script src="js/patches.js"></script>
 </body>
 </html>
 

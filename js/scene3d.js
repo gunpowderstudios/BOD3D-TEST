@@ -5,9 +5,9 @@
 // files would mean turning ~30 private variables into explicit exports/imports, which is
 // a much bigger, riskier refactor than a file reorganisation. See the chat notes for why.
 
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
-import { OrbitControls } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 const LIGHTING_STORAGE_KEY='bod3dLightingV94';
 const LIGHTING_DEFAULT_KEY='bod3dLightingCustomDefaultV1';

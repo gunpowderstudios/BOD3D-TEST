@@ -56,14 +56,19 @@ window.ASSET_PATHS = {
   }
 })();
 
-// v11.24 migration step 1: load UI behaviour from its own module.
-(function loadUiModule(){
-  if(document.querySelector('script[data-bod-module="ui"]'))return;
-  const script=document.createElement('script');
-  script.src='./js/ui.js?v=11.24';
-  script.dataset.bodModule='ui';
-  script.defer=true;
-  document.head.appendChild(script);
+// v11.23 TEST: show the current version consistently wherever the UI exposes it.
+(function syncTestVersion(){
+  const version='v11.23';
+  function apply(){
+    document.title='Bag of Dungeon 3D '+version;
+    ['bodVersionUnderLogo','topLogoVersion'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.textContent=version;
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});
+  else apply();
+  setTimeout(apply,1000);
 })();
 
 // v11.23 TEST: mute only dungeon-sounds.mp3. Other sounds are untouched.
