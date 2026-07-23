@@ -1,20 +1,20 @@
-// BOD3D-TEST v11.55 — mobile ranged/item actions stay above NSEW controls
+// BOD3D-TEST v11.56 — mobile action clearance, combat-only AP and no exploration Rest
 (function(){
-  const VERSION='v11.55';
+  const VERSION='v11.56';
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
   function loadScriptOnce(selector,src,datasetName){if(document.querySelector(selector))return;const script=document.createElement('script');script.src=src;script.dataset[datasetName]='1';document.head.appendChild(script);}
   function loadStyleOnce(selector,href,datasetName){if(document.querySelector(selector))return;const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset[datasetName]='1';document.head.appendChild(link);}
-  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.55','bodLethalBlow');}
-  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.55','bodMobileSheetFix');}
-  function loadQuestLogColours(){loadScriptOnce('script[data-bod-quest-log-colours]','assets/quest-log-colours.js?v=11.55','bodQuestLogColours');}
-  function loadCombatCleanup(){loadScriptOnce('script[data-bod-combat-cleanup]','assets/combat-cleanup.js?v=11.55','bodCombatCleanup');}
-  function loadCombatOnlyAP(){loadScriptOnce('script[data-bod-combat-only-ap]','assets/ap-combat-only.js?v=11.55','bodCombatOnlyAp');}
-  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.55','bodWarningScroll');}
-  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.55','bodDesktopHud');}
-  function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css?v=11.55','bodDarkCombat');}
-  function loadDarkHudStyles(){loadStyleOnce('link[data-bod-dark-hud]','css/dark-hud.css?v=11.55','bodDarkHud');}
-  function loadMobileActionFix(){loadStyleOnce('link[data-bod-mobile-action-fix]','css/mobile-action-fix.css?v=11.55','bodMobileActionFix');}
-  function loadEnterButtonFix(){loadStyleOnce('link[data-bod-enter-button-fix]','css/enter-button-fix.css?v=11.55','bodEnterButtonFix');}
+  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.56','bodLethalBlow');}
+  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.56','bodMobileSheetFix');}
+  function loadQuestLogColours(){loadScriptOnce('script[data-bod-quest-log-colours]','assets/quest-log-colours.js?v=11.56','bodQuestLogColours');}
+  function loadCombatCleanup(){loadScriptOnce('script[data-bod-combat-cleanup]','assets/combat-cleanup.js?v=11.56','bodCombatCleanup');}
+  function loadCombatOnlyAP(){loadScriptOnce('script[data-bod-combat-only-ap]','assets/ap-combat-only.js?v=11.56','bodCombatOnlyAp');}
+  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.56','bodWarningScroll');}
+  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.56','bodDesktopHud');}
+  function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css?v=11.56','bodDarkCombat');}
+  function loadDarkHudStyles(){loadStyleOnce('link[data-bod-dark-hud]','css/dark-hud.css?v=11.56','bodDarkHud');}
+  function loadMobileActionFix(){loadStyleOnce('link[data-bod-mobile-action-fix]','css/mobile-action-fix.css?v=11.56','bodMobileActionFix');}
+  function loadEnterButtonFix(){loadStyleOnce('link[data-bod-enter-button-fix]','css/enter-button-fix.css?v=11.56','bodEnterButtonFix');}
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
