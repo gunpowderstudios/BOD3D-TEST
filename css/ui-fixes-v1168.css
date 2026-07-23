@@ -1,8 +1,14 @@
-/* BOD3D-TEST v11.68 — permanent Mute button and clean character-panel edge */
+/* BOD3D-TEST v11.70 — streamlined camera controls and mobile top-bar spacing */
 
 /* Remove only the thick outer divider identified on the right of the sidebar. */
 #side{
   border-right:0!important;
+}
+
+/* Zoom remains available by gesture/wheel; remove the unused button pair. */
+#zoomOut,
+#zoomIn{
+  display:none!important;
 }
 
 /* Keep the sound control present independently of older responsive rules. */
@@ -34,6 +40,10 @@
 }
 
 @media(max-width:900px){
+  /* Reserve a clear lane for Mute and Full Screen; the Map/View control moves left. */
+  #topbar{
+    right:142px!important;
+  }
   #dungeonSoundToggle{
     top:7px!important;
     right:47px!important;
