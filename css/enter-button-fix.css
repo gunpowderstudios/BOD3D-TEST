@@ -1,0 +1,15 @@
+/* BOD3D-TEST v11.52 — force warning-scroll Enter copy to remain black */
+#modal .card:has(.testerWarningScroll) #modalButtons button,
+#modal .card:has(.testerWarningScroll) #modalButtons button *,
+#modal .card:has(.testerWarningScroll) #modalButtons button:hover,
+#modal .card:has(.testerWarningScroll) #modalButtons button:hover *,
+#modal .card:has(.testerWarningScroll) #modalButtons button:focus,
+#modal .card:has(.testerWarningScroll) #modalButtons button:focus *,
+#modal .card:has(.testerWarningScroll) #modalButtons button:focus-visible,
+#modal .card:has(.testerWarningScroll) #modalButtons button:focus-visible *,
+#modal .card:has(.testerWarningScroll) #modalButtons button:active,
+#modal .card:has(.testerWarningScroll) #modalButtons button:active *{
+  color:#000!important;
+  -webkit-text-fill-color:#000!important;
+  text-shadow:none!important;
+}
