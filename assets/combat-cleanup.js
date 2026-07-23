@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.66 — remove combat placeholders and grey divider
+// BOD3D-TEST v11.67 — remove combat placeholders without blocking controls
 (function () {
   'use strict';
 
@@ -18,7 +18,7 @@
     if (dice && DICE_PLACEHOLDERS.has(dice.textContent.trim())) {
       dice.textContent = '';
       dice.classList.add('combatTrayEmpty');
-    } else if (dice && dice.textContent.trim()) {
+    } else if (dice && dice.textContent.trim() && dice.classList.contains('combatTrayEmpty')) {
       dice.classList.remove('combatTrayEmpty');
     }
 
@@ -26,7 +26,7 @@
     if (log && LOG_PLACEHOLDERS.has(log.textContent.trim())) {
       log.textContent = '';
       log.classList.add('combatLogEmpty');
-    } else if (log && log.textContent.trim()) {
+    } else if (log && log.textContent.trim() && log.classList.contains('combatLogEmpty')) {
       log.classList.remove('combatLogEmpty');
     }
   }
@@ -72,9 +72,7 @@
     new MutationObserver(cleanCombatPlaceholders).observe(combat, {
       subtree: true,
       childList: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ['class']
+      characterData: true
     });
   }
 
