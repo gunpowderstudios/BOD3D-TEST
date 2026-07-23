@@ -1,24 +1,24 @@
-// BOD3D-TEST v11.57 — collapsed combat items drawer, direct hero North and black warning Enter fixes
+// BOD3D-TEST v11.58 — safe North-facing hero load, collapsed combat items drawer and previous UI fixes
 (function(){
-  const VERSION='v11.57';
+  const VERSION='v11.58';
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
   function loadScriptOnce(selector,src,datasetName){if(document.querySelector(selector))return;const script=document.createElement('script');script.src=src;script.dataset[datasetName]='1';document.head.appendChild(script);}
   function loadStyleOnce(selector,href,datasetName){if(document.querySelector(selector))return;const link=document.createElement('link');link.rel='stylesheet';link.href=href;link.dataset[datasetName]='1';document.head.appendChild(link);}
-  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.57','bodLethalBlow');}
-  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.57','bodMobileSheetFix');}
-  function loadQuestLogColours(){loadScriptOnce('script[data-bod-quest-log-colours]','assets/quest-log-colours.js?v=11.57','bodQuestLogColours');}
-  function loadCombatCleanup(){loadScriptOnce('script[data-bod-combat-cleanup]','assets/combat-cleanup.js?v=11.57','bodCombatCleanup');}
-  function loadCombatOnlyAP(){loadScriptOnce('script[data-bod-combat-only-ap]','assets/ap-combat-only.js?v=11.57','bodCombatOnlyAp');}
-  function loadHeroNorth(){loadScriptOnce('script[data-bod-hero-north]','assets/hero-north.js?v=11.57','bodHeroNorth');}
-  function loadEnterButtonRuntime(){loadScriptOnce('script[data-bod-enter-button-black]','assets/enter-button-black.js?v=11.57','bodEnterButtonBlack');}
-  function loadCombatItemsMenu(){loadScriptOnce('script[data-bod-combat-items-menu]','assets/combat-items-menu.js?v=11.57','bodCombatItemsMenu');}
-  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.57','bodWarningScroll');}
-  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.57','bodDesktopHud');}
-  function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css?v=11.57','bodDarkCombat');}
-  function loadDarkHudStyles(){loadStyleOnce('link[data-bod-dark-hud]','css/dark-hud.css?v=11.57','bodDarkHud');}
-  function loadMobileActionFix(){loadStyleOnce('link[data-bod-mobile-action-fix]','css/mobile-action-fix.css?v=11.57','bodMobileActionFix');}
-  function loadEnterButtonFix(){loadStyleOnce('link[data-bod-enter-button-fix]','css/enter-button-fix.css?v=11.57','bodEnterButtonFix');}
-  function loadCombatItemsStyles(){loadStyleOnce('link[data-bod-combat-items-menu]','css/combat-items-menu.css?v=11.57','bodCombatItemsMenu');}
+  function loadLethalBlow(){loadScriptOnce('script[data-bod-lethal-blow]','assets/lethal-blow.js?v=11.58','bodLethalBlow');}
+  function loadMobileSheetFix(){loadScriptOnce('script[data-bod-mobile-sheet-fix]','assets/mobile-sheet-fix.js?v=11.58','bodMobileSheetFix');}
+  function loadQuestLogColours(){loadScriptOnce('script[data-bod-quest-log-colours]','assets/quest-log-colours.js?v=11.58','bodQuestLogColours');}
+  function loadCombatCleanup(){loadScriptOnce('script[data-bod-combat-cleanup]','assets/combat-cleanup.js?v=11.58','bodCombatCleanup');}
+  function loadCombatOnlyAP(){loadScriptOnce('script[data-bod-combat-only-ap]','assets/ap-combat-only.js?v=11.58','bodCombatOnlyAp');}
+  function loadHeroNorth(){loadScriptOnce('script[data-bod-hero-north]','assets/hero-north.js?v=11.58','bodHeroNorth');}
+  function loadEnterButtonRuntime(){loadScriptOnce('script[data-bod-enter-button-black]','assets/enter-button-black.js?v=11.58','bodEnterButtonBlack');}
+  function loadCombatItemsMenu(){loadScriptOnce('script[data-bod-combat-items-menu]','assets/combat-items-menu.js?v=11.58','bodCombatItemsMenu');}
+  function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css?v=11.58','bodWarningScroll');}
+  function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css?v=11.58','bodDesktopHud');}
+  function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css?v=11.58','bodDarkCombat');}
+  function loadDarkHudStyles(){loadStyleOnce('link[data-bod-dark-hud]','css/dark-hud.css?v=11.58','bodDarkHud');}
+  function loadMobileActionFix(){loadStyleOnce('link[data-bod-mobile-action-fix]','css/mobile-action-fix.css?v=11.58','bodMobileActionFix');}
+  function loadEnterButtonFix(){loadStyleOnce('link[data-bod-enter-button-fix]','css/enter-button-fix.css?v=11.58','bodEnterButtonFix');}
+  function loadCombatItemsStyles(){loadStyleOnce('link[data-bod-combat-items-menu]','css/combat-items-menu.css?v=11.58','bodCombatItemsMenu');}
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
