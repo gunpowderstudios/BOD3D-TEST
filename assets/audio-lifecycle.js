@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.64 — reliable Android background-audio lifecycle and ambience mute
+// BOD3D-TEST v11.68 — reliable Android audio lifecycle with permanent mute button
 (function () {
   'use strict';
 
@@ -106,12 +106,17 @@
     let button = document.getElementById('dungeonSoundToggle');
     if (!button) {
       const fullscreen = document.getElementById('fullscreenBtn');
-      if (!fullscreen?.parentNode) return false;
       button = document.createElement('button');
       button.id = 'dungeonSoundToggle';
       button.type = 'button';
-      fullscreen.insertAdjacentElement('beforebegin', button);
+      if (fullscreen?.parentNode) {
+        fullscreen.insertAdjacentElement('beforebegin', button);
+      } else {
+        (document.getElementById('main') || document.body).appendChild(button);
+      }
     }
+    button.style.removeProperty('display');
+    button.hidden = false;
     button.onclick = event => {
       event.preventDefault();
       event.stopPropagation();
