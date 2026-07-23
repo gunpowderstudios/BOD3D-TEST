@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.61 — responsive parchment with copy and Enter button in normal flow */
+/* BOD3D-TEST v11.62 — keep desktop warning heading visible; mobile layout unchanged */
 #modal:has(.testerWarningScroll){
   padding:clamp(8px,2vw,24px)!important;
   overflow:auto!important;
@@ -32,7 +32,7 @@
   height:100%!important;
   min-height:0!important;
   margin:0!important;
-  padding:0!important;
+  padding:2px 0 0!important;
   background:none!important;
   color:#000!important;
   border:0!important;
@@ -40,7 +40,7 @@
   overflow:auto!important;
   display:flex!important;
   flex-direction:column!important;
-  justify-content:center!important;
+  justify-content:flex-start!important;
   align-items:center!important;
   text-align:center!important;
   font-family:"Alegreya",Georgia,serif!important;
@@ -115,6 +115,7 @@
     gap:8px!important;
   }
   .testerWarningScroll{
+    padding:0!important;
     font-size:clamp(15px,3.8vw,18px)!important;
     line-height:1.27!important;
     justify-content:center!important;
