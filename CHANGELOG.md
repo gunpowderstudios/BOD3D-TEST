@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.70
+
+- Removed the unused Zoom − and Zoom + buttons on desktop and mobile.
+- Kept the Centre control and compass unchanged.
+- Shifted the mobile top-bar/Map control left to reserve clear space for Mute and Full Screen.
+- No gameplay, combat, drawer or audio-behaviour changes.
+
 ## v11.69
 
 - Centralised the active patch version and cache-busting value in `assets/reward-fix.js`.
