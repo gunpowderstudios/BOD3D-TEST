@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.69 — central patch version, startup diagnostics and changelog
+// BOD3D-TEST v11.70 — remove Zoom buttons and clear mobile Map/Mute spacing
 (function(){
-  const BUILD='11.69';
+  const BUILD='11.70';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
