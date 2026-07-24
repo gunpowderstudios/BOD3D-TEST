@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.76
+
+- Allowed mobile table gestures through transparent combat and stats areas.
+- Kept Fight, Run Away, Items and Lethal Blow controls fully tappable.
+- Kept the Items drawer interactive.
+- Preserved the Fight-button camera reframe and hidden mobile combat compass.
+
 ## v11.75
 
 - Restored drag, rotate and pinch-zoom gestures during mobile combat.
