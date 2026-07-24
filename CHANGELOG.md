@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.74
+
+- Hid the compass during combat on mobile.
+- Blocked mobile combat drag, pinch, zoom and 3D model taps on the underlying dungeon.
+- Restored normal map interaction automatically when combat closes.
+- Kept desktop combat-camera behaviour unchanged.
+
 ## v11.73
 
 - Rebuilt mobile combat actions as a compact two-row tray.
