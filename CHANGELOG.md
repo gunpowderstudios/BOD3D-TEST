@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.78
+
+- Added a little padding above the mobile warning heading.
+- Removed the duplicate line break after the red Dragon warning.
+- Kept the v11.77 heading, body size and parchment height.
+
 ## v11.77
 
 - Reduced the mobile warning heading to 22px.
