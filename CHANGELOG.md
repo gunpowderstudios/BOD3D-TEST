@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.72
+
+- Added the live vertical Health-heart column to mobile.
+- Positioned mobile hearts midway down the left edge, clear of the top controls, compass, movement pad and sliding drawer.
+- Kept the existing desktop heart column unchanged.
+- No gameplay or combat changes.
+
 ## v11.71
 
 - Restored the desktop vertical health-heart column above the compass.
