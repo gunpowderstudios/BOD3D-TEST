@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.84
+
+- Refreshed the character card immediately when the Ring of Creation is collected.
+- The Ring indicator now changes to YES as soon as the guardian’s Ring is awarded.
+- Kept the existing 20-tile guardian and item-lock rules unchanged.
+
 ## v11.83
 
 - Moved the mobile Bow, Ice Staff and cancel-ranged controls completely above the D-pad.
