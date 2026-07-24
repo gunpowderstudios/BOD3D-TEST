@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.74 — lock mobile combat camera and hide compass
+// BOD3D-TEST v11.75 — enable mobile combat camera gestures, hide compass
 (function(){
-  const BUILD='11.74';
+  const BUILD='11.75';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
