@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.71
+
+- Restored the desktop vertical health-heart column above the compass.
+- Hearts update automatically when the hero gains or loses Health.
+- Kept the extra heart column hidden on mobile, where Health remains in the compact status/drawer.
+- No gameplay or combat changes.
+
 ## v11.70
 
 - Removed the unused Zoom − and Zoom + buttons on desktop and mobile.
