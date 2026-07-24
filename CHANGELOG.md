@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.80
+
+- Made all mobile warning and story body text bold.
+- Increased the space above the warning heading from 12px to 24px.
+- Kept the existing heading size, body size and parchment height.
+
 ## v11.79
 
 - Added “THE STORY SO FAR…” after the existing Good luck warning copy.
