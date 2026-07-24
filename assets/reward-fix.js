@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.75 — enable mobile combat camera gestures, hide compass
+// BOD3D-TEST v11.76 — pass mobile combat gestures through stats overlay
 (function(){
-  const BUILD='11.75';
+  const BUILD='11.76';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
