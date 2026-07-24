@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.82 — restore red combat Quest Log text
+// BOD3D-TEST v11.83 — clear mobile D-pad action overlap
 (function(){
-  const BUILD='11.82';
+  const BUILD='11.83';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
