@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.72 — add vertical mobile health hearts on the left
+// BOD3D-TEST v11.73 — compact two-row mobile combat controls
 (function(){
-  const BUILD='11.72';
+  const BUILD='11.73';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
