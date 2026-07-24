@@ -141,16 +141,14 @@
     grid-column:1/-1!important;
   }
 
-  /* Mobile combat is a locked encounter: hide navigation and block the
-     underlying 3D canvas from receiving drag, pinch, zoom or model taps. */
+  /* Hide the compass during mobile combat while leaving the 3D canvas
+     available for drag, rotate and pinch-zoom inspection. */
   body.combatActive #compass{
     display:none!important;
   }
   body.combatActive #viewport,
-  body.combatActive #threeBoard,
-  body.combatActive #camera3d,
-  body.combatActive #world{
-    pointer-events:none!important;
+  body.combatActive #threeBoard{
+    pointer-events:auto!important;
     touch-action:none!important;
   }
 
