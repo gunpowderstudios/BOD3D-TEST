@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.71 — restore the desktop vertical health-heart column
+// BOD3D-TEST v11.72 — vertical health-heart columns on desktop and mobile
 (function () {
   'use strict';
 
