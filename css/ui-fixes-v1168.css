@@ -40,6 +40,10 @@
 }
 
 @media(max-width:900px){
+  /* Mobile already shows health in its compact status/drawer. */
+  #livesHud{
+    display:none!important;
+  }
   /* Reserve a clear lane for Mute and Full Screen; the Map/View control moves left. */
   #topbar{
     right:142px!important;
