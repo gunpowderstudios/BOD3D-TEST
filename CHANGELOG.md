@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.82
+
+- Restored red Quest Log text for combat messages, including attacks and damage.
+- Kept system, loot and healing messages unchanged.
+
 ## v11.81
 
 - Changed “You have ONE LIFE. If your hero falls…” to “You have ONE LIFE! If your hero falls…”
