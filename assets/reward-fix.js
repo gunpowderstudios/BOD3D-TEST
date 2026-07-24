@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.73 — compact two-row mobile combat controls
+// BOD3D-TEST v11.74 — lock mobile combat camera and hide compass
 (function(){
-  const BUILD='11.73';
+  const BUILD='11.74';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
