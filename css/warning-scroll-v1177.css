@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.79 — warning parchment with scrollable story continuation */
+/* BOD3D-TEST v11.80 — bold warning copy with increased top spacing */
 .testerWarningScroll.hasStory{
   justify-content:flex-start!important;
 }
@@ -18,8 +18,9 @@
   }
   .testerWarningScroll{
     font-size:18px!important;
+    font-weight:700!important;
     line-height:1.24!important;
-    padding-top:12px!important;
+    padding-top:24px!important;
   }
   .testerWarningScroll>div:first-child{
     font-size:22px!important;
@@ -46,8 +47,9 @@
   }
   .testerWarningScroll{
     font-size:18px!important;
+    font-weight:700!important;
     line-height:1.2!important;
-    padding-top:10px!important;
+    padding-top:18px!important;
   }
   .testerWarningScroll>div:first-child{
     font-size:22px!important;
