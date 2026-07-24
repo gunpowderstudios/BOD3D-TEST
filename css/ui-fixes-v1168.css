@@ -141,6 +141,19 @@
     grid-column:1/-1!important;
   }
 
+  /* Mobile combat is a locked encounter: hide navigation and block the
+     underlying 3D canvas from receiving drag, pinch, zoom or model taps. */
+  body.combatActive #compass{
+    display:none!important;
+  }
+  body.combatActive #viewport,
+  body.combatActive #threeBoard,
+  body.combatActive #camera3d,
+  body.combatActive #world{
+    pointer-events:none!important;
+    touch-action:none!important;
+  }
+
   /* Reserve a clear lane for Mute and Full Screen; the Map/View control moves left. */
   #topbar{
     right:142px!important;
