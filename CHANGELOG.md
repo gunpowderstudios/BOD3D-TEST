@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.79
+
+- Added “THE STORY SO FAR…” after the existing Good luck warning copy.
+- Added the Wasted Wizard Tavern, Rose, Firkin and dungeon-map introduction.
+- Matched the mobile story heading to 22px and body copy to 18px.
+- Made the longer parchment content scroll from the top while keeping the Enter button accessible.
+
 ## v11.78
 
 - Added a little padding above the mobile warning heading.
