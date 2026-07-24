@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.77 — compact mobile warning parchment */
+/* BOD3D-TEST v11.78 — compact mobile warning parchment spacing */
 @media(max-width:900px){
   #modal .card:has(.testerWarningScroll){
     height:min(68dvh,600px)!important;
@@ -6,10 +6,16 @@
   .testerWarningScroll{
     font-size:18px!important;
     line-height:1.24!important;
+    padding-top:12px!important;
   }
   .testerWarningScroll>div:first-child{
     font-size:22px!important;
     line-height:1.02!important;
+  }
+  /* The warning copy contains two BRs after the red Dragon warning.
+     Hide the second so Good luck follows with one clear line space. */
+  .testerWarningScroll>span+br+br{
+    display:none!important;
   }
 }
 
@@ -20,6 +26,7 @@
   .testerWarningScroll{
     font-size:18px!important;
     line-height:1.2!important;
+    padding-top:10px!important;
   }
   .testerWarningScroll>div:first-child{
     font-size:22px!important;
