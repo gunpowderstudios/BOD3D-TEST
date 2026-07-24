@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.81
+
+- Changed “You have ONE LIFE. If your hero falls…” to “You have ONE LIFE! If your hero falls…”
+- Removed the unwanted full stop before “If”.
+
 ## v11.80
 
 - Made all mobile warning and story body text bold.
