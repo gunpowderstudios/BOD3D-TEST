@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.77
+
+- Reduced the mobile warning heading to 22px.
+- Increased the mobile warning body text to 18px.
+- Reduced the mobile parchment height from 76dvh to 68dvh to remove excess space above and below the copy.
+- Retained internal scrolling for unusually short screens.
+
 ## v11.76
 
 - Allowed mobile table gestures through transparent combat and stats areas.
