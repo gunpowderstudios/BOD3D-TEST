@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.83
+
+- Moved the mobile Bow, Ice Staff and cancel-ranged controls completely above the D-pad.
+- Added a consistent gap and reduced the action height while keeping a touch-safe 48px target.
+- Kept desktop controls unchanged.
+
 ## v11.82
 
 - Restored red Quest Log text for combat messages, including attacks and damage.
