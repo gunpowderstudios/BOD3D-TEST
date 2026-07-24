@@ -1,5 +1,13 @@
 # BOD3D-TEST Changelog
 
+## v11.73
+
+- Rebuilt mobile combat actions as a compact two-row tray.
+- Placed Fight and Run Away side by side.
+- Placed Items and the circular Lethal Blow control on the second row.
+- Reduced mobile action height while retaining touch-safe 52px targets.
+- Kept desktop combat unchanged.
+
 ## v11.72
 
 - Added the live vertical Health-heart column to mobile.
