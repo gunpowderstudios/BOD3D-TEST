@@ -1,0 +1,27 @@
+/* BOD3D-TEST v11.77 — compact mobile warning parchment */
+@media(max-width:900px){
+  #modal .card:has(.testerWarningScroll){
+    height:min(68dvh,600px)!important;
+  }
+  .testerWarningScroll{
+    font-size:18px!important;
+    line-height:1.24!important;
+  }
+  .testerWarningScroll>div:first-child{
+    font-size:22px!important;
+    line-height:1.02!important;
+  }
+}
+
+@media(max-width:420px) and (max-height:720px){
+  #modal .card:has(.testerWarningScroll){
+    height:min(68dvh,520px)!important;
+  }
+  .testerWarningScroll{
+    font-size:18px!important;
+    line-height:1.2!important;
+  }
+  .testerWarningScroll>div:first-child{
+    font-size:22px!important;
+  }
+}
