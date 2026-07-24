@@ -152,6 +152,22 @@
     touch-action:none!important;
   }
 
+  /* Let table gestures pass through the transparent combat UI and stats.
+     Only actual controls retain pointer input. */
+  body.combatActive #combat .combatCard,
+  body.combatActive #combat .combatWideLayout,
+  body.combatActive #combat .combatGrid,
+  body.combatActive #combat .fighter,
+  body.combatActive #combat .combatResolution,
+  body.combatActive #combatBtns{
+    pointer-events:none!important;
+  }
+  body.combatActive #combatBtns>button,
+  body.combatActive #combatItemsDrawer,
+  body.combatActive #combatItemsDrawer *{
+    pointer-events:auto!important;
+  }
+
   /* Reserve a clear lane for Mute and Full Screen; the Map/View control moves left. */
   #topbar{
     right:142px!important;
