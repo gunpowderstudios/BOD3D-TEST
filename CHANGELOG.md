@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.75
+
+- Restored drag, rotate and pinch-zoom gestures during mobile combat.
+- Kept the compass hidden during mobile combat.
+- Preserved the established Fight-button camera reframe.
+- Kept gameplay interactions with monsters, tiles and items locked during combat.
+
 ## v11.74
 
 - Hid the compass during combat on mobile.
