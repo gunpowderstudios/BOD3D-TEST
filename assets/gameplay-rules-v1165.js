@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.65 — 20-tile item lock and Ring guardian
+// BOD3D-TEST v11.84 — 20-tile rules and immediate Ring HUD refresh
 (function () {
   'use strict';
 
@@ -166,6 +166,7 @@
 
       tile.hasRing = false;
       state.player.hasRing = true;
+      render();
       playSound('ring');
       playTileEffect(tileKey, 'ring', 1200);
       log('You found the Ring of Creation — now get out!', 'loot');
