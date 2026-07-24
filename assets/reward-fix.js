@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.78 — refine mobile warning parchment spacing
+// BOD3D-TEST v11.79 — add The Story So Far parchment continuation
 (function(){
-  const BUILD='11.78';
+  const BUILD='11.79';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
@@ -25,6 +25,7 @@
   function loadAudioLifecycle(){loadScriptOnce('script[data-bod-audio-lifecycle]','assets/audio-lifecycle.js','bodAudioLifecycle');}
   function loadGameplayRules(){loadScriptOnce('script[data-bod-gameplay-rules-v1165]','assets/gameplay-rules-v1165.js','bodGameplayRulesV1165');}
   function loadHealthHud(){loadScriptOnce('script[data-bod-health-hud]','assets/health-hud.js','bodHealthHud');}
+  function loadStoryIntro(){loadScriptOnce('script[data-bod-story-intro]','assets/story-intro.js','bodStoryIntro');}
   function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css','bodWarningScroll');}
   function loadDesktopHudStyles(){loadStyleOnce('link[data-bod-desktop-hud]','css/desktop-hud.css','bodDesktopHud');}
   function loadDarkCombatStyles(){loadStyleOnce('link[data-bod-dark-combat]','css/dark-combat.css','bodDarkCombat');}
@@ -47,7 +48,7 @@
     awardItem=function(item){const drawn=item||drawItem();if(!drawn){if(typeof log==='function')log('No items left in the item deck.','system');return false;}rewardQueue.push(drawn);if(!delivering)setTimeout(deliverNext,40);return true;};
     return true;
   }
-  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadWarningScrollV1177();loadLethalBlow();loadMobileSheetFix();loadCombatCleanup();loadCombatOnlyAP();loadCombatItemsMenu();loadCharactersOnly();loadEnterButtonFix();loadAudioLifecycle();loadGameplayRules();loadHealthHud();}
+  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadWarningScrollV1177();loadLethalBlow();loadMobileSheetFix();loadCombatCleanup();loadCombatOnlyAP();loadCombatItemsMenu();loadCharactersOnly();loadEnterButtonFix();loadAudioLifecycle();loadGameplayRules();loadHealthHud();loadStoryIntro();}
   function start(){loadAll();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{loadAll();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   setTimeout(syncVersion,900);
