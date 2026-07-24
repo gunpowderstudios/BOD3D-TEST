@@ -40,10 +40,38 @@
 }
 
 @media(max-width:900px){
-  /* Mobile already shows health in its compact status/drawer. */
+  /* Mobile health sits vertically on the left, clear of controls and drawer. */
   #livesHud{
-    display:none!important;
+    position:fixed!important;
+    left:max(8px,env(safe-area-inset-left))!important;
+    right:auto!important;
+    top:50%!important;
+    bottom:auto!important;
+    transform:translateY(-50%)!important;
+    z-index:67!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:0!important;
+    width:22px!important;
+    max-width:none!important;
+    padding:0!important;
+    margin:0!important;
+    background:transparent!important;
+    pointer-events:none!important;
   }
+  #livesHud .lifeHeart{
+    display:block!important;
+    width:18px!important;
+    height:15px!important;
+    font-size:15px!important;
+    line-height:15px!important;
+    text-align:center!important;
+    color:#ef333b!important;
+    text-shadow:0 1px 4px #000!important;
+  }
+  #livesHud .emptyHeart{color:#4a2022!important;opacity:.7!important}
   /* Reserve a clear lane for Mute and Full Screen; the Map/View control moves left. */
   #topbar{
     right:142px!important;
