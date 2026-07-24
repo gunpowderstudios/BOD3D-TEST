@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.83 — clear mobile D-pad action overlap
+// BOD3D-TEST v11.84 — refresh character card when Ring is collected
 (function(){
-  const BUILD='11.83';
+  const BUILD='11.84';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
