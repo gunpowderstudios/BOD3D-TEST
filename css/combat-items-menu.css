@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.57 — compact combat Items drawer */
+/* BOD3D-TEST v11.85 — combat equipment and Items drawer */
 #combatBtns{
   position:relative!important;
   overflow:visible!important;
@@ -21,6 +21,68 @@
   background:rgba(0,0,0,.97);
   border:1px solid #aaa;
   box-shadow:0 10px 28px rgba(0,0,0,.7);
+}
+#combatItemsDrawer .combatItemsHeading{
+  color:#fff;
+  font-weight:800;
+  font-size:16px;
+  text-align:center;
+  padding:2px 4px 7px;
+  border-bottom:1px solid #777;
+}
+#combatItemsDrawer .combatItemRow{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  align-items:center;
+  padding:7px;
+  background:#111;
+  border:1px solid #666;
+}
+#combatItemsDrawer .combatItemInfo{
+  min-width:0;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+#combatItemsDrawer .combatItemInfo strong{
+  color:#fff;
+  font-size:15px;
+  line-height:1.1;
+}
+#combatItemsDrawer .combatItemInfo small{
+  color:#bbb;
+  font-size:11px;
+}
+#combatItemsDrawer .combatItemActions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+  gap:4px;
+}
+#combatItemsDrawer .combatItemAction{
+  width:auto!important;
+  min-width:48px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:6px 8px!important;
+  background:#8f171b!important;
+  color:#fff!important;
+  border:1px solid #ef6670!important;
+  box-shadow:none!important;
+  font-size:12px!important;
+  font-weight:800!important;
+}
+#combatItemsDrawer .combatItemAction:disabled{
+  opacity:.42!important;
+}
+#combatItemsDrawer .combatItemPack{
+  background:#333!important;
+  border-color:#777!important;
+}
+#combatItemsDrawer .combatItemUse{
+  background:#a91d24!important;
 }
 #combatItemsDrawer .combatItemChoice{
   width:100%!important;
