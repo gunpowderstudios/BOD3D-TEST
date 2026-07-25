@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.85
+
+- Replaced the large mobile ranged control with a compact red combat-style button low-left beside the D-pad.
+- Expanded the combat Items drawer to show equipped gear and backpack equipment.
+- Allowed free weapon, shield, armour and attire swapping between combat rolls with no AP cost.
+- Kept equipment changes locked while dice are rolling and retained backpack-capacity checks.
+
 ## v11.84
 
 - Refreshed the character card immediately when the Ring of Creation is collected.
