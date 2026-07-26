@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.86
+
+- Made permanent blood pools and droplets left by defeated monsters slightly redder.
+- Changed only the two blood-material colours; shape, size, opacity and behaviour are unchanged.
+
 ## v11.85
 
 - Replaced the large mobile ranged control with a compact red combat-style button low-left beside the D-pad.
