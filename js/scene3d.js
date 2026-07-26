@@ -869,7 +869,7 @@ function addBloodStain(x,y,seed=1,offsetX=0,offsetZ=0){
 
  const makeBloodMaterial=(opacity=.72)=>new THREE.MeshBasicMaterial({
   // Solid tile-surface decal: miniatures correctly occlude the blood.
-  color:opacity>.66?0x65130f:0x7a2119,
+  color:opacity>.66?0x7d1714:0x98231c,
   transparent:false,
   opacity:1,
   depthTest:true,
