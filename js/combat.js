@@ -3,10 +3,11 @@
 // Split out of index.html for easier editing. Depends on state/helpers from game.js, so
 // this must load AFTER game.js.
 
-function pCombatMod(){const e=state.player.equipment;return state.player.baseMod+applyEquipmentStats(e.weapon)}
+function pCombatMod(){const e=state.player.equipment;return state.player.baseMod+applyEquipmentStats(e.weapon)+(e.torch?1:0)}
 function pDamageReduction(){const e=state.player.equipment;return applyEquipmentStats(e.armour)+applyEquipmentStats(e.shield)}
 function pDice(){return state.player.baseDice+(state.player.equipment.bear?1:0)+(state.player.temp.strength?1:0)}
 function openCombat(tile,options={}){
+ if(!view3d.enabled){toast('Return to 3D to fight');return;}
  closeModal();
  const m=tile.monster;
  combat={
@@ -194,6 +195,7 @@ function rangedTargets(range,allowCorners=false){
  return out;
 }
 function startRangedAttack(type,item=null,consume=null){
+ if(!view3d.enabled){toast('Return to 3D to fight');return;}
  const p=state.player;
  let weapon=null,range=0,cost=0,label='';
 
@@ -268,6 +270,7 @@ async function waitForMonsterLanding(tileKey,timeout=2200){
 
 function rangedKill(tile,tileKey,monster,weaponName,damage){playSound('monsterDie');playTileEffect(tileKey,'monsterDeath',1000);log(weaponName+' defeats '+monster.name+' at range with '+damage+' damage.','combat');state.player.killed.push(monster.name);state.monsterDiscard.push(monster);recordMonsterCorpse(tile,tileKey,monster);tile.monster=null;collectRingIfSafe(tileKey);const startingHealth=monster.maxHealth;if(!monster.isDragon){const rewardCount=startingHealth>=10?2:(startingHealth>=6?1:0);if(rewardCount===0)log(monster.name+' had '+startingHealth+' starting Health: no item reward.','system');else{log(monster.name+' had '+startingHealth+' starting Health: draw '+rewardCount+' item'+(rewardCount===1?'':'s')+'.','loot');for(let i=0;i<rewardCount;i++)awardItem();}}render();}
 async function fireRangedAt(tileKey,event){
+ if(!view3d.enabled){cancelRangedAttack();toast('Return to 3D to fight');return;}
  if(event){
   event.preventDefault();
   event.stopPropagation();
