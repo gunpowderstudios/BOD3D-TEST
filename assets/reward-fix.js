@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.87 — repair Asset Manager PNG mappings
+// BOD3D-TEST v11.88 — Torch combat bonus and reference-only 2D map
 (function(){
-  const BUILD='11.87';
+  const BUILD='11.88';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
