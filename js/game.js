@@ -149,7 +149,7 @@ const ITEM_MASTER=[
  {name:'Rusty Armour',copies:1,type:'equipment',slot:'armour',icon:'▤',desc:'One fight: -1 damage from attacks, then discard.'},
  {name:'Steel Armour',copies:1,type:'equipment',slot:'armour',icon:'▥',desc:'-1 damage from attacks.'},
  {name:'Magic Armour',copies:1,type:'equipment',slot:'armour',icon:'▦',desc:'-2 damage from attacks.'},
- {name:'Magic Boots',copies:2,type:'equipment',slot:'boots',icon:'👢',desc:'+1 AP each turn.',apply:p=>{if(!p.equipment.boots){p.maxAp+=1;p.ap+=1;}p.equipment.boots={name:'Magic Boots',icon:'👢',value:1};}},
+ {name:'Magic Boots',copies:2,type:'equipment',slot:'boots',icon:'👢',desc:'Old Spikey springs only on a roll of 1 while equipped (normally 1–2).'},
  {name:'Teleport Crystal',copies:1,type:'spell',icon:'◆',desc:'1 use: teleport to any revealed tile.',use:'teleport'},
  {name:'Acme Insurance',copies:1,type:'other',icon:'☂',desc:'Used automatically on defeat: keep items and revive once.',apply:p=>{p.flags.insurance=true;p.other.push({name:'Acme Insurance',icon:'☂',desc:'Auto revive / keep items.'});}},
  {name:"Imp's Teeth",copies:1,type:'consumable',icon:'☷',desc:'1 use: reroll your next combat roll.',use:'reroll'},
@@ -697,9 +697,9 @@ function resetAllSounds(){
 loadSounds();
 window.addEventListener('pointerdown',()=>{try{audio()}catch(e){}},{once:true});
 function createTileDeck(){
-  // Start is face up and Exit is set aside. These 38 ordinary floor tiles form the shuffled dungeon stack.
+  // Start is face up and Exit is set aside. These 40 ordinary floor tiles form the shuffled dungeon stack.
   const deck=[...Array(15)].map(()=>({kind:'straight'}))
-    .concat([...Array(14)].map(()=>({kind:'corner'})),[...Array(2)].map(()=>({kind:'t'})),[...Array(5)].map(()=>({kind:'cross'})),[{kind:'spike'},{kind:'pool'}]);
+    .concat([...Array(14)].map(()=>({kind:'corner'})),[...Array(2)].map(()=>({kind:'t'})),[...Array(5)].map(()=>({kind:'cross'})),[...Array(3)].map(()=>({kind:'spike'})),[{kind:'pool'}]);
 
   const ordinaryFloors=()=>deck.filter(t=>!['spike','pool'].includes(t.kind));
 
@@ -766,8 +766,8 @@ function moveToBackpack(item){const p=state.player;if(p.backpack.includes(item))
 function equipToSlot(item,slot){const p=state.player;if(slot==='armour'&&!isArmour(item))return false;if(slot==='boots'&&!isBoots(item))return false;if(slot==='cloak'&&!isCloak(item))return false;if((slot==='left'||slot==='right')&&!isHandItem(item))return false;
  if(isTwoHanded(item)){const displaced=[p.slots.left,p.slots.right].filter(Boolean).filter(x=>x!==item);if(p.backpack.length+displaced.length>BACKPACK_LIMIT){toast('Not enough backpack room to free both hands');return false;}displaced.forEach(x=>{removeFromCurrentLocation(x);p.backpack.push(x)});removeFromCurrentLocation(item);p.slots.left=item;p.slots.right=item;}
  else {const old=p.slots[slot];if(old&&old!==item){if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(old);p.backpack.push(old);}if((slot==='left'||slot==='right')){const other=slot==='left'?'right':'left';if(p.slots[other]===item)p.slots[other]=null;}removeFromCurrentLocation(item);p.slots[slot]=item;}
- if(slot==='boots'&&item.name==='Magic Boots'&&!p.flags.bootsBonus){p.flags.bootsBonus=true;p.maxAp+=1;p.ap+=1;}syncEquipment();playSound('equip');toast(item.name+' equipped');return true;}
-function unequipItem(item){const p=state.player;if(!item)return false;if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}if(item.name==='Magic Boots'&&p.flags.bootsBonus){p.flags.bootsBonus=false;p.maxAp=Math.max(1,p.maxAp-1);p.ap=Math.min(p.ap,p.maxAp);}removeFromCurrentLocation(item);p.backpack.push(item);syncEquipment();return true;}
+ syncEquipment();playSound('equip');toast(item.name+' equipped');return true;}
+function unequipItem(item){const p=state.player;if(!item)return false;if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(item);p.backpack.push(item);syncEquipment();return true;}
 function equippedSlotFor(item){const s=state.player.slots;if(s.left===item&&s.right===item)return 'both hands';if(s.left===item)return 'left hand';if(s.right===item)return 'right hand';if(s.armour===item)return 'armour';if(s.boots===item)return 'boots';if(s.cloak===item)return 'attire';if(state.player.companionBear===item)return 'companion';return null;}
 function carriedHas(item){return allCarriedItems().includes(item);}
 function addToInventory(item,tile=getTile(state.player.x,state.player.y)){if(!item)return false;if(isBear(item)){state.player.companionBear=item;syncEquipment();sndItem();log('Loyal Bear joins you and uses no inventory space.','loot');render();return true;}pendingItemQueue.push({item,tile});if(pendingItemQueue.length===1)processPendingItem();return true;}
@@ -944,18 +944,18 @@ function promptOldSpikey(tile){
  const carried=allCarriedItems().filter(x=>!isBear(x));
  const buttons=[];
  if(carried.length)buttons.push({text:'Destroy an Item',cls:'red',fn:()=>chooseSpikeSacrifice(tile)});
- buttons.push({text:'Roll the Dice',cls:'green',fn:async()=>{closeModal();const triggerRoll=roll(1);const trigger=triggerRoll.total;playSound('dice');const triggerDice=window.BODDice3D?.roll?.(triggerRoll.rolls,'hero');if(triggerDice&&typeof triggerDice.then==='function')await triggerDice;if(trigger<=2){const dmgRoll=roll(1);const dmg=dmgRoll.total;const damageDice=window.BODDice3D?.roll?.(dmgRoll.rolls,'hero');if(damageDice&&typeof damageDice.then==='function')await damageDice;state.player.health-=dmg;playSound('trap');playSound('hit');playSound('heroHurt');showCombatImpact('hero',state.player.health<=0?'kill':'hit',dmg);playCurrentTileEffect('trap',900);log('Old Spikey rolls '+trigger+' and springs! You take '+dmg+' direct damage.','combat');if(state.player.health<=0){death();return;}}else log('Old Spikey rolls '+trigger+'. You cross safely.','system');render();}});
- showModal('Old Spikey','Destroy one carried item to jam the mechanism, or roll a die. On 1–2 the trap springs and deals one die of direct damage.',buttons);
+ buttons.push({text:'Roll the Dice',cls:'green',fn:async()=>{closeModal();const triggerRoll=roll(1);const trigger=triggerRoll.total;const triggerLimit=state.player.equipment.boots?.name==='Magic Boots'?1:2;playSound('dice');const triggerDice=window.BODDice3D?.roll?.(triggerRoll.rolls,'hero');if(triggerDice&&typeof triggerDice.then==='function')await triggerDice;if(trigger<=triggerLimit){const dmgRoll=roll(1);const dmg=dmgRoll.total;const damageDice=window.BODDice3D?.roll?.(dmgRoll.rolls,'hero');if(damageDice&&typeof damageDice.then==='function')await damageDice;state.player.health-=dmg;playSound('trap');playSound('hit');playSound('heroHurt');showCombatImpact('hero',state.player.health<=0?'kill':'hit',dmg);playCurrentTileEffect('trap',900);log('Old Spikey rolls '+trigger+' and springs! You take '+dmg+' direct damage.','combat');if(state.player.health<=0){death();return;}}else log('Old Spikey rolls '+trigger+'. You cross safely.','system');render();}});
+ showModal('Old Spikey','Destroy one carried item to jam the mechanism, or roll a die. '+(state.player.equipment.boots?.name==='Magic Boots'?'Your Magic Boots help you pass: only a 1 springs the trap.':'On 1–2 the trap springs and deals one die of direct damage.'),buttons);
 }
 function chooseSpikeSacrifice(tile){const items=allCarriedItems().filter(x=>!isBear(x));showModal('Jam Old Spikey','Choose an item to destroy.',items.map(it=>({text:it.name,cls:'red',fn:()=>{dropDestroyedItem(it);closeModal();log('Destroyed '+it.name+' to jam Old Spikey.','system');render();}})).concat([{text:'Back',fn:()=>promptOldSpikey(tile)}]));}
-function dropDestroyedItem(item){const p=state.player;if(item.name==='Magic Boots'&&p.flags.bootsBonus){p.flags.bootsBonus=false;p.maxAp=Math.max(1,p.maxAp-1);p.ap=Math.min(p.ap,p.maxAp);}removeFromCurrentLocation(item);state.itemDiscard.push(item);syncEquipment();}
+function dropDestroyedItem(item){const p=state.player;removeFromCurrentLocation(item);state.itemDiscard.push(item);syncEquipment();}
 function promptHealingPool(tile){
  showModal('Healing Pool','Use the Healing Pool and restore your Health to full? The pool can only be used once.'+(tile.droppedItems&&tile.droppedItems.length?'\n\nItems belonging to a fallen adventurer lie here and may be recovered.':''),[
   {text:'Yes — Heal',cls:'green',fn:()=>{closeModal();state.player.health=state.player.maxHealth;tile.poolUsed=true;sndItem();playCurrentTileEffect('heal',1000);log('You use the Healing Pool and restore your health to full.','heal');render();}},
   {text:'No — Leave It',fn:()=>{closeModal();log('You leave the Healing Pool unused.','system');render();}}
  ]);
 }
-function clearPlayerItems(){const p=state.player;p.slots={left:null,right:null,armour:null,boots:null,cloak:null};p.backpack=[];p.companionBear=null;p.flags.bootsBonus=false;p.maxAp=state.charDef.maxAp;p.ap=Math.min(p.ap,p.maxAp);syncEquipment();}
+function clearPlayerItems(){const p=state.player;p.slots={left:null,right:null,armour:null,boots:null,cloak:null};p.backpack=[];p.companionBear=null;p.flags.bootsBonus=false;syncEquipment();}
 function healingPoolTile(){return Object.values(state.tiles).find(t=>t.kind==='pool')||null;}
 function useInventoryItem(list,idx){ /* legacy alias */ if(list==='inventory')useInventoryIndex(idx); }
 function useItem(it,consume){const p=state.player,m=combat?.tile?.monster;let used=false,msg='';
@@ -1497,7 +1497,7 @@ vp.addEventListener('contextmenu',e=>{if(view3d.enabled)e.preventDefault();});
 vp.addEventListener('wheel',e=>{e.preventDefault();zoomAt(e.clientX,e.clientY,pan.scale*(e.deltaY<0?1.12:0.89));},{passive:false});
 window.addEventListener('resize',()=>{if(state)centreOnHero(false);});
 document.getElementById('viewBtn').onclick=()=>{audio();toggleView3D();};
-function migrateSave(){if(!state||!state.player)return;const p=state.player;p.slots=p.slots||{left:null,right:null,armour:null,boots:null};p.backpack=p.backpack||[];p.flags=p.flags||{};p.flags.bootsBonus=!!p.flags.bootsBonus;p.flags.torchFreeLay=!!p.flags.torchFreeLay;if(Array.isArray(p.inventory)&&!p.backpack.length){p.inventory.slice(0,4).forEach(x=>p.backpack.push(x));}p.companionBear=p.companionBear||null;p.inventory=[];syncEquipment();}
+function migrateSave(){if(!state||!state.player)return;const p=state.player;p.slots=p.slots||{left:null,right:null,armour:null,boots:null};p.backpack=p.backpack||[];p.flags=p.flags||{};p.flags.bootsBonus=false;p.flags.torchFreeLay=!!p.flags.torchFreeLay;if(Array.isArray(p.inventory)&&!p.backpack.length){p.inventory.slice(0,4).forEach(x=>p.backpack.push(x));}p.companionBear=p.companionBear||null;p.inventory=[];syncEquipment();}
 
 
 function saveGame(){
@@ -1671,18 +1671,8 @@ function testerEquipItem(name,slot){
   if(p.slots.cloak)testerDropDisplaced([p.slots.cloak]);
   p.slots.cloak=item;
  }else if(slot==='boots'){
-  if(p.slots.boots?.name==='Magic Boots'&&p.flags.bootsBonus){
-   p.flags.bootsBonus=false;
-   p.maxAp=Math.max(1,p.maxAp-1);
-   p.ap=Math.min(p.ap,p.maxAp);
-  }
   if(p.slots.boots)testerDropDisplaced([p.slots.boots]);
   p.slots.boots=item;
-  if(item.name==='Magic Boots'&&!p.flags.bootsBonus){
-   p.flags.bootsBonus=true;
-   p.maxAp+=1;
-   p.ap+=1;
-  }
  }else if(slot==='bear'){
   if(p.companionBear)testerDropDisplaced([p.companionBear]);
   p.companionBear=item;
@@ -1755,12 +1745,6 @@ function testerAddToBackpack(name){
 function testerClearEquipment(){
  if(!state)return;
  const p=state.player;
-
- if(p.slots.boots?.name==='Magic Boots'&&p.flags.bootsBonus){
-  p.flags.bootsBonus=false;
-  p.maxAp=Math.max(1,p.maxAp-1);
-  p.ap=Math.min(p.ap,p.maxAp);
- }
 
  p.slots={left:null,right:null,armour:null,boots:null,cloak:null};
  p.companionBear=null;
