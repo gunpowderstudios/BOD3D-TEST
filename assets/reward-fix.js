@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.86 — redder permanent monster blood
+// BOD3D-TEST v11.87 — repair Asset Manager PNG mappings
 (function(){
-  const BUILD='11.86';
+  const BUILD='11.87';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
