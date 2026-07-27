@@ -1422,11 +1422,13 @@ function fitFullMap(){
 function toggleView3D(){
  view3d.enabled=!view3d.enabled;
  applyView3D();
+ renderControls();
  if(!view3d.enabled)setTimeout(fitFullMap,0);
 }
 function resetView3D(){
  view3d.enabled=true;
  applyView3D();
+ renderControls();
  if(window.BOD3D)window.BOD3D.resetCamera();
 }
 function applyPan(){document.getElementById('world').style.transform=`translate(${pan.x}px,${pan.y}px) scale(${pan.scale})`;}
