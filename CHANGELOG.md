@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.90
+
+- Fixed the D-pad and combat controls remaining disabled after returning from the reference-only 2D map to 3D.
+- Control availability now refreshes whenever the board view changes or the 3D view is reset.
+
 ## v11.89
 
 - Replaced the Magic Boots' obsolete +1 AP effect with improved protection against Old Spikey: the trap springs only on a roll of 1 while the boots are equipped, instead of 1–2.
