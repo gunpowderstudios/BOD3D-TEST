@@ -153,7 +153,7 @@ const ITEM_MASTER=[
  {name:'Teleport Crystal',copies:1,type:'spell',icon:'◆',desc:'1 use: teleport to any revealed tile.',use:'teleport'},
  {name:'Acme Insurance',copies:1,type:'other',icon:'☂',desc:'Used automatically on defeat: keep items and revive once.',apply:p=>{p.flags.insurance=true;p.other.push({name:'Acme Insurance',icon:'☂',desc:'Auto revive / keep items.'});}},
  {name:"Imp's Teeth",copies:1,type:'consumable',icon:'☷',desc:'1 use: reroll your next combat roll.',use:'reroll'},
- {name:'Torch',copies:1,type:'equipment',slot:'tool',icon:'🔥',desc:'Lay 2 dungeon tiles for 1 AP.',apply:p=>{p.equipment.torch={name:'Torch',icon:'🔥',value:1};}},
+ {name:'Torch',copies:1,type:'equipment',slot:'tool',icon:'🔥',desc:'+1 Combat while equipped.',apply:p=>{p.equipment.torch={name:'Torch',icon:'🔥',value:1};}},
  {name:'Flying Daggers',copies:1,type:'spell',icon:'✣',desc:'One-use ranged spell. Range 1-3; spend 2 AP and roll 2 dice damage. Can fly around connected corners. Hidden or revealed monsters may be targeted. If it survives, it charges and there is no escape. The Dragon is immune.',use:'daggers'},
  {name:'Steel Sword',copies:1,type:'equipment',slot:'weapon',icon:'⚔',desc:'+1 combat roll.'},
  {name:"Sorcerer's Skull",copies:1,type:'spell',icon:'☠',desc:'1 use: 1 dice damage to all on tile.',use:'skull'},
@@ -809,14 +809,12 @@ function awardItem(item=drawItem()){
  return addToInventory(item,tile);
 }
 function maybePopulate(tile){ if(tile.monsterMarker) tile.monsterPending=true; if(tile.itemMarker) tile.itemPending=true; }
-function startPlace(dir){const p=state.player;const freeTorchLay=!!(p.equipment.torch&&p.flags.torchFreeLay);if(p.ap<1&&!freeTorchLay)return;const raw=state.tileDeck.pop();if(!raw){log('No dungeon tiles left.','system');return;}placement={dir,kind:raw.kind,rot:0,raw};showPlacement();}
+function startPlace(dir){if(!view3d.enabled){toast('Return to 3D to lay tiles');return;}const p=state.player;if(p.ap<1)return;const raw=state.tileDeck.pop();if(!raw){log('No dungeon tiles left.','system');return;}placement={dir,kind:raw.kind,rot:0,raw};showPlacement();}
 function showPlacement(){const need=DIRS[placement.dir].opp;document.getElementById('placeInfo').textContent='Drawn: '+TILE_LABEL[placement.kind]+' — placing to the '+placement.dir+'.';document.getElementById('tilePreview').innerHTML=tileSVG({kind:placement.kind,rot:placement.rot,opens:openings(placement.kind,placement.rot)});document.getElementById('placeBtn').disabled=!openings(placement.kind,placement.rot)[need];document.getElementById('placement').classList.add('open');}
 document.getElementById('rotBtn').onclick=()=>{placement.rot=(placement.rot+1)%4;showPlacement();};
 document.getElementById('cancelPlace').onclick=()=>{if(placement){state.tileDeck.push(placement.raw);shuffle(state.tileDeck);}placement=null;document.getElementById('placement').classList.remove('open');render();setTimeout(()=>centreOnHero(),0);};
 document.getElementById('placeBtn').onclick=()=>{const p=state.player,d=DIRS[placement.dir],nx=p.x+d.dx,ny=p.y+d.dy;const tile={kind:placement.kind,rot:placement.rot,opens:openings(placement.kind,placement.rot),visited:false,monsterMarker:placement.raw.monsterMarker,mNumber:placement.raw.mNumber||null,itemMarker:placement.raw.itemMarker};maybePopulate(tile);state.tiles[key(nx,ny)]=tile;
- const usedFreeTorchLay=!!(p.equipment.torch&&p.flags.torchFreeLay);
- if(usedFreeTorchLay){p.flags.torchFreeLay=false;log('Torch: second dungeon tile placed for no extra AP.','system');}
- else {p.ap-=1;if(p.equipment.torch&&state.tileDeck.length>0){p.flags.torchFreeLay=true;log('Torch: your next tile placement costs 0 AP.','system');}}
+ p.ap-=1;
  sndTile();log('Placed '+TILE_LABEL[tile.kind]+(tile.itemMarker?' with item marker':'')+' to the '+placement.dir+'.','system');if(state.tileDeck.length===0&&!state.exitPlaced)placeExitAndRing(nx,ny,tile);placement=null;document.getElementById('placement').classList.remove('open');render();setTimeout(()=>centreOnHero(),0);};
 function placeExitAndRing(x,y,fromTile){
  state.exitPlaced=true;
@@ -881,7 +879,7 @@ function collectRingIfSafe(tileKey){
 function canMove(dir){const p=state.player,t=getTile(p.x,p.y),d=DIRS[dir],nt=getTile(p.x+d.dx,p.y+d.dy);return t&&t.opens[dir]&&nt&&nt.opens[d.opp];}
 function canLay(dir){const p=state.player,t=getTile(p.x,p.y),d=DIRS[dir];return t&&t.opens[dir]&&!getTile(p.x+d.dx,p.y+d.dy)&&state.tileDeck.length>0;}
 
-function move(dir){window.BOD3D?.clearDice3D?.();const p=state.player;if(p.ap<1)return;const d=DIRS[dir];p.facing=dir;p.prevX=p.x;p.prevY=p.y;p.x+=d.dx;p.y+=d.dy;p.ap-=1;sndMove();const t=getTile(p.x,p.y);t.visited=true;
+function move(dir){if(!view3d.enabled){toast('Return to 3D to move');return;}window.BOD3D?.clearDice3D?.();const p=state.player;if(p.ap<1)return;const d=DIRS[dir];p.facing=dir;p.prevX=p.x;p.prevY=p.y;p.x+=d.dx;p.y+=d.dy;p.ap-=1;sndMove();const t=getTile(p.x,p.y);t.visited=true;
  if(t.kind==='spike'){promptOldSpikey(t);render();centreOnHero(false);return;}
  if(t.kind==='pool'&&!t.poolUsed){promptHealingPool(t);}
  if(t.itemPending&&!t.itemUsed){t.itemUsed=true;t.itemPending=false;awardItem(drawItem());}
@@ -1328,8 +1326,8 @@ function updateMobileDpad(){
  if(!dpad||!state)return;
 
  const p=state.player;
- const canPayLay=p.ap>=1||!!(p.equipment.torch&&p.flags.torchFreeLay);
- const blocked=state.gameOver||!!combat||!!placement||!!teleportItem||!!rangedMode;
+ const canPayLay=p.ap>=1;
+ const blocked=!view3d.enabled||state.gameOver||!!combat||!!placement||!!teleportItem||!!rangedMode;
 
  dpad.querySelectorAll('.dpadBtn').forEach(btn=>{
   const dir=btn.dataset.dir;
@@ -1371,8 +1369,8 @@ function renderControls(){
  if(rangedMode){addBtn(wrap,'Cancel Ranged Attack','red',cancelRangedAttack);return;}
 
  const p=state.player;
- if(p.equipment.bow)addBtn(wrap,p.equipment.bow.name+' — Range 1-3 (3 AP)','blue',()=>startRangedAttack('bow'),p.ap<3);
- if(p.equipment.staff)addBtn(wrap,'Ice Staff — Range 1-2 (4 AP)','blue',()=>startRangedAttack('iceStaff'),p.ap<4);
+ if(p.equipment.bow)addBtn(wrap,p.equipment.bow.name+' — Range 1-3 (3 AP)','blue',()=>startRangedAttack('bow'),!view3d.enabled||p.ap<3);
+ if(p.equipment.staff)addBtn(wrap,'Ice Staff — Range 1-2 (4 AP)','blue',()=>startRangedAttack('iceStaff'),!view3d.enabled||p.ap<4);
 
  // Directional movement/tile laying is handled by the shared N/E/S/W D-pad
  // on both desktop and mobile. Avoid rendering the old duplicate labelled row.
@@ -2403,9 +2401,10 @@ function handleGameKeyboard(e){
  if(anyGameOverlayOpen()||state.gameOver||teleportItem||rangedMode)return;
  const dir=keyboardDirection(e);if(!dir)return;
  e.preventDefault();
+ if(!view3d.enabled){toast('Return to 3D to move');return;}
  if(canMove(dir)){move(dir);return;}
  if(canLay(dir)){
-  const p=state.player,canPay=p.ap>=1||!!(p.equipment.torch&&p.flags.torchFreeLay);
+  const p=state.player,canPay=p.ap>=1;
   if(canPay)startPlace(dir);else toast('Not enough AP');
  }
 }
