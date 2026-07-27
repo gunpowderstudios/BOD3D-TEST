@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.87
+
+- Removed unresolved Git conflict markers from `assets/assets.js`.
+- Restored the canonical PNG mappings for Sirrus, Tamara, Mud Monster, Giant Snake and Mirror Monster in the Asset Manager.
+- Removed obsolete duplicate runtime patches from the asset-path file; current dedicated patches remain unchanged.
+- Updated the `assets.js` cache tag so browsers load the repaired mapping table.
+
 ## v11.86
 
 - Made permanent blood pools and droplets left by defeated monsters slightly redder.
