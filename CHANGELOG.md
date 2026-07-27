@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.89
+
+- Replaced the Magic Boots' obsolete +1 AP effect with improved protection against Old Spikey: the trap springs only on a roll of 1 while the boots are equipped, instead of 1–2.
+- Increased the shuffled dungeon from one Spike Trap tile to three.
+- Removed all remaining Magic Boots AP adjustments from equipment, inventory, save migration, and tester paths.
+
 ## v11.88
 
 - Changed the equipped Torch to grant +1 Combat.
