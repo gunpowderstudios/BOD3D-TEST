@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.88 — Torch combat bonus and reference-only 2D map
+// BOD3D-TEST v11.89 — Magic Boots trap bonus and three trap tiles
 (function(){
-  const BUILD='11.88';
+  const BUILD='11.89';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
