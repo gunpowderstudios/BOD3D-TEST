@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.88
+
+- Changed the equipped Torch to grant +1 Combat.
+- Removed the Torch's obsolete AP-free second tile effect.
+- Made 2D/map mode reference-only: map pan and zoom remain available, but movement, tile laying, and combat actions require returning to 3D.
+
 ## v11.87
 
 - Removed unresolved Git conflict markers from `assets/assets.js`.
