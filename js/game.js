@@ -126,6 +126,7 @@ function showCharSelect(){
  if(window.stopDungeonAmbience)window.stopDungeonAmbience();
  if(window.startDistantMonstersAmbience)window.startDistantMonstersAmbience();
  document.getElementById('charSelect').classList.remove('hidden');
+ renderCarriedRingHud();
  renderCharSelect();
  if(window.BODHeroPreview)window.BODHeroPreview.resume();
 }
@@ -1100,6 +1101,26 @@ function tileSVG(tile){
  path+=`<rect x="${c-w-3}" y="${c-w-3}" width="${(w+3)*2}" height="${(w+3)*2}"/>`;
  return `<svg viewBox="0 0 64 64"><rect x="0" y="0" width="64" height="64" fill="var(--cream)"/><g fill="var(--ink)">${path}</g></svg>`;
 }
+function renderCarriedRingHud(){
+ const viewport=document.getElementById('viewport');
+ if(!viewport)return;
+ let hud=document.getElementById('carriedRingHud');
+ if(!hud){
+  hud=document.createElement('div');
+  hud.id='carriedRingHud';
+  hud.setAttribute('aria-label','Ring of Creation carried');
+  const image=document.createElement('img');
+  image.alt='Ring of Creation';
+  hud.appendChild(image);
+  viewport.appendChild(hud);
+ }
+ const src=assetSrc('Ring');
+ const image=hud.querySelector('img');
+ if(image&&image.getAttribute('src')!==src)image.src=src;
+ const inGame=document.getElementById('charSelect')?.classList.contains('hidden');
+ hud.classList.toggle('visible',!!(state?.player?.hasRing&&inGame));
+}
+
 function render(){
  if(!state)return;
  document.getElementById('stats').innerHTML=`<div class="sectionTitle">${state.charDef?state.charDef.name:'Adventurer'}</div><div class="row"><span>Health</span><b class="hp">${state.player.health}/${state.player.maxHealth}</b></div><div class="hearts">${heartLine(state.player.health,state.player.maxHealth)}</div><div class="row"><span>AP</span><b class="ap">${state.player.ap}/${state.player.maxAp}</b></div><div class="statline">Combat: ${pDice()}d6+${pCombatMod()} &nbsp; Armour: -${pDamageReduction()}</div><div class="statline">Lives: ${state.player.lives} &nbsp; Ring: ${state.player.hasRing?`<span class="ringStatus">${iconHTML('Ring','◎')}<b>YES</b></span>`:'no'}</div>`;
@@ -1108,6 +1129,7 @@ function render(){
  renderWorld();
  renderControls();
  renderDev();
+ renderCarriedRingHud();
 
  document.getElementById('deckBadge').textContent='Tiles '+state.tileDeck.length;
  document.getElementById('monsterBadge').textContent='Monsters '+state.monsterDeck.length;
