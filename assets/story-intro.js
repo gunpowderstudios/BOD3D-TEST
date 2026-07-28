@@ -1,4 +1,4 @@
-// BOD3D-TEST v12.06 — revised story body
+// BOD3D-TEST v12.07 — Firkin story timing and ending guard
 (function () {
   'use strict';
 
@@ -17,7 +17,7 @@
     '“It’s all I have,” she sighs, as though she has run out of options. With that, she passes you the map. The parchment looks old and its markings are convincing, but the finest forgers could manage as much.',
     '“All right,” you say. “Mary! Put this halfling’s room, meal and ale on my tab.”',
     '“Settle up before you leave!” Mary calls back.',
-    '“Rose,” says the halfling quietly. “My name is Rose. My husband, Firkin, entered that dungeon many years ago. He never returned. This map is all I have left.”',
+    '“Rose,” says the halfling quietly. “My name is Rose. My husband, Firkin, entered that dungeon many days ago. He never returned. This map is all I have left.”',
     'Tears gather in her eyes as she pushes it towards you.',
     '“If you find him, tell him I’m still waiting.”',
     'The next morning, you follow the map southeast from Dragon Reach. After two nights on the road, you arrive at the marked location—but there is no cave, no doorway and no sign of any dungeon.',
@@ -29,7 +29,7 @@
   ];
 
   function appendStory(scroll) {
-    if (!scroll) return;
+    if (!scroll || scroll.classList.contains('endingScroll')) return;
 
     if (scroll.querySelector('.testerStoryHeading')) return;
     scroll.classList.add('hasStory');
