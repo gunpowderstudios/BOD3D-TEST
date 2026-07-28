@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.98
+
+- Ranged-action buttons now appear only when the relevant item is equipped and at least one legal monster target is within its permitted range.
+- Applied the automatic-button rule to Bow, Elven Bow, Ice Staff, and equipped Fireball or Flying Daggers; backpack-only spells remain available through Items.
+- Preserved weapon and backpack switching during melee combat so a player can change to a hand weapon after a monster charges.
+- Randomised each dungeon to contain a hidden total of 40–50 ordinary tiles before the Dragon's Exit appears, while retaining three Spike Traps, the Healing Pool, M2–M12, two item locations, and the 20-tile Ring guardian rule.
+
 ## v11.97
 
 - Restored the player's AP after a ranged encounter fully resolves, allowing permanent ranged weapons such as the Bow and Elven Bow to be used again against later monsters.
