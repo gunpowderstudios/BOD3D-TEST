@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.95 — floating carried-Ring HUD
+// BOD3D-TEST v11.96 — full mobile map pan and pinch navigation
 (function(){
-  const BUILD='11.95';
+  const BUILD='11.96';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
