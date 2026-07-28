@@ -152,7 +152,7 @@ const ITEM_MASTER=[
  {name:'Magic Armour',copies:1,type:'equipment',slot:'armour',icon:'▦',desc:'-2 damage from attacks.'},
  {name:'Magic Boots',copies:2,type:'equipment',slot:'boots',icon:'👢',desc:'Old Spikey springs only on a roll of 1 while equipped (normally 1–2).'},
  {name:'Teleport Crystal',copies:1,type:'spell',icon:'◆',desc:'1 use: teleport to any revealed tile.',use:'teleport'},
- {name:'Acme Insurance',copies:1,type:'other',icon:'☂',desc:'Used automatically on defeat: keep items and revive once.',apply:p=>{p.flags.insurance=true;p.other.push({name:'Acme Insurance',icon:'☂',desc:'Auto revive / keep items.'});}},
+ {name:'Acme Insurance',copies:1,type:'other',icon:'☂',desc:'Used automatically on defeat: gain another life, drop all items where you fell, and return to Start.'},
  {name:"Imp's Teeth",copies:1,type:'consumable',icon:'☷',desc:'1 use: reroll your next combat roll.',use:'reroll'},
  {name:'Torch',copies:1,type:'equipment',slot:'tool',icon:'🔥',desc:'+1 Combat while equipped.',apply:p=>{p.equipment.torch={name:'Torch',icon:'🔥',value:1};}},
  {name:'Flying Daggers',copies:1,type:'spell',icon:'✣',desc:'One-use ranged spell. Range 1-3; spend 2 AP and roll 2 dice damage. Can fly around connected corners. Hidden or revealed monsters may be targeted. If it survives, it charges and there is no escape. The Dragon is immune.',use:'daggers'},
@@ -963,7 +963,6 @@ function promptHealingPool(tile){
  ]);
 }
 function clearPlayerItems(){const p=state.player;p.slots={left:null,right:null,armour:null,boots:null,cloak:null};p.backpack=[];p.companionBear=null;p.flags.bootsBonus=false;syncEquipment();}
-function healingPoolTile(){return Object.values(state.tiles).find(t=>t.kind==='pool')||null;}
 function useInventoryItem(list,idx){ /* legacy alias */ if(list==='inventory')useInventoryIndex(idx); }
 function useItem(it,consume){const p=state.player,m=combat?.tile?.monster;let used=false,msg='';
  if(it.use==='healthPotion'){const h=roll(2).total;p.health=Math.min(p.maxHealth,p.health+h);msg='Health Potion restores '+h+' health.';used=true;}
