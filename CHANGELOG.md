@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.06
+
+- Replaced the body of “A SHORT STORY…” with the revised tavern and dungeon introduction.
+- Corrected dialogue punctuation, hyphenation, capitalisation and sentence structure while preserving the existing title.
+
 ## v12.05
 
 - Removed the stray punctuation before “If your hero falls…” and placed the exclamation mark correctly inside “ONE LIFE!”.
