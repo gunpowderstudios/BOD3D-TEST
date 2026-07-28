@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.02
+
+- Changed Dragonlance from three extra damage dice after a hit to +1 normal combat die against the Red Dragon only.
+- Dragonlance now behaves like the Bear's dice bonus, but never applies against ordinary monsters.
+- Updated the item description to match the corrected rule.
+
 ## v12.01
 
 - Moved the solid-blue BUY BOD button flush to the upper-left corner on desktop and mobile.
