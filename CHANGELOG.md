@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.00
+
+- Restyled BUY BOD as a smaller solid-blue button with bold white text.
+- Matched the bordered, raised and pressed appearance of the compact red mobile action buttons without changing its link or position.
+
 ## v11.99
 
 - Added a persistent blue BUY BOD tab on the right edge of desktop and mobile screens.
