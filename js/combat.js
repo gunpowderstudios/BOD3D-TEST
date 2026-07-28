@@ -5,7 +5,7 @@
 
 function pCombatMod(){const e=state.player.equipment;return state.player.baseMod+applyEquipmentStats(e.weapon)+(e.torch?1:0)}
 function pDamageReduction(){const e=state.player.equipment;return applyEquipmentStats(e.armour)+applyEquipmentStats(e.shield)}
-function pDice(){return state.player.baseDice+(state.player.equipment.bear?1:0)+(state.player.temp.strength?1:0)}
+function pDice(){const p=state.player;const dragonBonus=!!(combat?.tile?.monster?.isDragon&&p.equipment.dragonlance);return p.baseDice+(p.equipment.bear?1:0)+(p.temp.strength?1:0)+(dragonBonus?1:0)}
 function openCombat(tile,options={}){
  if(!view3d.enabled){toast('Return to 3D to fight');return;}
  closeModal();
@@ -540,7 +540,7 @@ function resolveFightRound(){
  let damageToMonster=0,damageToHero=0;
  const deadeye=p.special==='Dead-eye'&&pr.rolls.includes(6);
  if(deadeye){damageToMonster=Math.max(0,m.health);m.health=0;text+='Dead-eye! Instant kill.';}
- else if(pt>mt){let dmg=pt-mt;if(m.isDragon&&p.equipment.dragonlance){const extra=roll(3).total;dmg+=extra;text+='Dragonlance adds '+extra+' damage. ';}damageToMonster=dmg;m.health-=dmg;text+='You hit for '+dmg+'.';}
+ else if(pt>mt){let dmg=pt-mt;damageToMonster=dmg;m.health-=dmg;text+='You hit for '+dmg+'.';}
  else if(mt>pt){if(combat.monsterSkip){combat.monsterSkip=false;text+=m.name+' is held and misses.';}else{let dmg=Math.max(0,mt-pt-pDamageReduction());damageToHero=dmg;p.health-=dmg;text+=m.name+' hits for '+dmg+'.';if(dmg>0&&p.equipment.bear){text+=' Loyal Bear is defeated protecting you.';if(p.companionBear)state.itemDiscard.push(p.companionBear);p.companionBear=null;syncEquipment();}}}
  else{text+='Both miss.';}
  combat.rolling=false;
