@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.08 — Firkin guardian targeting correction
+// BOD3D-TEST v12.09 — ACME Insurance resurrection and death drops
 (function(){
-  const BUILD='12.08';
+  const BUILD='12.09';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
