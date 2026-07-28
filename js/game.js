@@ -635,7 +635,7 @@ function openSoundManager(){
    <input id="soundVolume" type="range" min="0" max="1" step="0.05" value="${soundVolume}">
    <span id="soundVolumeValue">${Math.round(soundVolume*100)}%</span>
   </div>
-  <div class="small">
+  <div class="small soundManagerInfo">
    Green means the sound was found on GitHub and can be heard by everyone.
    Brown means a private browser override is active.
    Red means the expected GitHub file could not be loaded.
