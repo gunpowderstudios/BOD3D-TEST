@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.03
+
+- Moved the character-selection logo down on mobile so it no longer clashes with the upper-left BUY BOD tag or upper-right mute control.
+- Preserved the existing logo size and desktop placement.
+
 ## v12.02
 
 - Changed Dragonlance from three extra damage dice after a hit to +1 normal combat die against the Red Dragon only.
