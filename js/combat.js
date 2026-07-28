@@ -190,6 +190,7 @@ function rangedTargets(range,allowCorners=false){
  const from=key(state.player.x,state.player.y),out=[];
  for(const [kk,t] of Object.entries(state.tiles)){
   if(!(t.monsterPending||(t.monster&&t.monster.health>0)))continue;
+  if(t.monster?.isDragon)continue;
   const distance=allowCorners?connectedDistance(from,kk,range):straightCorridorDistance(from,kk,range);
   if(distance>=1&&distance<=range)out.push({key:kk,distance});
  }
