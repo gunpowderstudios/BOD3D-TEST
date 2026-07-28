@@ -2245,6 +2245,28 @@ function developerAction(action){
  }
 }
 
+function wireMobileDeveloperHold(){
+ const version=document.getElementById('visibleBuildVersion');
+ if(!version||version.dataset.devHoldWired)return;
+ version.dataset.devHoldWired='1';
+ version.style.userSelect='none';
+ version.style.webkitUserSelect='none';
+ version.style.webkitTouchCallout='none';
+ let holdTimer=null;
+ const cancelHold=()=>{if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null;}};
+ version.addEventListener('pointerdown',event=>{
+  if(event.pointerType==='mouse')return;
+  cancelHold();
+  holdTimer=setTimeout(()=>{
+   holdTimer=null;
+   if(navigator.vibrate)navigator.vibrate(40);
+   openDeveloperConsole();
+  },5000);
+ });
+ ['pointerup','pointercancel','pointerleave'].forEach(type=>version.addEventListener(type,cancelHold));
+ version.addEventListener('contextmenu',event=>{if(event.pointerType!=='mouse')event.preventDefault();});
+}
+
 function wireDeveloperConsole(){
  const consoleEl=document.getElementById('developerConsole');
  const closeButton=document.getElementById('developerConsoleClose');
@@ -2426,10 +2448,12 @@ if(document.readyState==='loading'){
  document.addEventListener('DOMContentLoaded',()=>{
   wireItemTester();
   wireDeveloperConsole();
+  wireMobileDeveloperHold();
  });
 }else{
  wireItemTester();
  wireDeveloperConsole();
+ wireMobileDeveloperHold();
 }
 
 function win(){state.gameOver=true;sndWin();closeCombat();showModal('YOU ESCAPED!','You defeated the Dragon and escaped with the Ring of Creation.\n\n'+adventureStats(),[{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]);}
