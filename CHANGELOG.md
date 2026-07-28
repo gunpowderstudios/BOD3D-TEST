@@ -1,5 +1,14 @@
 # BOD3D-TEST Changelog
 
+## v12.09
+
+- Restored ACME Insurance under the single-life rules: it is consumed automatically on defeat and grants one resurrection.
+- The hero returns to Start with full Health and AP.
+- All equipped and backpack items drop on the exact death tile; the Ring also drops there if carried.
+- Companions are not treated as dropped items.
+- Removed the old Dragon-death rule that transferred items to the Healing Pool.
+- Updated the ACME Insurance item description and removed its obsolete legacy inventory hook.
+
 ## v12.08
 
 - Fixed Firkin’s guardian assignment so the whimpering message can no longer refer to an older revealed monster elsewhere in the dungeon.
