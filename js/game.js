@@ -635,7 +635,7 @@ function openSoundManager(){
    <input id="soundVolume" type="range" min="0" max="1" step="0.05" value="${soundVolume}">
    <span id="soundVolumeValue">${Math.round(soundVolume*100)}%</span>
   </div>
-  <div class="small">
+  <div class="small soundManagerInfo">
    Green means the sound was found on GitHub and can be heard by everyone.
    Brown means a private browser override is active.
    Red means the expected GitHub file could not be loaded.
@@ -742,7 +742,7 @@ function createTileDeck(){
   return shuffle(deck);
 }
 function showTesterWarning(){
- showModal('A WARNING FROM THE DUNGEON','',[{text:'Enter at your own risk',cls:'green',fn:closeModal}]);
+ showModal('A WARNING FROM THE DUNGEON','',[{text:'Begin your quest…',cls:'green',fn:closeModal}]);
  const body=document.getElementById('modalBody');
  if(body)body.innerHTML=`<div class="testerWarningScroll"><div style="font-size:28px;font-weight:700;margin-bottom:28px;">A WARNING FROM THE DUNGEON</div>You have <b>ONE LIFE!</b> If your hero falls, the dungeon claims you and the game ends.<br><br>Your quest: Get in, get the Ring, and try to get out alive.<br><br><span style="color:#B4201A;font-weight:bold;">TIP: The Ring may be hidden on one of the many large monsters that dwell in this dungeon.<br>BEWARE! The Red Dragon waits patiently for you at the Exit.</span><br><br>Good luck, brave adventurer. You’ll need it.</div>`;
 }
