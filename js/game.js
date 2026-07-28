@@ -2148,8 +2148,10 @@ function developerBuildCompleteDungeon(withMonsters){
 
  // Use the real end-of-dungeon routine so developer-built dungeons receive
  // the guarded Exit and the normal M2-M12 Ring location roll.
- if(lastLaid)placeExitAndRing(lastLaid.x,lastLaid.y,lastLaid.tile);
- else log('[TEST] Could not place the Exit because no dungeon tiles were generated.','combat');
+ if(lastLaid){
+  placeExitAndRing(lastLaid.x,lastLaid.y,lastLaid.tile);
+  if(withMonsters)setTimeout(()=>window.BODAssignRingGuardian?.(),0);
+ }else log('[TEST] Could not place the Exit because no dungeon tiles were generated.','combat');
 
  if(withMonsters){
   log('[TEST] Spawned a complete random dungeon with revealed monsters.','system');
@@ -2242,10 +2244,10 @@ function wireMobileDeveloperHold(){
  viewButton.style.userSelect='none';
  viewButton.style.webkitUserSelect='none';
  viewButton.style.webkitTouchCallout='none';
+ viewButton.style.touchAction='manipulation';
  let holdTimer=null,suppressNextClick=false;
  const cancelHold=()=>{if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null;}};
- viewButton.addEventListener('pointerdown',event=>{
-  if(event.pointerType==='mouse')return;
+ const startHold=()=>{
   cancelHold();
   holdTimer=setTimeout(()=>{
    holdTimer=null;
@@ -2254,8 +2256,14 @@ function wireMobileDeveloperHold(){
    if(navigator.vibrate)navigator.vibrate(40);
    openDeveloperConsole();
   },5000);
- });
- ['pointerup','pointercancel','pointerleave'].forEach(type=>viewButton.addEventListener(type,cancelHold));
+ };
+ if('ontouchstart' in window){
+  viewButton.addEventListener('touchstart',startHold,{passive:true});
+  ['touchend','touchcancel'].forEach(type=>viewButton.addEventListener(type,cancelHold,{passive:true}));
+ }else{
+  viewButton.addEventListener('pointerdown',event=>{if(event.pointerType!=='mouse')startHold();});
+  ['pointerup','pointercancel'].forEach(type=>viewButton.addEventListener(type,cancelHold));
+ }
  viewButton.addEventListener('click',event=>{
   if(!suppressNextClick)return;
   suppressNextClick=false;
