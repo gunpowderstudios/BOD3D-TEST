@@ -95,18 +95,26 @@
       );
     }
 
-    function firkinCandidates() {
-      return Object.entries(state?.tiles || {}).filter(([, tile]) => {
-        const monster = tile?.monster;
-        return monster &&
-          monster.health > 0 &&
-          (monster.revealed || monster.peeked) &&
-          !monster.isDragon &&
-          !monster.carriesRing &&
-          !monster.guardsFirkin &&
-          !monster.firkinChecked &&
-          Number(monster.maxHealth) >= 8;
-      });
+    function currentFirkinCandidate() {
+      if (!combat?.tile?.monster) return null;
+
+      const tile = combat.tile;
+      const monster = tile.monster;
+      const tileEntry = Object.entries(state?.tiles || {})
+        .find(([, candidateTile]) => candidateTile === tile);
+      const tileKey = tileEntry?.[0] || key(state.player.x, state.player.y);
+
+      if (
+        monster.health <= 0 ||
+        !monster.revealed ||
+        monster.isDragon ||
+        monster.carriesRing ||
+        monster.guardsFirkin ||
+        monster.firkinChecked ||
+        Number(monster.maxHealth) < 10
+      ) return null;
+
+      return [tileKey, tile];
     }
 
     function assignFirkinGuardian() {
@@ -117,22 +125,20 @@
         Number(state.player?.killed?.length || 0) < 6
       ) return false;
 
-      const candidates = firkinCandidates();
-      if (!candidates.length) return false;
+      const candidate = currentFirkinCandidate();
+      if (!candidate) return false;
+
+      const [tileKey, tile] = candidate;
       const guaranteed = laidTileCount() >= 25;
+      tile.monster.firkinChecked = true;
+      if (!guaranteed && Math.random() >= 0.25) return false;
 
-      for (const [tileKey, tile] of candidates) {
-        tile.monster.firkinChecked = true;
-        if (!guaranteed && Math.random() >= 0.25) continue;
-
-        tile.monster.guardsFirkin = true;
-        state.firkinGuardianAssigned = true;
-        state.firkinGuardianKey = tileKey;
-        log('You hear a frightened whimpering nearby…', 'loot');
-        if (typeof toast === 'function') toast('You hear a frightened whimpering nearby…');
-        return true;
-      }
-      return false;
+      tile.monster.guardsFirkin = true;
+      state.firkinGuardianAssigned = true;
+      state.firkinGuardianKey = tileKey;
+      log('You hear whimpering nearby…!', 'loot');
+      if (typeof toast === 'function') toast('You hear whimpering nearby…!');
+      return true;
     }
 
     function placeFirkinOnTile(tile, tileKey, monsterName) {
