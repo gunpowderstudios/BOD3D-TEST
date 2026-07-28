@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.00 — compact solid-blue Buy BOD button
+// BOD3D-TEST v12.01 — top-left fabric-style Buy BOD tag
 (function(){
-  const BUILD='12.00';
+  const BUILD='12.01';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
