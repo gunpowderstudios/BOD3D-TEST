@@ -43,7 +43,7 @@
 
     const heading = document.createElement('div');
     heading.className = 'testerStoryHeading';
-    heading.textContent = 'THE STORY SO FAR…';
+    heading.textContent = 'A SHORT STORY…';
     scroll.appendChild(heading);
 
     paragraphs.forEach(text => {
