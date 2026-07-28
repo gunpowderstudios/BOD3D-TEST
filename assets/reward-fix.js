@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.94 — reliable mobile tools and restored Ring guardian
+// BOD3D-TEST v11.95 — floating carried-Ring HUD
 (function(){
-  const BUILD='11.94';
+  const BUILD='11.95';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
@@ -36,6 +36,7 @@
   function loadUiFixes(){loadStyleOnce('link[data-bod-ui-fixes-v1168]','css/ui-fixes-v1168.css','bodUiFixesV1168');}
   function loadQuestLogColours(){loadStyleOnce('link[data-bod-quest-log-colours]','css/quest-log-colours.css','bodQuestLogColours');}
   function loadWarningScrollV1177(){loadStyleOnce('link[data-bod-warning-scroll-v1177]','css/warning-scroll-v1177.css','bodWarningScrollV1177');}
+  function loadCarriedRingHud(){loadStyleOnce('link[data-bod-carried-ring-hud]','css/carried-ring-hud.css','bodCarriedRingHud');}
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
@@ -49,7 +50,7 @@
     awardItem=function(item){const drawn=item||drawItem();if(!drawn){if(typeof log==='function')log('No items left in the item deck.','system');return false;}rewardQueue.push(drawn);if(!delivering)setTimeout(deliverNext,40);return true;};
     return true;
   }
-  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadQuestLogColours();loadWarningScrollV1177();loadLethalBlow();loadMobileSheetFix();loadCombatCleanup();loadCombatOnlyAP();loadCombatItemsMenu();loadCharactersOnly();loadEnterButtonFix();loadAudioLifecycle();loadGameplayRules();loadHealthHud();loadStoryIntro();}
+  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadQuestLogColours();loadWarningScrollV1177();loadCarriedRingHud();loadLethalBlow();loadMobileSheetFix();loadCombatCleanup();loadCombatOnlyAP();loadCombatItemsMenu();loadCharactersOnly();loadEnterButtonFix();loadAudioLifecycle();loadGameplayRules();loadHealthHud();loadStoryIntro();}
   function start(){loadAll();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{loadAll();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   setTimeout(syncVersion,900);
