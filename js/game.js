@@ -346,7 +346,7 @@ function assetNames(){
  CHARACTERS.forEach(x=>names.push(x.name));
  MONSTER_MASTER.forEach(x=>names.push(x.name));
  ITEM_MASTER.forEach(x=>names.push(x.name));
- ['Hero','Hidden Monster','Item Marker','Red Dragon','Start','Exit','Spike Trap','Healing Pool','Ring','Straight','Corner','T-Junction','Crossroad'].forEach(x=>names.push(x));
+ ['Hero','Hidden Monster','Item Marker','Red Dragon','Firkin','Start','Exit','Spike Trap','Healing Pool','Ring','Straight','Corner','T-Junction','Crossroad'].forEach(x=>names.push(x));
  return [...new Set(names)];
 }
 function openAssetManager(){
@@ -746,7 +746,7 @@ function showTesterWarning(){
  const body=document.getElementById('modalBody');
  if(body)body.innerHTML=`<div class="testerWarningScroll"><div style="font-size:28px;font-weight:700;margin-bottom:28px;">A WARNING FROM THE DUNGEON</div>You have <b>ONE LIFE!</b> If your hero falls, the dungeon claims you and the game ends.<br><br>Your quest: Get in, get the Ring, and try to get out alive.<br><br><span style="color:#B4201A;font-weight:bold;">TIP: The Ring may be hidden on one of the many large monsters that dwell in this dungeon.<br>BEWARE! The Red Dragon waits patiently for you at the Exit.</span><br><br>Good luck, brave adventurer. You’ll need it.</div>`;
 }
-function newGame(charDef=CHARACTERS[0]){document.getElementById('log').innerHTML='';pan={x:0,y:0,scale:1};view3d={enabled:true};if(window.BOD3D)window.BOD3D.resetHeroFacing();state={charDef,tiles:{},tileDeck:createTileDeck(),monsterDeck:expanded(MONSTER_MASTER),itemDeck:expanded(ITEM_MASTER),tileDiscard:[],monsterDiscard:[],itemDiscard:[],exitPlaced:false,ringActivated:false,ringKey:null,ringNumber:null,ringRoll:null,turns:1,startedAt:Date.now(),player:{x:0,y:0,prevX:0,prevY:0,facing:'S',maxHealth:charDef.maxHealth,health:charDef.maxHealth,maxAp:charDef.maxAp,ap:charDef.maxAp,baseDice:charDef.baseDice,baseMod:charDef.baseMod,lives:1,hasRing:false,equipment:{},slots:{left:null,right:null,armour:null,boots:null,cloak:null},backpack:[],companionBear:null,inventory:[],flags:{special:charDef.special,usedSpecial:false,renewCharges:3,bootsBonus:false,torchFreeLay:false},temp:{},killed:[]},gameOver:false};state.tiles['0,0']={kind:'start',opens:{...TILE_BASE.start},rot:0,visited:true};log(charDef.name+' enters the dungeon.','system');log('Welcome to Bag of Dungeon 3D '+VERSION+'.','system');render();setTimeout(()=>{setOpeningCamera();showTesterWarning();},0);}
+function newGame(charDef=CHARACTERS[0]){document.getElementById('log').innerHTML='';pan={x:0,y:0,scale:1};view3d={enabled:true};if(window.BOD3D)window.BOD3D.resetHeroFacing();state={charDef,tiles:{},tileDeck:createTileDeck(),monsterDeck:expanded(MONSTER_MASTER),itemDeck:expanded(ITEM_MASTER),tileDiscard:[],monsterDiscard:[],itemDiscard:[],exitPlaced:false,ringActivated:false,ringKey:null,ringNumber:null,ringRoll:null,turns:1,startedAt:Date.now(),player:{x:0,y:0,prevX:0,prevY:0,facing:'S',maxHealth:charDef.maxHealth,health:charDef.maxHealth,maxAp:charDef.maxAp,ap:charDef.maxAp,baseDice:charDef.baseDice,baseMod:charDef.baseMod,lives:1,hasRing:false,equipment:{},slots:{left:null,right:null,armour:null,boots:null,cloak:null},backpack:[],companionBear:null,companionFirkin:null,inventory:[],flags:{special:charDef.special,usedSpecial:false,renewCharges:3,bootsBonus:false,torchFreeLay:false},temp:{},killed:[]},gameOver:false};state.tiles['0,0']={kind:'start',opens:{...TILE_BASE.start},rot:0,visited:true};log(charDef.name+' enters the dungeon.','system');log('Welcome to Bag of Dungeon 3D '+VERSION+'.','system');render();setTimeout(()=>{setOpeningCamera();showTesterWarning();},0);}
 
 const TESTER_SINGLE_LIFE=true;
 const INVENTORY_LIMIT=8;
@@ -904,7 +904,7 @@ function move(dir){if(!view3d.enabled){toast('Return to 3D to move');return;}win
   }
   openCombat(t);
  }
- else {collectRingIfSafe(key(p.x,p.y));}
+ else {const currentKey=key(p.x,p.y);collectRingIfSafe(currentKey);if(typeof window.collectFirkinIfSafe==='function')window.collectFirkinIfSafe(currentKey);}
  if(t.kind==='exit'&&p.hasRing&&!t.monster){win();}
  render();centreOnHero(false);}
 function showCloakChoice(tile){
@@ -1180,7 +1180,10 @@ function renderInventory(){
  for(let i=0;i<BACKPACK_LIMIT;i++){const it=p.backpack[i];html+=`<div class="backpackSlot">${it?`<div class="slotItem" onclick="inspectBackpack(${i})"><div class="slotArt">${iconHTML(it.name,it.icon||'?')}</div><div class="slotName">${it.name}</div><div class="slotDesc">${it.desc||'No effect description.'}</div></div>`:'<div class="slotEmpty">Empty</div>'}</div>`;}
  html+=`</div>
  <div class="sectionTitle">Companions</div>
- <div class="slotGrid"><div class="equipSlot wide"><span class="slotLabel">${slotSymbolHTML('companion')}<span class="slotLabelText">Companions</span></span>${p.companionBear?`<div class="slotItem" onclick="inspectBear()"><div class="slotArt">${iconHTML('Loyal Bear',p.companionBear.icon||'🐻')}</div><div class="slotName">Loyal Bear</div><div class="slotDesc">Does not use inventory space.</div></div>`:'<div class="slotEmpty">No companions</div>'}</div></div>`;
+ <div class="slotGrid"><div class="equipSlot wide"><span class="slotLabel">${slotSymbolHTML('companion')}<span class="slotLabelText">Companions</span></span>
+ ${p.companionBear?`<div class="slotItem" onclick="inspectBear()"><div class="slotArt">${iconHTML('Loyal Bear',p.companionBear.icon||'🐻')}</div><div class="slotName">Loyal Bear</div><div class="slotDesc">+1 combat die.</div></div>`:''}
+ ${p.companionFirkin?`<div class="slotItem" onclick="inspectFirkin()"><div class="slotArt">${iconHTML('Firkin','F')}</div><div class="slotName">Firkin</div><div class="slotDesc">+3 to every attack roll.</div></div>`:''}
+ ${!p.companionBear&&!p.companionFirkin?'<div class="slotEmpty">No companions</div>':''}</div></div>`;
  const t=getTile(p.x,p.y);
  if(t&&t.droppedItems&&t.droppedItems.length)html+='<div class="sectionTitle">On this tile</div><div class="invgrid">'+t.droppedItems.map((x,i)=>`<button class="itemBtn" onclick="pickupDropped(${i})" title="Pick up ${x.name}">${iconHTML(x.name,x.icon||'?')}<span class="dropMark">+</span></button>`).join('')+'</div>';
  if(p.equipment.weapon&&p.equipment.weapon.name==='Magic Sword')html+=magicSwordPeekHTML();
@@ -1189,7 +1192,7 @@ function renderInventory(){
 function magicSwordPeekHTML(){const p=state.player;let rows=[];for(const dir of dirOrder){const d=DIRS[dir],t=getTile(p.x+d.dx,p.y+d.dy);if(t&&(t.monsterPending||(t.monster&&!t.monster.revealed)))rows.push(`<button class="peekBtn" onclick="peekMonster('${dir}')">View ${dir}</button>`);}return rows.length?'<div class="sectionTitle">Magic Sword</div><div class="small">View adjacent monster:</div>'+rows.join(' '):'';}
 window.peekMonster=function(dir){const p=state.player,d=DIRS[dir],t=getTile(p.x+d.dx,p.y+d.dy);if(!t)return;if(t.monsterPending&&!t.monster){t.monster=drawMonster();t.monsterPending=false;}if(t.monster){t.monster.peeked=true;showModal('Magic Sword: '+dir,t.monster.name+'\nHealth '+t.monster.maxHealth+'\nCombat '+t.monster.dice+'d6+'+t.monster.mod,[{text:'Close',fn:closeModal}]);render();}};
 function carriedAt(slot){return state.player.slots[slot];}
-window.inspectCarried=function(slot){const item=carriedAt(slot);if(item)inspectItemObject(item);};window.inspectBackpack=function(idx){const item=state.player.backpack[idx];if(item)inspectItemObject(item);};window.inspectBear=function(){if(state.player.companionBear)inspectItemObject(state.player.companionBear);};
+window.inspectCarried=function(slot){const item=carriedAt(slot);if(item)inspectItemObject(item);};window.inspectBackpack=function(idx){const item=state.player.backpack[idx];if(item)inspectItemObject(item);};window.inspectBear=function(){if(state.player.companionBear)inspectItemObject(state.player.companionBear);};window.inspectFirkin=function(){if(!state.player.companionFirkin)return;showModal('Firkin','Rose’s rescued husband. Firkin adds +3 to every attack roll and can fight alongside the Loyal Bear.',[{text:'Close',fn:closeModal}]);};
 function inspectItemObject(item){const buttons=[];const eq=equippedSlotFor(item);if(item.type==='equipment'||isHandItem(item)||isAttire(item)){if(eq&&eq!=='companion')buttons.push({text:'Move to Backpack',fn:()=>{if(unequipItem(item)){closeModal();render();}}});if(isArmour(item)&&eq!=='armour')buttons.push({text:'Wear Armour',cls:'green',fn:()=>{if(equipToSlot(item,'armour')){closeModal();render();}}});else if(isBoots(item)&&eq!=='boots')buttons.push({text:'Wear Boots',cls:'green',fn:()=>{if(equipToSlot(item,'boots')){closeModal();render();}}});else if(isCloak(item)&&eq!=='attire')buttons.push({text:'Wear Attire',cls:'green',fn:()=>{if(equipToSlot(item,'cloak')){closeModal();render();}}});else if(isHandItem(item)&&eq!=='both hands'){buttons.push({text:isTwoHanded(item)?'Equip Both Hands':'Equip Left Hand',cls:'green',fn:()=>{if(equipToSlot(item,'left')){closeModal();render();}}});if(!isTwoHanded(item))buttons.push({text:'Equip Right Hand',cls:'green',fn:()=>{if(equipToSlot(item,'right')){closeModal();render();}}});}}
  if(!isChest(item)&&(item.type==='spell'||item.type==='consumable'||item.use))buttons.push({text:'Use',cls:'green',fn:()=>{closeModal();useItemObject(item);}});buttons.push({text:'Drop',cls:'red',fn:()=>dropItemObject(item)});buttons.push({text:'Close',fn:closeModal});showModal(item.name,(item.desc||'Item')+(eq?'\n\nActive: '+eq:''),buttons);}
 function useItemObject(item){if(item.use==='iceStaff'){useItem(item);return;}useItem(item,()=>{removeFromCurrentLocation(item);state.itemDiscard.push(item);syncEquipment();render();});}
@@ -1320,7 +1323,7 @@ function beginDroppedPickup(tileKey,idx){
  },0);
 }
 window.pickupDroppedFromTile=function(tileKey,idx){beginDroppedPickup(tileKey,idx);};
-function renderWorld(){const world=document.getElementById('world');world.innerHTML='';for(const k in state.tiles){const [x,y]=k.split(',').map(Number),t=state.tiles[k];const d=document.createElement('div');d.className='tile'+(teleportItem?' teleportTarget':'');d.dataset.tileKey=k;d.style.left=(x*STEP)+'px';d.style.top=(y*STEP)+'px';d.innerHTML=tileSVG(t);if(t.ringReveal)d.classList.add('ringReveal');if(TILE_GLYPH[t.kind]&&t.kind!=='start')d.innerHTML+=`<span class="tileOverlay">${iconHTML(TILE_LABEL[t.kind]||t.kind,TILE_GLYPH[t.kind])}</span>`;if(t.hasRing)d.innerHTML+=`<span class="ringMark">${iconHTML('Ring','💍')}</span>`;if(t.itemPending&&!t.itemUsed)d.innerHTML+=`<span class="itemLocationMarker">${iconHTML('Item Marker','Item')}</span>`;if(t.droppedItems&&t.droppedItems.length){
+function renderWorld(){const world=document.getElementById('world');world.innerHTML='';for(const k in state.tiles){const [x,y]=k.split(',').map(Number),t=state.tiles[k];const d=document.createElement('div');d.className='tile'+(teleportItem?' teleportTarget':'');d.dataset.tileKey=k;d.style.left=(x*STEP)+'px';d.style.top=(y*STEP)+'px';d.innerHTML=tileSVG(t);if(t.ringReveal)d.classList.add('ringReveal');if(TILE_GLYPH[t.kind]&&t.kind!=='start')d.innerHTML+=`<span class="tileOverlay">${iconHTML(TILE_LABEL[t.kind]||t.kind,TILE_GLYPH[t.kind])}</span>`;if(t.hasRing)d.innerHTML+=`<span class="ringMark">${iconHTML('Ring','💍')}</span>`;if(t.hasFirkin)d.innerHTML+=`<span class="firkinMark" aria-label="Firkin is waiting here">${iconHTML('Firkin','F')}</span>`;if(t.itemPending&&!t.itemUsed)d.innerHTML+=`<span class="itemLocationMarker">${iconHTML('Item Marker','Item')}</span>`;if(t.droppedItems&&t.droppedItems.length){
  const visible=t.droppedItems.slice(0,5);
  d.innerHTML+=`<span class="tileItemStack" role="button" tabindex="0" data-item-key="${k}" aria-label="View ${t.droppedItems.length} item${t.droppedItems.length===1?'':'s'} on this tile" title="Click to view items on this tile">${visible.map((item,i)=>`<span class="tileItemMarker">${iconHTML(item.name,item.icon||'?')}${i===visible.length-1&&t.droppedItems.length>visible.length?`<span class="tileItemCount">${t.droppedItems.length}</span>`:''}</span>`).join('')}</span>`;
 }if((t.monsterPending)||(t.monster&&t.monster.health>0)){d.innerHTML+=(t.monster&&(t.monster.revealed||t.monster.peeked))?monsterBoardHTML(t.monster,rangedMode&&rangedMode.targetKeys.has(k)?' rangedTarget':'',k):`<span class="hiddenMonster${rangedMode&&rangedMode.targetKeys.has(k)?' rangedTarget':''}" role="button" tabindex="0" data-ranged-key="${k}">${iconHTML('Hidden Monster','M')}</span>`;}world.appendChild(d);wireBoardModels(d);
@@ -2513,7 +2516,55 @@ if(document.readyState==='loading'){
  wireMobileDeveloperHold();
 }
 
-function win(){state.gameOver=true;sndWin();closeCombat();showModal('YOU ESCAPED!','You defeated the Dragon and escaped with the Ring of Creation.\n\n'+adventureStats(),[{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]);}
+function endingParagraph(text){return '<p class="testerStoryParagraph">'+text+'</p>';}
+function endingScrollHTML(rescuedFirkin){
+ const heading='<div class="testerStoryHeading">CONGRATULATIONS, ADVENTURER!</div>';
+ const stats='<div class="testerStoryHeading endingStatsHeading">YOUR ADVENTURE</div><p class="testerStoryParagraph endingStats">'+adventureStats().replace(/\\n/g,'<br>')+'</p>';
+ const end='<div class="testerStoryHeading endingTheEnd">THE END</div>';
+ const rescued=[
+  'You found the Ring of Creation—the legends were true! Better still, you helped Firkin escape from the dungeon.',
+  'Exhausted, you collapse outside the cave entrance. Smoke billows into the night, obscuring the stars. You and Firkin rest beside the dying fire and share stories of your adventures.',
+  'Firkin cannot thank you enough.',
+  '“Well, Firkin, I may have a surprise for you—but it’ll cost you a mug of ale!”',
+  'At last, you make your way back to the Wasted Wizard Tavern and slump your weary bones into what feels like the finest firelit alcove in all the realm.',
+  'Mary recognises you immediately.',
+  '“Our hero returns!” she calls across the room, giving you a knowing look. “I knew you’d be back. Still, I’m glad you settled your tab first!” she laughs.',
+  'Suddenly, Firkin cries out.',
+  '“Rose! Rose, my love!”',
+  'Rose looks up from her table. Mary has been kind enough to look after her while she waited. She rushes across the tavern and throws herself into Firkin’s arms.',
+  '“How can I ever repay you?” she asks, turning to you.',
+  'Then she looks at Firkin.',
+  '“And how can I ever forgive you?” she adds, slapping him across the back of the head.',
+  'All’s well that ends well—and this adventure did end well.',
+  'At least, until another map turns up…'
+ ];
+ const missing=[
+  'You found the Ring of Creation—the legends were true!',
+  'Exhausted, you collapse outside the cave entrance. Smoke billows into the night, obscuring the stars. As you rest beneath their faint light, the horrors of the dungeon slowly begin to fade.',
+  'Once you have gathered your strength, you make your way back to the Wasted Wizard Tavern, victorious—but carrying sad news for Rose.',
+  'You slump your weary bones into the warmth of the finest firelit alcove in all the realm.',
+  'Mary recognises you immediately.',
+  '“Our hero returns!” she calls across the room. “I knew you’d be back. Still, I’m glad you settled your tab first!” she laughs.',
+  'Rose looks up from her table, hope shining in her eyes.',
+  '“I found the Ring,” you tell her quietly, “but I couldn’t find Firkin.”',
+  'Her eyes fill with tears.',
+  'You place a reassuring hand upon her shoulder.',
+  '“Perhaps the dungeon hasn’t claimed him. Let me rest, and I will go in again. Trust me.”',
+  'Somewhere beneath the earth, in the cold darkness of the dungeon, a frightened halfling waits.',
+  'Your adventure is over—for now.'
+ ];
+ return '<div class="testerWarningScroll hasStory endingScroll">'+heading+
+  (rescuedFirkin?rescued:missing).map(endingParagraph).join('')+stats+end+'</div>';
+}
+function win(){
+ state.gameOver=true;
+ sndWin();
+ closeCombat();
+ const rescuedFirkin=!!state.player.companionFirkin;
+ showModal('YOU ESCAPED!','',[{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]);
+ const body=document.getElementById('modalBody');
+ if(body)body.innerHTML=endingScrollHTML(rescuedFirkin);
+}
 function lose(){state.gameOver=true;sndLose();closeCombat();showModal('GAME OVER','The dungeon claims another adventurer.\n\n'+adventureStats(),[{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]);}
 
 // v11.19: Clear any settled or still-animating dice at the start of a new game.
