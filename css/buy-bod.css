@@ -1,4 +1,4 @@
-/* BOD3D-TEST v11.99 — persistent Buy BOD tab */
+/* BOD3D-TEST v12.00 — compact solid-blue Buy BOD button */
 #buyBodButton{
  position:fixed;
  right:0;
@@ -8,39 +8,36 @@
  display:flex;
  align-items:center;
  justify-content:center;
- width:98px;
- min-height:42px;
- padding:8px 10px;
- border:2px solid #9bc9ff;
+ width:84px;
+ min-height:36px;
+ padding:6px 8px;
+ border:2px solid #67adff;
  border-right:0;
- border-radius:9px 0 0 9px;
- background:linear-gradient(180deg,#167ee8,#0752aa);
+ border-radius:7px 0 0 7px;
+ background:#0966cc;
  color:#fff;
- box-shadow:-3px 4px 0 rgba(0,20,55,.85),-5px 8px 16px rgba(0,0,0,.45);
- font:900 13px/1.05 "Alegreya Sans",Arial,sans-serif;
- letter-spacing:.055em;
+ box-shadow:0 4px 0 #031a36,-3px 7px 14px rgba(0,0,0,.5);
+ font:900 12px/1.05 "Alegreya Sans",Arial,sans-serif;
+ letter-spacing:.045em;
  text-align:center;
  text-decoration:none;
  text-shadow:0 1px 1px rgba(0,0,0,.55);
  pointer-events:auto;
- transition:width .16s ease,filter .16s ease,transform .16s ease;
+ transition:filter .14s ease,transform .14s ease;
 }
 #buyBodButton:hover,
 #buyBodButton:focus-visible{
- width:108px;
- filter:brightness(1.13);
- outline:3px solid #fff;
+ filter:brightness(1.14);
+ outline:2px solid #fff;
  outline-offset:2px;
 }
-#buyBodButton:active{transform:translateY(-50%) translateY(2px)}
+#buyBodButton:active{transform:translateY(calc(-50% + 3px));box-shadow:0 1px 0 #031a36,-2px 4px 9px rgba(0,0,0,.45)}
 @media(max-width:800px){
  #buyBodButton{
   top:48%;
-  width:84px;
-  min-height:40px;
-  padding:7px 8px;
-  font-size:12px;
+  width:74px;
+  min-height:34px;
+  padding:5px 7px;
+  font-size:11px;
  }
- #buyBodButton:hover,
- #buyBodButton:focus-visible{width:92px}
 }
