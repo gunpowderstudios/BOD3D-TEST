@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.10
+
+- Fixed the intro ambience switching prematurely from `distant-monsters.mp3` to `dungeon-sounds.mp3`.
+- The Android/page-lifecycle audio controller now recognises the actual `#charSelect` screen used by the game.
+- Focus, pageshow and tab-return events now restore the correct track for the visible screen.
+
 ## v12.09
 
 - Restored ACME Insurance under the single-life rules: it is consumed automatically on defeat and grants one resurrection.
