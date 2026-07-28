@@ -2519,7 +2519,7 @@ if(document.readyState==='loading'){
 function endingParagraph(text){return '<p class="testerStoryParagraph">'+text+'</p>';}
 function endingScrollHTML(rescuedFirkin){
  const heading='<div class="testerStoryHeading">CONGRATULATIONS, ADVENTURER!</div>';
- const stats='<div class="testerStoryHeading endingStatsHeading">YOUR ADVENTURE</div><p class="testerStoryParagraph endingStats">'+adventureStats().replace(/\\n/g,'<br>')+'</p>';
+ const stats='<div class="testerStoryHeading endingStatsHeading">YOUR ADVENTURE</div><p class="testerStoryParagraph endingStats">'+adventureStats().replace(/\n/g,'<br>')+'</p>';
  const end='<div class="testerStoryHeading endingTheEnd">THE END</div>';
  const rescued=[
   'You found the Ring of Creation—the legends were true! Better still, you helped Firkin escape from the dungeon.',
