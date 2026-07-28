@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.01
+
+- Moved the solid-blue BUY BOD button flush to the upper-left corner on desktop and mobile.
+- Restyled it as a neat fabric/jeans-style tag with a squared attached corner, subtle inset edge and compact raised shadow.
+- Shifted the mobile Centre circle to the right so it remains clear of the tag without moving Map, mute, menu or fullscreen controls.
+
 ## v12.00
 
 - Restyled BUY BOD as a smaller solid-blue button with bold white text.
