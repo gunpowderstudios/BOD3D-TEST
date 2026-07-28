@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.05
+
+- Removed the stray punctuation before “If your hero falls…” and placed the exclamation mark correctly inside “ONE LIFE!”.
+- Added the Ring guardian tip and retained the Red Dragon warning in red text on the opening scroll.
+
 ## v12.04
 
 - Removed the separate white “3D” text beneath the opening-screen logo because the updated logo graphic now includes it.
