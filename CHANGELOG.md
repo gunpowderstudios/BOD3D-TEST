@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v12.08
+
+- Fixed Firkin’s guardian assignment so the whimpering message can no longer refer to an older revealed monster elsewhere in the dungeon.
+- Firkin now attaches only to the specific 10+ Health monster in the current combat encounter.
+- The Red Dragon and Ring guardian remain excluded; running away leaves Firkin attached to that monster.
+- Changed the notification to: “You hear whimpering nearby…!”
+
 ## v12.07
 
 - Added Firkin as a hidden rescue companion after 15 tiles and 6 monster kills, with a 25% chance on each newly revealed 8+ Health monster and a guaranteed next suitable guardian from tile 25.
