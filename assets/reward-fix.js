@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.09 — ACME Insurance resurrection and death drops
+// BOD3D-TEST v12.10 — correct intro/dungeon ambience handoff
 (function(){
-  const BUILD='12.09';
+  const BUILD='12.10';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
