@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.84 — 20-tile rules and immediate Ring HUD refresh
+// BOD3D-TEST v11.94 — restored 20-tile Ring guardian and developer assignment
 (function () {
   'use strict';
 
@@ -80,6 +80,8 @@
       }
       return true;
     }
+
+    window.BODAssignRingGuardian=assignRingGuardian;
 
     // The Exit still appears normally, but it no longer rolls or places the Ring.
     placeExitAndRing = function (x, y, from) {
