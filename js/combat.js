@@ -614,7 +614,88 @@ function runAway(){
  centreOnHero(false);
 }
 
-function death(){const p=state.player;const carried=allCarriedItems();const acme=carried.find(it=>it.name==='Acme Insurance');if(!TESTER_SINGLE_LIFE&&(p.flags.insurance||acme)){if(acme){removeFromCurrentLocation(acme);state.itemDiscard.push(acme);}p.flags.insurance=false;p.health=p.maxHealth;p.x=0;p.y=0;p.facing='S';log('Acme Insurance saves you and lets you keep your items!','heal');closeCombat();render();centreOnHero();return;}const killedByDragon=!!(combat&&combat.tile&&combat.tile.monster&&combat.tile.monster.isDragon);const droppable=carried.filter(it=>!isBear(it));if(droppable.length){let targetTile;if(killedByDragon){targetTile=healingPoolTile();if(targetTile){log('The Dragon defeats you. Your items are transferred to the Healing Pool.','combat');}else{targetTile=getTile(p.x,p.y);log('The Dragon defeats you. No Healing Pool is available, so your items remain at the Exit.','combat');}}else{targetTile=getTile(p.x,p.y);log('Your items drop on the tile where you fell.','combat');}if(targetTile){targetTile.droppedItems=targetTile.droppedItems||[];targetTile.droppedItems.push(...droppable);}clearPlayerItems();}p.lives--;if(p.lives<=0){lose();return;}p.health=p.maxHealth;p.x=0;p.y=0;p.facing='S';p.hasRing=false;log('You fall and wake at Start. Lives left: '+p.lives+'.','combat');closeCombat();window.BOD3D?.snapHeroToPlayer?.();render();centreOnHero(false);setTimeout(()=>{window.BOD3D?.snapHeroToPlayer?.();render();centreOnHero(true);window.BOD3D?.centreOnHero?.();},120);}
+function dropDeathItems(p,deathTile,deathKey,keepCompanions){
+ const bear=keepCompanions?p.companionBear:null;
+ const droppable=allCarriedItems().filter(
+  item=>!isBear(item)&&item.name!=='Acme Insurance'
+ );
+
+ if(droppable.length&&deathTile){
+  deathTile.droppedItems=deathTile.droppedItems||[];
+  deathTile.droppedItems.push(...droppable);
+  log('All your items drop on the tile where you fell.','combat');
+ }
+
+ if(p.hasRing&&deathTile){
+  deathTile.hasRing=true;
+  state.ringActivated=true;
+  state.ringKey=deathKey;
+  p.hasRing=false;
+  log('The Ring of Creation drops where you fell.','loot');
+ }
+
+ clearPlayerItems();
+ if(keepCompanions&&bear){
+  p.companionBear=bear;
+  syncEquipment();
+ }
+}
+
+function returnHeroToStart(p){
+ p.health=p.maxHealth;
+ p.ap=p.maxAp;
+ p.x=0;
+ p.y=0;
+ p.prevX=0;
+ p.prevY=0;
+ p.facing='S';
+ closeCombat();
+ window.BOD3D?.snapHeroToPlayer?.();
+ render();
+ centreOnHero(false);
+ setTimeout(()=>{
+  window.BOD3D?.snapHeroToPlayer?.();
+  render();
+  centreOnHero(true);
+  window.BOD3D?.centreOnHero?.();
+ },120);
+}
+
+function death(){
+ const p=state.player;
+ const deathKey=key(p.x,p.y);
+ const deathTile=getTile(p.x,p.y);
+ const carried=allCarriedItems();
+ const acme=carried.find(item=>item.name==='Acme Insurance');
+ const insured=Boolean(acme||p.flags.insurance);
+
+ if(insured){
+  if(acme){
+   removeFromCurrentLocation(acme);
+   state.itemDiscard.push(acme);
+  }
+  p.flags.insurance=false;
+  dropDeathItems(p,deathTile,deathKey,true);
+  log('ACME Insurance grants you another life and returns you to Start.','heal');
+  returnHeroToStart(p);
+  showModal(
+   'ACME INSURANCE PAYS OUT!',
+   'You gain another life. All your items remain on the tile where you fell, and you awaken at Start with full Health and AP.',
+   [{text:'Return to the Dungeon',cls:'green',fn:closeModal}]
+  );
+  return;
+ }
+
+ dropDeathItems(p,deathTile,deathKey,false);
+ p.lives--;
+ if(p.lives<=0){
+  lose();
+  return;
+ }
+
+ returnHeroToStart(p);
+ log('You fall and wake at Start. Lives left: '+p.lives+'.','combat');
+}
 function closeCombat(){
  const finishedCombat=combat;
 
