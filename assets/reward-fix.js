@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.91 — five-second mobile developer gesture
+// BOD3D-TEST v11.92 — mobile developer gesture on Map button
 (function(){
-  const BUILD='11.91';
+  const BUILD='11.92';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
