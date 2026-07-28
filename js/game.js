@@ -2069,6 +2069,7 @@ function developerBuildCompleteDungeon(withMonsters){
  };
 
  const frontier=[{x:0,y:0}];
+ let lastLaid=null;
 
  function findPlacement(raw){
   const candidates=[];
@@ -2129,7 +2130,6 @@ function developerBuildCompleteDungeon(withMonsters){
    }
   }else{
    delete tile.monsterMarker;
-   delete tile.mNumber;
    delete tile.monsterPending;
    delete tile.monster;
    delete tile.itemMarker;
@@ -2140,26 +2140,16 @@ function developerBuildCompleteDungeon(withMonsters){
   generated[key(placementChoice.x,placementChoice.y)]=tile;
   frontier.push({x:placementChoice.x,y:placementChoice.y});
   state.tileDiscard.push(raw);
- }
-
- // Add the Exit as the final connected tile.
- const exitRaw={kind:'exit'};
- const exitPlacement=findPlacement(exitRaw);
-
- if(exitPlacement){
-  const exitTile={
-   kind:'exit',
-   rot:exitPlacement.rot,
-   opens:openings('exit',exitPlacement.rot),
-   visited:false
-  };
-
-  generated[key(exitPlacement.x,exitPlacement.y)]=exitTile;
-  state.exitPlaced=true;
+  lastLaid={x:placementChoice.x,y:placementChoice.y,tile};
  }
 
  state.tiles=generated;
  state.tileDeck=[];
+
+ // Use the real end-of-dungeon routine so developer-built dungeons receive
+ // the guarded Exit and the normal M2-M12 Ring location roll.
+ if(lastLaid)placeExitAndRing(lastLaid.x,lastLaid.y,lastLaid.tile);
+ else log('[TEST] Could not place the Exit because no dungeon tiles were generated.','combat');
 
  if(withMonsters){
   log('[TEST] Spawned a complete random dungeon with revealed monsters.','system');
