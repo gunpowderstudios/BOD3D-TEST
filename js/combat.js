@@ -20,6 +20,7 @@ function openCombat(tile,options={}){
   mustFightRound:!!options.mustFightRound,
   noEscape:!!options.noEscape,
   rangedEngagement:!!options.rangedEngagement,
+  restoreApAfterRanged:!!options.restoreApAfterRanged,
   sourceKey:options.sourceKey||null,
   chargedFromKey:options.chargedFromKey||null
  };
@@ -370,6 +371,7 @@ async function fireRangedAt(tileKey,event){
   // Leave the projectile and impact visible before resolving death or charge.
   setTimeout(async()=>{
    if(monster.health<=0){
+    p.ap=p.maxAp;
     rangedKill(tile,tileKey,monster,weaponName,damage);
     window.BOD3D?.finishRangedAttack?.();
     return;
@@ -388,6 +390,8 @@ async function fireRangedAt(tileKey,event){
     attack.type
    );
    if(killedByTrap){
+    p.ap=p.maxAp;
+    render();
     window.BOD3D?.finishRangedAttack?.();
     return;
    }
@@ -409,6 +413,7 @@ async function fireRangedAt(tileKey,event){
 
    openCombat(heroTile||tile,{
     rangedEngagement:true,
+    restoreApAfterRanged:true,
     noEscape:true,
     sourceKey:heroTileKey,
     chargedFromKey:tileKey
@@ -611,6 +616,10 @@ function runAway(){
 function death(){const p=state.player;const carried=allCarriedItems();const acme=carried.find(it=>it.name==='Acme Insurance');if(!TESTER_SINGLE_LIFE&&(p.flags.insurance||acme)){if(acme){removeFromCurrentLocation(acme);state.itemDiscard.push(acme);}p.flags.insurance=false;p.health=p.maxHealth;p.x=0;p.y=0;p.facing='S';log('Acme Insurance saves you and lets you keep your items!','heal');closeCombat();render();centreOnHero();return;}const killedByDragon=!!(combat&&combat.tile&&combat.tile.monster&&combat.tile.monster.isDragon);const droppable=carried.filter(it=>!isBear(it));if(droppable.length){let targetTile;if(killedByDragon){targetTile=healingPoolTile();if(targetTile){log('The Dragon defeats you. Your items are transferred to the Healing Pool.','combat');}else{targetTile=getTile(p.x,p.y);log('The Dragon defeats you. No Healing Pool is available, so your items remain at the Exit.','combat');}}else{targetTile=getTile(p.x,p.y);log('Your items drop on the tile where you fell.','combat');}if(targetTile){targetTile.droppedItems=targetTile.droppedItems||[];targetTile.droppedItems.push(...droppable);}clearPlayerItems();}p.lives--;if(p.lives<=0){lose();return;}p.health=p.maxHealth;p.x=0;p.y=0;p.facing='S';p.hasRing=false;log('You fall and wake at Start. Lives left: '+p.lives+'.','combat');closeCombat();window.BOD3D?.snapHeroToPlayer?.();render();centreOnHero(false);setTimeout(()=>{window.BOD3D?.snapHeroToPlayer?.();render();centreOnHero(true);window.BOD3D?.centreOnHero?.();},120);}
 function closeCombat(){
  const finishedCombat=combat;
+
+ if(finishedCombat?.restoreApAfterRanged&&state?.player){
+  state.player.ap=state.player.maxAp;
+ }
 
  document.getElementById('combat').classList.remove('open');
  document.body.classList.remove('combatActive','cinematicCombat');
