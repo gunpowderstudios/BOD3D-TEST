@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.92
+
+- Moved the five-second mobile Developer Console gesture from the version number to the always-visible Map/3D button during gameplay.
+- A normal tap still switches views; a completed long press opens Developer Tools without also switching the view.
+
 ## v11.91
 
 - Added a TEST-only mobile shortcut: press and hold the visible version number continuously for five seconds to open the existing Developer Console.
