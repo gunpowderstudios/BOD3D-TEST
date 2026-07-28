@@ -1,4 +1,4 @@
-/* BOD3D-TEST v12.01 — top-left fabric-style Buy BOD tag */
+/* BOD3D-TEST v12.03 — mobile logo clearance below top tags */
 #buyBodButton{
  position:fixed;
  left:0;
@@ -55,4 +55,6 @@
  /* The Centre circle is the first visible mobile top-bar control.
     Move it just beyond the tag while preserving the rest of the row. */
  #centreBtn{margin-left:78px!important}
+ /* Keep the opening-screen logo below the BUY BOD and mute controls. */
+ .heroSelectLogo{top:56px!important}
 }
