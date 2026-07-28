@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.11 — opening-scroll quest button
+// BOD3D-TEST v12.12 — larger Sound Manager information text
 (function(){
-  const BUILD='12.11';
+  const BUILD='12.12';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
