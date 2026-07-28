@@ -1199,6 +1199,26 @@ async function addTile(key,t,token){
    boardGroup.add(ringLight);
   }
  }
+ if(t.hasFirkin){
+  const firkinSprite=await addSprite(
+   'assets/companions/firkin.png',
+   x,
+   y,
+   .72,
+   .48,
+   null,
+   key,
+   token
+  );
+  if(firkinSprite){
+   firkinSprite.renderOrder=650;
+   firkinSprite.userData.floatObject=true;
+   firkinSprite.userData.floatBaseY=firkinSprite.position.y;
+   firkinSprite.userData.floatAmplitude=.035;
+   firkinSprite.userData.floatSpeed=.72;
+   firkinSprite.userData.floatPhase=(x*1.29+y*1.83);
+  }
+ }
  if(t.droppedItems&&t.droppedItems.length){
   const stack=t.droppedItems.slice(0,8);
   const itemSize=.46;
