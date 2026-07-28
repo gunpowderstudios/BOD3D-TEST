@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.99
+
+- Added a persistent blue BUY BOD tab on the right edge of desktop and mobile screens.
+- The button opens `https://www.gunpowderstudios.co.uk/` in a new tab with safe external-link attributes.
+- Positioned it away from the left-side Ring/hearts and the centred movement and ranged controls.
+
 ## v11.98
 
 - Ranged-action buttons now appear only when the relevant item is equipped and at least one legal monster target is within its permitted range.
