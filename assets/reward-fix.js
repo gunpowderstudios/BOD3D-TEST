@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.97 — reusable ranged weapons and desktop action layout
+// BOD3D-TEST v11.98 — contextual ranged actions and variable dungeon length
 (function(){
-  const BUILD='11.97';
+  const BUILD='11.98';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
