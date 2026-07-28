@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.97
+
+- Restored the player's AP after a ranged encounter fully resolves, allowing permanent ranged weapons such as the Bow and Elven Bow to be used again against later monsters.
+- A ranged kill or trap kill restores AP immediately; a surviving monster's charge restores it only after the resulting melee encounter closes.
+- Moved desktop ranged-action buttons into a bounded low-left column so they no longer overlap the centred NSEW D-pad.
+
 ## v11.96
 
 - Restored the complete-dungeon fit when entering 2D Map mode on mobile.
