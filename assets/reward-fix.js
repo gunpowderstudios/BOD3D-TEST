@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.05 — opening-scroll warning copy
+// BOD3D-TEST v12.06 — revised story body
 (function(){
-  const BUILD='12.05';
+  const BUILD='12.06';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
