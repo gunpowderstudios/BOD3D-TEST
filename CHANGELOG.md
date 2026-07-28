@@ -1,5 +1,30 @@
 # BOD3D-TEST Changelog
 
+## v12.07
+
+- Added Firkin as a hidden rescue companion after 15 tiles and 6 monster kills, with a 25% chance on each newly revealed 8+ Health monster and a guaranteed next suitable guardian from tile 25.
+- Prevented Firkin from sharing a guardian with the Ring or Red Dragon.
+- Added melee, ranged and trap rescue handling; a distant Firkin waits on the guardian’s tile until reached.
+- Firkin adds +3 to every attack roll and stacks with the Loyal Bear’s extra combat die.
+- Added Firkin to the companion panel, Asset Manager and 2D/3D token rendering at `assets/companions/firkin.png`.
+- Changed Firkin’s disappearance in the introduction from many years to many days.
+- Added scroll-based rescued-Firkin and missing-Firkin victory endings using the approved stories.
+
+## v12.06
+
+- Replaced the body of “A SHORT STORY…” with the revised tavern and dungeon introduction.
+- Corrected dialogue punctuation, hyphenation, capitalisation and sentence structure while preserving the existing title.
+
+## v12.05
+
+- Removed the stray punctuation before “If your hero falls…” and placed the exclamation mark correctly inside “ONE LIFE!”.
+- Added the Ring guardian tip and retained the Red Dragon warning in red text on the opening scroll.
+
+## v12.04
+
+- Removed the separate white “3D” text beneath the opening-screen logo because the updated logo graphic now includes it.
+- Kept the visible version number beneath the logo and left the logo artwork itself unchanged.
+
 ## v12.03
 
 - Moved the character-selection logo down on mobile so it no longer clashes with the upper-left BUY BOD tag or upper-right mute control.

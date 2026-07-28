@@ -59,6 +59,7 @@
         return monster &&
           monster.health > 0 &&
           !monster.isDragon &&
+          !monster.guardsFirkin &&
           Number(monster.maxHealth) >= 10;
       });
     }
@@ -81,6 +82,109 @@
       return true;
     }
 
+    function firkinAlreadyPlacedOrRescued() {
+      return Boolean(
+        state && (
+          state.player?.companionFirkin ||
+          state.firkinRescued ||
+          state.firkinGuardianAssigned ||
+          Object.values(state.tiles || {}).some(tile =>
+            tile?.hasFirkin || tile?.monster?.guardsFirkin
+          )
+        )
+      );
+    }
+
+    function firkinCandidates() {
+      return Object.entries(state?.tiles || {}).filter(([, tile]) => {
+        const monster = tile?.monster;
+        return monster &&
+          monster.health > 0 &&
+          (monster.revealed || monster.peeked) &&
+          !monster.isDragon &&
+          !monster.carriesRing &&
+          !monster.guardsFirkin &&
+          !monster.firkinChecked &&
+          Number(monster.maxHealth) >= 8;
+      });
+    }
+
+    function assignFirkinGuardian() {
+      if (
+        !state ||
+        firkinAlreadyPlacedOrRescued() ||
+        laidTileCount() < 15 ||
+        Number(state.player?.killed?.length || 0) < 6
+      ) return false;
+
+      const candidates = firkinCandidates();
+      if (!candidates.length) return false;
+      const guaranteed = laidTileCount() >= 25;
+
+      for (const [tileKey, tile] of candidates) {
+        tile.monster.firkinChecked = true;
+        if (!guaranteed && Math.random() >= 0.25) continue;
+
+        tile.monster.guardsFirkin = true;
+        state.firkinGuardianAssigned = true;
+        state.firkinGuardianKey = tileKey;
+        log('You hear a frightened whimpering nearby…', 'loot');
+        if (typeof toast === 'function') toast('You hear a frightened whimpering nearby…');
+        return true;
+      }
+      return false;
+    }
+
+    function placeFirkinOnTile(tile, tileKey, monsterName) {
+      if (!tile || state.player?.companionFirkin) return false;
+      tile.hasFirkin = true;
+      state.firkinGuardianAssigned = true;
+      state.firkinGuardianKey = tileKey;
+      log('The defeated ' + monsterName + ' was guarding someone!', 'loot');
+      return true;
+    }
+
+    function collectFirkinIfSafe(tileKey) {
+      if (!state || state.player?.companionFirkin || !tileKey) return false;
+      if (key(state.player.x, state.player.y) !== tileKey) return false;
+      const tile = state.tiles?.[tileKey];
+      if (
+        !tile ||
+        !tile.hasFirkin ||
+        tile.monsterPending ||
+        (tile.monster && tile.monster.health > 0)
+      ) return false;
+
+      tile.hasFirkin = false;
+      state.player.companionFirkin = {
+        name: 'Firkin',
+        icon: 'F',
+        desc: '+3 to every attack roll. Can fight alongside the Loyal Bear.'
+      };
+      state.firkinRescued = true;
+      state.firkinGuardianAssigned = true;
+      log('You rescued Firkin. Return him to Rose—if you escape alive.', 'loot');
+      render();
+
+      showModal(
+        'FIRKIN RESCUED',
+        '',
+        [{ text: 'Welcome, Firkin', cls: 'green', fn: closeModal }]
+      );
+      const body = document.getElementById('modalBody');
+      if (body) {
+        body.innerHTML =
+          '<div style="font-size:84px;line-height:1;margin-bottom:12px">' +
+          iconHTML('Firkin', 'F') +
+          '</div><b>A bedraggled halfling crawls from his hiding place.</b>' +
+          '<br><br>It’s Firkin—Rose’s long-lost husband!' +
+          '<br><br><b>Companion:</b> +3 to every attack roll. Firkin can fight alongside the Loyal Bear.';
+      }
+      return true;
+    }
+
+    window.collectFirkinIfSafe = collectFirkinIfSafe;
+    window.BODAssignFirkinGuardian = assignFirkinGuardian;
     window.BODAssignRingGuardian=assignRingGuardian;
 
     // The Exit still appears normally, but it no longer rolls or places the Ring.
@@ -183,6 +287,7 @@
     const originalRangedKill = rangedKill;
     rangedKill = function (tile, tileKey, monster) {
       const carriesRing = Boolean(monster?.carriesRing);
+      const guardsFirkin = Boolean(monster?.guardsFirkin);
       if (carriesRing) {
         // Prevent the original ranged-kill routine awarding normal loot or
         // collecting the Ring remotely. The Ring remains on the guardian tile.
@@ -192,22 +297,38 @@
         state.ringKey = tileKey;
         monster.isDragon = true;
       }
+      if (guardsFirkin) placeFirkinOnTile(tile, tileKey, monster.name);
 
       const result = originalRangedKill.apply(this, arguments);
 
       if (carriesRing) {
         monster.isDragon = false;
         log(monster.name + ' drops the Ring of Creation!', 'loot');
-        render();
       }
+      if (guardsFirkin) {
+        log('Firkin is waiting on the fallen monster’s tile. Reach him to complete the rescue.', 'loot');
+      }
+      if (carriesRing || guardsFirkin) render();
       return result;
     };
+
+    if (typeof dropMonsterRewardsOnTile === 'function') {
+      const originalDropMonsterRewardsOnTile = dropMonsterRewardsOnTile;
+      dropMonsterRewardsOnTile = function (monster, tile, tileKey) {
+        if (monster?.guardsFirkin) {
+          placeFirkinOnTile(tile, tileKey, monster.name);
+          log('Firkin is waiting on the trap tile. Reach him to complete the rescue.', 'loot');
+        }
+        return originalDropMonsterRewardsOnTile.apply(this, arguments);
+      };
+    }
 
     killMonster = function () {
       const monster = combat.tile.monster;
       const tile = combat.tile;
       const tileKey = combat.sourceKey || key(state.player.x, state.player.y);
       const carriesRing = Boolean(monster.carriesRing);
+      const guardsFirkin = Boolean(monster.guardsFirkin);
 
       playSound('monsterDie');
       playTileEffect(tileKey, 'monsterDeath', 1000);
@@ -216,6 +337,10 @@
       state.monsterDiscard.push(monster);
       recordMonsterCorpse(tile, tileKey, monster);
       tile.monster = null;
+
+      if (guardsFirkin) {
+        placeFirkinOnTile(tile, tileKey, monster.name);
+      }
 
       if (carriesRing) {
         tile.hasRing = true;
@@ -249,8 +374,11 @@
       closeCombat();
       render();
 
+      if (guardsFirkin) {
+        setTimeout(() => collectFirkinIfSafe(tileKey), 80);
+      }
       if (carriesRing) {
-        setTimeout(() => collectRingIfSafe(tileKey), 80);
+        setTimeout(() => collectRingIfSafe(tileKey), guardsFirkin ? 180 : 80);
       } else if (rewardCount) {
         setTimeout(() => {
           if (typeof queueMonsterRewards === 'function') {
@@ -264,7 +392,11 @@
 
     // Assign as soon as tile 20 exists and a qualifying living guardian is present.
     assignRingGuardian();
-    setInterval(assignRingGuardian, 250);
+    assignFirkinGuardian();
+    setInterval(() => {
+      assignRingGuardian();
+      assignFirkinGuardian();
+    }, 250);
     return true;
   }
 
