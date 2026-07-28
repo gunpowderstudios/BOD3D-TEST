@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.04 — remove duplicate opening-screen 3D title
+// BOD3D-TEST v12.05 — opening-scroll warning copy
 (function(){
-  const BUILD='12.04';
+  const BUILD='12.05';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
