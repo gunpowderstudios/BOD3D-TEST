@@ -1,6 +1,6 @@
-// BOD3D-TEST v11.93 — complete developer dungeon finale
+// BOD3D-TEST v11.94 — reliable mobile tools and restored Ring guardian
 (function(){
-  const BUILD='11.93';
+  const BUILD='11.94';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
