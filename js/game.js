@@ -698,9 +698,15 @@ function resetAllSounds(){
 loadSounds();
 window.addEventListener('pointerdown',()=>{try{audio()}catch(e){}},{once:true});
 function createTileDeck(){
-  // Start is face up and Exit is set aside. These 40 ordinary floor tiles form the shuffled dungeon stack.
+  // Start is face up and Exit is set aside. Each dungeon secretly contains
+  // 40-50 ordinary tiles before the Dragon's Exit appears.
   const deck=[...Array(15)].map(()=>({kind:'straight'}))
     .concat([...Array(14)].map(()=>({kind:'corner'})),[...Array(2)].map(()=>({kind:'t'})),[...Array(5)].map(()=>({kind:'cross'})),[...Array(3)].map(()=>({kind:'spike'})),[{kind:'pool'}]);
+  const extraCount=Math.floor(Math.random()*11);
+  const extraKinds=['straight','straight','corner','corner','t','cross'];
+  for(let i=0;i<extraCount;i++){
+    deck.push({kind:extraKinds[Math.floor(Math.random()*extraKinds.length)]});
+  }
 
   const ordinaryFloors=()=>deck.filter(t=>!['spike','pool'].includes(t.kind));
 
@@ -1391,8 +1397,30 @@ function renderControls(){
  if(rangedMode){addBtn(wrap,'Cancel Ranged Attack','red',cancelRangedAttack);return;}
 
  const p=state.player;
- if(p.equipment.bow)addBtn(wrap,p.equipment.bow.name+' — Range 1-3 (3 AP)','blue',()=>startRangedAttack('bow'),!view3d.enabled||p.ap<3);
- if(p.equipment.staff)addBtn(wrap,'Ice Staff — Range 1-2 (4 AP)','blue',()=>startRangedAttack('iceStaff'),!view3d.enabled||p.ap<4);
+ const hasTargets=(range,allowCorners=false)=>
+  typeof rangedTargets==='function'&&rangedTargets(range,allowCorners).length>0;
+ const equippedHands=[...new Set([p.slots.left,p.slots.right].filter(Boolean))];
+ const equippedFireball=equippedHands.find(item=>item.use==='fireball');
+ const equippedDaggers=equippedHands.find(item=>item.use==='daggers');
+ const consumeEquippedSpell=item=>{
+  removeFromCurrentLocation(item);
+  state.itemDiscard.push(item);
+  syncEquipment();
+  render();
+ };
+
+ if(p.equipment.bow&&hasTargets(3)){
+  addBtn(wrap,p.equipment.bow.name+' — Range 1-3 (3 AP)','blue',()=>startRangedAttack('bow'),!view3d.enabled||p.ap<3);
+ }
+ if(p.equipment.staff&&hasTargets(2)){
+  addBtn(wrap,'Ice Staff — Range 1-2 (4 AP)','blue',()=>startRangedAttack('iceStaff'),!view3d.enabled||p.ap<4);
+ }
+ if(equippedFireball&&hasTargets(3)){
+  addBtn(wrap,'Fireball — Range 1-3 (2 AP)','blue',()=>startRangedAttack('fireball',equippedFireball,()=>consumeEquippedSpell(equippedFireball)),!view3d.enabled||p.ap<2);
+ }
+ if(equippedDaggers&&hasTargets(3,true)){
+  addBtn(wrap,'Flying Daggers — Range 1-3 (2 AP)','blue',()=>startRangedAttack('daggers',equippedDaggers,()=>consumeEquippedSpell(equippedDaggers)),!view3d.enabled||p.ap<2);
+ }
 
  // Directional movement/tile laying is handled by the shared N/E/S/W D-pad
  // on both desktop and mobile. Avoid rendering the old duplicate labelled row.
