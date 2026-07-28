@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.04
+
+- Removed the separate white “3D” text beneath the opening-screen logo because the updated logo graphic now includes it.
+- Kept the visible version number beneath the logo and left the logo artwork itself unchanged.
+
 ## v12.03
 
 - Moved the character-selection logo down on mobile so it no longer clashes with the upper-left BUY BOD tag or upper-right mute control.
