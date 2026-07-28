@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.02 — Dragonlance Dragon-only combat die
+// BOD3D-TEST v12.03 — mobile opening-logo clearance
 (function(){
-  const BUILD='12.02';
+  const BUILD='12.03';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
