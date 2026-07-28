@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v11.95
+
+- Added a small floating Ring of Creation image at the upper-left of the board after the player physically collects the Ring.
+- The indicator uses the current Ring asset mapping, does not intercept controls, and hides when the Ring is not carried or the player returns to character selection.
+- Preserved the user's updated “A SHORT STORY…” heading and story text unchanged.
+
 ## v11.94
 
 - Made the five-second Map/3D mobile Developer Tools hold reliable by using native touch start/end handling and allowing normal finger drift during the hold.
