@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.12
+
+- Enlarged the Sound Manager explanatory text and red/green status messages from 12px to 16px.
+- Enlarged the sound file paths from 10px to 14px for easier reading.
+
 ## v12.11
 
 - Renamed the opening-scroll button from “Enter at your own risk” to “Begin your quest…” so it matches the story’s premise that the hero awakens inside the dungeon.
