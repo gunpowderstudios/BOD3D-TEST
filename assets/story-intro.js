@@ -1,4 +1,4 @@
-// BOD3D-TEST v11.81 — story introduction and warning punctuation correction
+// BOD3D-TEST v12.05 — story introduction
 (function () {
   'use strict';
 
@@ -30,13 +30,6 @@
 
   function appendStory(scroll) {
     if (!scroll) return;
-
-    const oneLife = Array.from(scroll.querySelectorAll('b,strong'))
-      .find(element => element.textContent.trim() === 'ONE LIFE');
-    if (oneLife && oneLife.nextSibling?.nodeType === Node.TEXT_NODE) {
-      oneLife.nextSibling.textContent = oneLife.nextSibling.textContent
-        .replace(/^\.\s*If\b/, '! If');
-    }
 
     if (scroll.querySelector('.testerStoryHeading')) return;
     scroll.classList.add('hasStory');
