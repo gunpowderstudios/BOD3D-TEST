@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v11.91
+
+- Added a TEST-only mobile shortcut: press and hold the visible version number continuously for five seconds to open the existing Developer Console.
+- Preserved the current desktop Developer Console, dice rolls, calibration, tuning controls, and keyboard shortcut unchanged.
+
 ## v11.90
 
 - Fixed the D-pad and combat controls remaining disabled after returning from the reference-only 2D map to 3D.
