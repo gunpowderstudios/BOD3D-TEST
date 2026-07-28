@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v11.96
+
+- Restored the complete-dungeon fit when entering 2D Map mode on mobile.
+- Kept one-finger panning and two-finger pinch zoom enabled in the reference-only map.
+- Matched the pinch-zoom minimum scale to the full-map fit so large dungeons no longer jump back to a cropped 0.45 scale.
+- Double-tapping the 2D map or rotating/resizing the screen now refits the entire dungeon.
+
 ## v11.95
 
 - Added a small floating Ring of Creation image at the upper-left of the board after the player physically collects the Ring.
