@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.21
+
+- Reduced the intro and both end-game story scroll text areas from 80% to 70% of the parchment width on desktop for more comfortable margins.
+- Left the existing mobile scroll layout unchanged.
+
 ## v12.20
 
 - Kept the intro and both end-game story scrolls at a stable 80% of the parchment width on desktop and wide displays.
