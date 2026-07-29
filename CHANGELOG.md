@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.13
+
+- Added Developer Console buttons to preview both real end-game scrolls: Firkin rescued and Firkin lost.
+- Ending previews do not end or modify the active test game.
+
 ## v12.12
 
 - Enlarged the Sound Manager explanatory text and red/green status messages from 12px to 16px.
