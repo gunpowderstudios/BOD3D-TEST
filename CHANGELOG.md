@@ -1,5 +1,9 @@
 # BOD3D-TEST Changelog
 
+## v12.16
+
+- Fixed ACME Insurance resurrection camera tracking: returning to Start now cancels the stale combat-exit camera tween and automatically centres the hero on the Start tile.
+
 ## v12.15
 
 - Restored Flying Daggers to range 1-4 while retaining connected-path targeting around corners.
