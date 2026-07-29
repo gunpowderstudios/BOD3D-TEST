@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.19 — black Enter the Dungeon hover text
+// BOD3D-TEST v12.20 — stable 80% desktop story-scroll text width
 (function(){
-  const BUILD='12.19';
+  const BUILD='12.20';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}

@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.20
+
+- Kept the intro and both end-game story scrolls at a stable 80% of the parchment width on desktop and wide displays.
+- Preserved the existing mobile scroll spacing and typography.
+
 ## v12.19
 
 - Fixed the home-screen “Enter the Dungeon” button so its text turns black against the pale cream hover background.
