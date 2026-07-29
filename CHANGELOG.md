@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.17
+
+- Made the Exit a real final tile at the bottom of the dungeon deck: 40-50 ordinary tiles are laid first, then the player legally connects the Exit and its Dragon.
+- Removed the extra post-deck Exit placement and its unsafe fallback, which could place the Dragon behind a wall.
+- Preserved the full M2-M12 marker set and both item locations by reserving the final Exit before markers are assigned.
+
 ## v12.16
 
 - Fixed ACME Insurance resurrection camera tracking: returning to Start now cancels the stale combat-exit camera tween and automatically centres the hero on the Start tile.
