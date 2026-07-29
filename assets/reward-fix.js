@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.13 — Developer Console ending-scroll previews
+// BOD3D-TEST v12.14 — dual-wield melee combat bonuses
 (function(){
-  const BUILD='12.13';
+  const BUILD='12.14';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
