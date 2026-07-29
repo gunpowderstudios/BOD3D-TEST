@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.28
+
+- Added a clearly marked TEST-only robots meta directive: `noindex, nofollow, noarchive, nosnippet`.
+- Search engines can crawl the TEST page to read the directive but should not list or cache it in search results.
+- The marked block must be removed whenever `index.html` is promoted to LIVE; LIVE remains indexable.
+
 ## v12.27
 
 - Limited the custom Install BOD3D App button and instruction popup to mobile devices.
