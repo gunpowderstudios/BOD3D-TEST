@@ -155,7 +155,7 @@ const ITEM_MASTER=[
  {name:'Acme Insurance',copies:1,type:'other',icon:'☂',desc:'Used automatically on defeat: gain another life, drop all items where you fell, and return to Start.'},
  {name:"Imp's Teeth",copies:1,type:'consumable',icon:'☷',desc:'1 use: reroll your next combat roll.',use:'reroll'},
  {name:'Torch',copies:1,type:'equipment',slot:'tool',icon:'🔥',desc:'+1 Combat while equipped.',apply:p=>{p.equipment.torch={name:'Torch',icon:'🔥',value:1};}},
- {name:'Flying Daggers',copies:1,type:'spell',icon:'✣',desc:'One-use ranged spell. Range 1-3; spend 2 AP and roll 2 dice damage. Can fly around connected corners. Hidden or revealed monsters may be targeted. If it survives, it charges and there is no escape. The Dragon is immune.',use:'daggers'},
+ {name:'Flying Daggers',copies:1,type:'spell',icon:'✣',desc:'One-use ranged spell. Range 1-4; spend 2 AP and roll 2 dice damage. Can fly around connected corners. Hidden or revealed monsters may be targeted. If it survives, it charges and there is no escape. The Dragon is immune.',use:'daggers'},
  {name:'Steel Sword',copies:1,type:'equipment',slot:'weapon',icon:'⚔',desc:'+1 combat roll.'},
  {name:"Sorcerer's Skull",copies:1,type:'spell',icon:'☠',desc:'1 use: 1 dice damage to all on tile.',use:'skull'},
  {name:'Magic Sword',copies:1,type:'equipment',slot:'weapon',icon:'🗡',desc:'+2 combat roll. View adjacent monster.'},
@@ -921,10 +921,16 @@ function showCloakChoice(tile){
    {
     text:'Sneak Past',
     cls:'green',
-    fn:()=>{
+    fn:async()=>{
      closeModal();
      m.revealed=true;
-     const roll1=roll(1).total;
+     const sneakRoll=roll(1);
+     const roll1=sneakRoll.total;
+     playSound('dice');
+     const dicePromise=window.BODDice3D?.roll?.(sneakRoll.rolls,'hero');
+     if(dicePromise&&typeof dicePromise.then==='function'){
+      try{await dicePromise;}catch(error){console.warn('Cloak dice animation failed.',error);}
+     }
 
      if(roll1<=2){
       log('You roll '+roll1+' — the '+m.name+' spots you! There is no escape.','combat');
@@ -1219,35 +1225,37 @@ function openChestOnTile(tileKey,item){
  const p=state.player;
  const chestRoll=roll(1);
  const r=chestRoll.total;
- playSound('dice');
- let msg='';
- let rewardCount=0;
 
- if(item.use==='smallChest'){
-  if(r<=2){p.health-=2;msg='TRAPPED! Take 2 damage.';}
-  else{rewardCount=1;msg='Small Chest opened: draw 1 item.';}
- }else{
-  if(r<=2){p.health-=5;msg='TRAPPED! Take 5 damage.';}
-  else{rewardCount=2;msg='Large Chest opened: draw 2 items.';}
- }
-
- state.itemDiscard.push(item);
- playSound('spell');
- log(msg,p.health<=0?'combat':'loot');
- toast(msg);
  closeModal();
+ playSound('dice');
  render();
 
  const finishChestResolution=()=>{
+  let msg='';
+  let rewardCount=0;
+
+  if(item.use==='smallChest'){
+   if(r<=2){p.health-=2;msg='TRAPPED! Take 2 damage.';}
+   else{rewardCount=1;msg='Small Chest opened: draw 1 item.';}
+  }else{
+   if(r<=2){p.health-=5;msg='TRAPPED! Take 5 damage.';}
+   else{rewardCount=2;msg='Large Chest opened: draw 2 items.';}
+  }
+
+  state.itemDiscard.push(item);
+  playSound('spell');
+  log('Chest roll: '+r+'. '+msg,p.health<=0?'combat':'loot');
+  toast('Rolled '+r+' — '+msg);
+  render();
+
   if(p.health<=0){death();return;}
   for(let i=0;i<rewardCount;i++)awardItem();
   // Defensive restart: if a dice/modal timing race ever interrupted the queue,
   // explicitly resume the normal item-placement flow.
-  if(pendingItemQueue.length) setTimeout(processPendingItem,40);
+  if(pendingItemQueue.length)setTimeout(processPendingItem,40);
  };
 
- // The 3D die is visual only, but chest resolution now waits for it to finish
- // so its animation cannot overwrite or obscure the reward placement dialog.
+ // Show the physical die first, then resolve the chest after its animation.
  const dicePromise=window.BODDice3D?.roll?.(chestRoll.rolls,'hero');
  if(dicePromise&&typeof dicePromise.then==='function'){
   dicePromise.then(()=>{
@@ -1417,11 +1425,11 @@ function renderControls(){
  if(p.equipment.staff&&hasTargets(2)){
   addBtn(wrap,'Ice Staff — Range 1-2 (4 AP)','blue',()=>startRangedAttack('iceStaff'),!view3d.enabled||p.ap<4);
  }
- if(equippedFireball&&hasTargets(3)){
-  addBtn(wrap,'Fireball — Range 1-3 (2 AP)','blue',()=>startRangedAttack('fireball',equippedFireball,()=>consumeEquippedSpell(equippedFireball)),!view3d.enabled||p.ap<2);
+ if(equippedFireball&&hasTargets(5)){
+  addBtn(wrap,'Fireball — Range 1-5 (2 AP)','blue',()=>startRangedAttack('fireball',equippedFireball,()=>consumeEquippedSpell(equippedFireball)),!view3d.enabled||p.ap<2);
  }
- if(equippedDaggers&&hasTargets(3,true)){
-  addBtn(wrap,'Flying Daggers — Range 1-3 (2 AP)','blue',()=>startRangedAttack('daggers',equippedDaggers,()=>consumeEquippedSpell(equippedDaggers)),!view3d.enabled||p.ap<2);
+ if(equippedDaggers&&hasTargets(4,true)){
+  addBtn(wrap,'Flying Daggers — Range 1-4 (2 AP)','blue',()=>startRangedAttack('daggers',equippedDaggers,()=>consumeEquippedSpell(equippedDaggers)),!view3d.enabled||p.ap<2);
  }
 
  // Directional movement/tile laying is handled by the shared N/E/S/W D-pad
