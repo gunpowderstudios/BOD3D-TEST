@@ -2231,6 +2231,21 @@ function developerBuildCompleteDungeon(withMonsters){
  );
 }
 
+function developerPreviewEnding(rescuedFirkin){
+ if(!state)return;
+ closeDeveloperConsole();
+ showModal(
+  rescuedFirkin?'ENDING PREVIEW — FIRKIN RESCUED':'ENDING PREVIEW — FIRKIN LOST',
+  '',
+  [{text:'Return to Game',cls:'green',fn:closeModal}]
+ );
+ const body=document.getElementById('modalBody');
+ if(body){
+  body.innerHTML=endingScrollHTML(rescuedFirkin);
+  body.scrollTop=0;
+ }
+}
+
 function developerAction(action){
  switch(action){
   case 'items':
@@ -2286,6 +2301,12 @@ function developerAction(action){
   case 'sounds':
    closeDeveloperConsole();
    openSoundManager();
+   break;
+  case 'ending-firkin':
+   developerPreviewEnding(true);
+   break;
+  case 'ending-no-firkin':
+   developerPreviewEnding(false);
    break;
  }
 }
