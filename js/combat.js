@@ -218,7 +218,7 @@ function startRangedAttack(type,item=null,consume=null){
    toast('Equip or carry a Fireball first');
    return;
   }
-  range=3;
+  range=5;
   cost=2;
   label='Fireball';
  }else if(type==='daggers'){
@@ -226,7 +226,7 @@ function startRangedAttack(type,item=null,consume=null){
    toast('Carry Flying Daggers first');
    return;
   }
-  range=3;
+  range=4;
   cost=2;
   label='Flying Daggers';
  }else{
