@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.16 — ACME resurrection camera recenter
+// BOD3D-TEST v12.17 — connected final Exit and Dragon tile
 (function(){
-  const BUILD='12.16';
+  const BUILD='12.17';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
