@@ -550,6 +550,14 @@ async function sndMonster(monsterName=''){
  }
  playSound('monsterReveal');
 }
+async function sndMonsterCombat(monsterName=''){
+ const specificKey=monsterLandSoundKey(monsterName);
+ if(USER_SOUNDS[specificKey]||await resolveGitHubSound(specificKey)){
+  playSound(specificKey);
+  return;
+ }
+ playSound('monsterReveal');
+}
 function sndWin(){playSound('win')}
 function sndLose(){playSound('lose')}
 
