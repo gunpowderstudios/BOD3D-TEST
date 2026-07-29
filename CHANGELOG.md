@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v12.15
+
+- Restored Flying Daggers to range 1-4 while retaining connected-path targeting around corners.
+- Restored Fireball to range 1-5.
+- Added a visible die roll when using the Invisibility Cloak; rolls of 1-2 start a no-escape fight.
+- Small and Large Chest results now wait until the visible die animation has played before being applied and announced.
+
 ## v12.14
 
 - Fixed dual-wield combat so bonuses from both equipped one-handed melee weapons are added to the displayed score and actual attack roll.
