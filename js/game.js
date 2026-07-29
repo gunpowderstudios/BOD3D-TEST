@@ -698,8 +698,8 @@ function resetAllSounds(){
 loadSounds();
 window.addEventListener('pointerdown',()=>{try{audio()}catch(e){}},{once:true});
 function createTileDeck(){
-  // Start is face up and Exit is set aside. Each dungeon secretly contains
-  // 40-50 ordinary tiles before the Dragon's Exit appears.
+  // Start is face up. The Exit is kept at the bottom of the deck so the
+  // player legally connects 40-50 ordinary tiles before drawing the Dragon's tile.
   const deck=[...Array(15)].map(()=>({kind:'straight'}))
     .concat([...Array(14)].map(()=>({kind:'corner'})),[...Array(2)].map(()=>({kind:'t'})),[...Array(5)].map(()=>({kind:'cross'})),[...Array(3)].map(()=>({kind:'spike'})),[{kind:'pool'}]);
   const extraCount=Math.floor(Math.random()*11);
@@ -739,7 +739,7 @@ function createTileDeck(){
     throw new Error('Dungeon setup failed: exactly two item markers are required.');
   }
 
-  return shuffle(deck);
+  return [{kind:'exit'},...shuffle(deck)];
 }
 function showTesterWarning(){
  showModal('A WARNING FROM THE DUNGEON','',[{text:'Begin your quest…',cls:'green',fn:closeModal}]);
@@ -825,25 +825,33 @@ document.getElementById('placeBtn').onclick=()=>{const p=state.player,d=DIRS[pla
  sndTile();log('Placed '+TILE_LABEL[tile.kind]+(tile.itemMarker?' with item marker':'')+' to the '+placement.dir+'.','system');if(state.tileDeck.length===0&&!state.exitPlaced)placeExitAndRing(nx,ny,tile);placement=null;document.getElementById('placement').classList.remove('open');render();setTimeout(()=>centreOnHero(),0);};
 function placeExitAndRing(x,y,fromTile){
  state.exitPlaced=true;
- let exitKey=null, placed=false;
- for(const dir of dirOrder){
-  const d=DIRS[dir],ex=x+d.dx,ey=y+d.dy;
-  if(fromTile.opens[dir]&&!getTile(ex,ey)){
-   exitKey=key(ex,ey);
-   state.tiles[exitKey]={kind:'exit',opens:{...TILE_BASE.exit},rot:0,visited:false,monster:{name:'Red Dragon',dice:4,mod:0,maxHealth:20,health:20,glyph:'🐉',revealed:true,isDragon:true}};
-   placed=true;break;
-  }
- }
- if(!placed){
-  for(const dir of dirOrder){
-   const d=DIRS[dir],ex=x+d.dx,ey=y+d.dy;
-   if(!getTile(ex,ey)){
-    exitKey=key(ex,ey);
-    state.tiles[exitKey]={kind:'exit',opens:{...TILE_BASE.exit},rot:0,visited:false,monster:{name:'Red Dragon',dice:4,mod:0,maxHealth:20,health:20,glyph:'🐉',revealed:true,isDragon:true}};
-    break;
-   }
-  }
- }
+ const exitKey=key(x,y);
+ const exitTile=state.tiles[exitKey]||fromTile;
+
+ // The Exit is the final tile the player has just legally connected.
+ // Never append another tile beside it: the old fallback could put the
+ // Dragon behind a wall when the final floor tile had no free open edge.
+ exitTile.kind='exit';
+ exitTile.opens={...TILE_BASE.exit};
+ exitTile.rot=0;
+ exitTile.visited=!!exitTile.visited;
+ delete exitTile.monsterMarker;
+ delete exitTile.monsterPending;
+ delete exitTile.mNumber;
+ delete exitTile.itemMarker;
+ delete exitTile.itemPending;
+ delete exitTile.item;
+ exitTile.monster={
+  name:'Red Dragon',
+  dice:4,
+  mod:0,
+  maxHealth:20,
+  health:20,
+  glyph:'🐉',
+  revealed:true,
+  isDragon:true
+ };
+ state.tiles[exitKey]=exitTile;
  // Board-game Ring system: when the Exit appears, roll 2 dice and place the Ring on the matching M2-M12 floor tile.
  const rr=roll(2);
  const ringNumber=rr.total;
