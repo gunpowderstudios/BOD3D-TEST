@@ -39,7 +39,10 @@ function openCombat(tile,options={}){
  const combatElement=document.getElementById('combat');
  combatElement.classList.remove('open');
  setTimeout(()=>{
-  if(combat&&combat.tile===tile)combatElement.classList.add('open');
+  if(combat&&combat.tile===tile){
+   combatElement.classList.add('open');
+   sndMonsterCombat(m.name);
+  }
  },520);
  document.getElementById('combatTitle').textContent=
   options.rangedEngagement?'The Monster Charges!':(options.noEscape?'Spotted!':'Combat');
