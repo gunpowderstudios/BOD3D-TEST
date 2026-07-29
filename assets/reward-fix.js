@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.22 — 85% desktop story-scroll text width
+// BOD3D-TEST v12.23 — automatic TEST-only developer tools
 (function(){
-  const BUILD='12.22';
+  const BUILD='12.23';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}

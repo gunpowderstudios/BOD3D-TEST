@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.23
+
+- Added an automatic environment guard for developer tools.
+- Kept the Developer Console, Item Tester, desktop shortcuts and mobile five-second hold enabled on BOD3D-TEST and local development.
+- Disabled all of those activation routes automatically on the LIVE /BOD3D/ site, making future TEST-to-LIVE promotions safe by default.
+
 ## v12.22
 
 - Widened the intro and both end-game story scroll text areas to 85% of the parchment on desktop.
