@@ -1,5 +1,11 @@
 # BOD3D-TEST Changelog
 
+## v12.14
+
+- Fixed dual-wield combat so bonuses from both equipped one-handed melee weapons are added to the displayed score and actual attack roll.
+- Two-handed melee weapons still count only once even though they occupy both hand slots.
+- Sirrus and Tamara with a Morning Star and Small Axe now fight at 2d6+5.
+
 ## v12.13
 
 - Added Developer Console buttons to preview both real end-game scrolls: Firkin rescued and Firkin lost.
