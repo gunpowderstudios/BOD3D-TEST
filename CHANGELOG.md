@@ -1,5 +1,13 @@
 # BOD3D-TEST Changelog
 
+## v12.24
+
+- Added a TEST-scoped installable web-app manifest and app icons.
+- Added an Install BOD3D App button beneath Enter the Dungeon on the character screen.
+- Chromium browsers use the native install prompt; iPhone/iPad and Safari receive Add to Home Screen/Add to Dock instructions.
+- Added standalone display metadata so an installed copy opens like an app.
+- Deliberately omitted a service worker and offline caching to avoid stale game code, sounds or artwork.
+
 ## v12.23
 
 - Added an automatic environment guard for developer tools.
