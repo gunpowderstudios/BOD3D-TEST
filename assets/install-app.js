@@ -1,4 +1,4 @@
-// BOD3D v12.24 — safe install/Add to Home Screen helper (no offline cache)
+// BOD3D v12.25 — safe install/Add to Home Screen helper (no offline cache)
 (function(){
  'use strict';
  let deferredPrompt=null;
@@ -57,4 +57,4 @@
  });
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',buildUI,{once:true});
  else buildUI();
-})().catch?.(()=>{});
+})();

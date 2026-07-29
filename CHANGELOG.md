@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.25
+
+- Removed a trailing install-helper console error found during final runtime validation.
+- No game mechanics, layout or install behaviour changed.
+
 ## v12.24
 
 - Added a TEST-scoped installable web-app manifest and app icons.
