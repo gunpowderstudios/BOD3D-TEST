@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.23 — automatic TEST-only developer tools
+// BOD3D-TEST v12.25 — verified installable web-app test
 (function(){
-  const BUILD='12.23';
+  const BUILD='12.25';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
