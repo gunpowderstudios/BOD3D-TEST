@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Bag of Dungeon 3D">
- <rect width="512" height="512" rx="88" fill="#050505"/>
- <rect x="18" y="18" width="476" height="476" rx="72" fill="none" stroke="#d5af55" stroke-width="18"/>
- <path d="M78 118h356M78 394h356" stroke="#7d171c" stroke-width="12"/>
- <text x="256" y="245" text-anchor="middle" fill="#f4e2aa" font-family="Georgia,serif" font-size="112" font-weight="700">BOD</text>
- <text x="256" y="350" text-anchor="middle" fill="#b4201a" stroke="#fff" stroke-width="3" paint-order="stroke" font-family="Georgia,serif" font-size="104" font-weight="700">3D</text>
-</svg>

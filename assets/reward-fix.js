@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.25 — verified installable web-app test
+// BOD3D-TEST v12.26 — custom production app icon sizes
 (function(){
-  const BUILD='12.25';
+  const BUILD='12.26';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}

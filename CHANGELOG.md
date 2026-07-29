@@ -1,5 +1,12 @@
 # BOD3D-TEST Changelog
 
+## v12.26
+
+- Adopted the uploaded 1024×1024 `assets/ui/app-icon.png` as the master application icon.
+- Generated proper 192×192 and 512×512 PNG application icons from the master.
+- Updated the web-app manifest and Apple touch icon to use the custom artwork.
+- Removed the temporary generated SVG application icons.
+
 ## v12.25
 
 - Removed a trailing install-helper console error found during final runtime validation.
