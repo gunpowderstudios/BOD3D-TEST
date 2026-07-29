@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.18
+
+- Replay the current monster's assigned individual sound whenever melee combat opens, including cloak failures and ranged-charge fights.
+- Fall back to the generic monster sound when no individual sound file or browser override is available.
+
 ## v12.17
 
 - Made the Exit a real final tile at the bottom of the dungeon deck: 40-50 ordinary tiles are laid first, then the player legally connects the Exit and its Dragon.
