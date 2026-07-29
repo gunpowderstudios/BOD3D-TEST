@@ -1,5 +1,10 @@
 # BOD3D-TEST Changelog
 
+## v12.19
+
+- Fixed the home-screen “Enter the Dungeon” button so its text turns black against the pale cream hover background.
+- Scoped the change to that button only; its normal appearance and all other buttons remain unchanged.
+
 ## v12.18
 
 - Replay the current monster's assigned individual sound whenever melee combat opens, including cloak failures and ranged-charge fights.
