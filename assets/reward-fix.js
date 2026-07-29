@@ -1,6 +1,6 @@
-// BOD3D-TEST v12.14 — dual-wield melee combat bonuses
+// BOD3D-TEST v12.15 — original ranged item ranges and visible dice checks
 (function(){
-  const BUILD='12.14';
+  const BUILD='12.15';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Bag of Dungeon 3D '+VERSION;const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
