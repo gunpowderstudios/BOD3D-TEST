@@ -301,6 +301,7 @@
 // ==================== Version placement under logo ====================
 (function(){
  function placeVersionUnderLogo(){
+  if(document.getElementById('visibleBuildVersion'))return;
   if(document.getElementById('topLogoVersion'))return;
   const imgs=[...document.querySelectorAll('img')];
   const logo=imgs.find(img=>/bod3d-logo|bod3d_logo|logo/i.test((img.getAttribute('src')||'')));
@@ -340,6 +341,7 @@
 /* v10.90 — Move version from welcome Quest Log entry to beneath 3D logo */
 (function(){
  function fixVersionPlacement(){
+  if(document.getElementById('visibleBuildVersion'))return;
   // Clean the actual welcome log entry, including dynamically generated text.
   document.querySelectorAll('*').forEach(function(el){
    if(el.children.length)return;
