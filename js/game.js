@@ -183,7 +183,7 @@ const ITEM_MASTER=[
  {name:'Tornado',copies:1,type:'spell',icon:'↻',desc:'1 use, 1 AP: move away from current monster without losing HP.',use:'tornado'},
  {name:'Morning Star',copies:1,type:'equipment',slot:'weapon',icon:'✹',desc:'+2 combat roll.'},
  {name:'Dragonlance',copies:1,type:'equipment',slot:'dragonlance',icon:'♜',desc:'One-handed. +1 combat die against the Red Dragon only.',apply:p=>{p.equipment.dragonlance={name:'Dragonlance',icon:'♜'};}},
- {name:'Loyal Bear',copies:1,type:'equipment',slot:'bear',icon:'🐻',desc:'+1 combat die until defeated. Takes no inventory space.',apply:p=>{p.equipment.bear={name:'Loyal Bear',icon:'🐻'};}},
+ {name:'Loyal Bear',copies:1,type:'equipment',slot:'bear',icon:'🐻',desc:'+1 combat die until game over. Takes no inventory space.',apply:p=>{p.equipment.bear={name:'Loyal Bear',icon:'🐻'};}},
  {name:'Magic Vine',copies:1,type:'spell',icon:'♧',desc:'1 use, 1 AP: 1 dice damage and monster skips its next attack.',use:'vine'}
 ];
 
