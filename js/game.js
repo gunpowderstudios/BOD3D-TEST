@@ -1,7 +1,10 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.35';
+const VERSION='v12.36';
+const visibleBuildVersion=document.getElementById('visibleBuildVersion');
+if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
+document.title='Bag of Dungeon 3D '+VERSION;
 
 // Developer tools are available only on TEST and local development builds.
 // The same code can be promoted safely: LIVE disables every activation route automatically.
