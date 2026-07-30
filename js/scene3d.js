@@ -1093,8 +1093,11 @@ async function addCorpseMiniature(corpse,x,y,token){
 
 async function addTile(key,t,token){
  const [x,y]=key.split(',').map(Number);
- const file=tileFiles[t.kind]||'crossroad.png';
- const tex=await loadTexture('assets/tiles/'+file);
+ const poolWasUsed=t.kind==='pool'&&t.poolUsed;
+ const file=poolWasUsed?'healingpool-used.png':(tileFiles[t.kind]||'crossroad.png');
+ let tex=await loadTexture('assets/tiles/'+file);
+ // Keep the original artwork as a safe fallback if the used-pool asset cannot load.
+ if(!tex&&poolWasUsed)tex=await loadTexture('assets/tiles/healingpool.png');
  if(token!==renderToken)return;
  // Shallow punchboard body. Its brown edge is visible beneath the artwork.
  const sideMaterial=new THREE.MeshStandardMaterial({
