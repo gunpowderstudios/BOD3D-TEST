@@ -1224,7 +1224,7 @@ async function addTile(key,t,token){
  }
  if(t.droppedItems&&t.droppedItems.length){
   const stack=t.droppedItems.slice(0,8);
-  const itemSize=.46;
+  const itemSize=.46*1.3; // 30% larger floating dropped-item artwork
   const verticalGap=.22;
 
   // Keep dropped loot away from the centre, where heroes and corpses stand.
