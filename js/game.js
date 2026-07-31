@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.49';
+const VERSION='v12.50';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -173,7 +173,7 @@ const ITEM_MASTER=[
  {name:'Vampire Teeth',copies:1,type:'spell',icon:'⌇',desc:'1 use: drain and gain 5 health.',use:'vampire'},
  {name:"Witch's Claw",copies:1,type:'spell',icon:' claw',desc:'1 use: remove the current monster’s Combat bonus for this fight. Cannot be used on the Red Dragon.',use:'claw'},
  {name:'Elven Bow',copies:1,type:'equipment',slot:'bow',icon:'➶',desc:'Two-handed. Range 1-3. Spend 3 AP for 1 die +2 ranged damage. May target hidden or revealed monsters. If it survives, it charges into melee. The Dragon is immune.',apply:p=>{p.equipment.bow={name:'Elven Bow',icon:'➶',dice:1,bonus:2};}},
- {name:'Fireball',copies:1,type:'spell',icon:'☄',desc:'1 use, 2 AP: 3 dice damage to monster.',use:'fireball'},
+ {name:'Fireball',copies:1,type:'spell',icon:'☄',desc:'1 use. Range 1-5. Spend 2 AP for 3 dice ranged damage. May target hidden or revealed monsters. If it survives, it charges into melee. The Dragon is immune.',use:'fireball'},
  {name:'Steel Shield',copies:1,type:'equipment',slot:'shield',icon:'◫',desc:'-1 damage from attacks.'},
  {name:'Magic Shield',copies:1,type:'equipment',slot:'shield',icon:'⬟',desc:'-2 damage from attacks.'},
  {name:'Strength Potion',copies:1,type:'consumable',icon:'▲',desc:'1 use: +1 combat die for one fight.',use:'strengthPotion'},
