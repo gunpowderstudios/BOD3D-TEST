@@ -1,4 +1,4 @@
-// BOD3D-TEST v12.42 — fully random decks with secret Ring and late Firkin guardians
+// BOD3D-TEST v12.43 — 10+ Health monsters offer two items; choose one
 (function () {
   'use strict';
 
@@ -270,6 +270,8 @@
     rangedKill = function (tile, tileKey, monster) {
       const carriesRing = Boolean(monster?.carriesRing);
       const guardsFirkin = Boolean(monster?.guardsFirkin);
+      const chooseOneReward = !carriesRing && !monster?.isDragon &&
+        Number(monster?.maxHealth) >= 10;
       if (carriesRing) {
         // Prevent the original ranged-kill routine awarding normal loot or
         // collecting the Ring remotely. The Ring remains on the guardian tile.
@@ -277,15 +279,24 @@
         state.ringActivated = true;
         state.ringCarrierAssigned = true;
         state.ringKey = tileKey;
-        monster.isDragon = true;
       }
+      // The original ranged routine awards two separate items to 10+ Health
+      // monsters. Suppress that reward so the choice rule can handle it.
+      if (carriesRing || chooseOneReward) monster.isDragon = true;
       if (guardsFirkin) placeFirkinOnTile(tile, tileKey, monster.name);
 
       const result = originalRangedKill.apply(this, arguments);
 
+      if (carriesRing || chooseOneReward) monster.isDragon = false;
       if (carriesRing) {
-        monster.isDragon = false;
         log(monster.name + ' drops the Ring of Creation!', 'loot');
+      }
+      if (chooseOneReward) {
+        log(monster.name + ' had ' + monster.maxHealth +
+          ' starting Health: draw 2 items and choose 1.', 'loot');
+        setTimeout(() => {
+          if (typeof queueMonsterRewards === 'function') queueMonsterRewards(2);
+        }, 120);
       }
       if (guardsFirkin) {
         log('Firkin is waiting on the fallen monster’s tile. Reach him to complete the rescue.', 'loot');
@@ -368,7 +379,7 @@
       if (rewardCount) {
         log(
           monster.name + ' had ' + monster.maxHealth + ' starting Health: draw ' +
-          rewardCount + ' item' + (rewardCount === 1 ? '' : 's') + '.',
+          (rewardCount === 2 ? '2 items and choose 1.' : '1 item.'),
           'loot'
         );
       }
