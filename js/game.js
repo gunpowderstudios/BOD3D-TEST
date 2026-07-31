@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.51';
+const VERSION='v12.52';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -1256,7 +1256,7 @@ function renderInventory(){
  ${!p.companionBear&&!p.companionFirkin?'<div class="slotEmpty">No companions</div>':''}</div></div>`;
  const t=getTile(p.x,p.y);
  if(t&&t.droppedItems&&t.droppedItems.length)html+='<div class="sectionTitle">On this tile</div><div class="invgrid">'+t.droppedItems.map((x,i)=>`<button class="itemBtn" onclick="pickupDropped(${i})" title="Pick up ${x.name}">${iconHTML(x.name,x.icon||'?')}<span class="dropMark">+</span></button>`).join('')+'</div>';
- if(p.equipment.weapon&&p.equipment.weapon.name==='Magic Sword')html+=magicSwordPeekHTML();
+ if([p.slots.left,p.slots.right].some(item=>item?.name==='Magic Sword'))html+=magicSwordPeekHTML();
  el.innerHTML=html;
 }
 function magicSwordPeekHTML(){const p=state.player;let rows=[];for(const dir of dirOrder){const d=DIRS[dir],t=getTile(p.x+d.dx,p.y+d.dy);if(t&&(t.monsterPending||(t.monster&&!t.monster.revealed)))rows.push(`<button class="peekBtn" onclick="peekMonster('${dir}')">View ${dir}</button>`);}return rows.length?'<div class="sectionTitle">Magic Sword</div><div class="small">View adjacent monster:</div>'+rows.join(' '):'';}
