@@ -374,22 +374,18 @@
 
 /* v12.47 — mobile bottom panels keep the dungeon visible */
 @media(max-width:800px){
-  #placement,#modal.modalEdge{
+  #modal.modalEdge{
     align-items:flex-end!important;
     justify-content:center!important;
     padding:6px max(6px,env(safe-area-inset-right)) max(6px,env(safe-area-inset-bottom)) max(6px,env(safe-area-inset-left))!important;
   }
-  #placement .card,#modal.modalEdge .card{
+  #modal.modalEdge .card{
     width:100%!important;
     max-width:none!important;
     max-height:48dvh!important;
     margin:0!important;
     padding:8px!important;
   }
-  #placement .preview{width:86px;height:86px;margin:4px auto}
-  .placementPair{gap:5px;margin:7px 0}
-  .placementConnector{font-size:18px}
-  .placementConnector span{font-size:10px;max-width:58px}
   #modal.questLogModal{
     align-items:flex-end!important;
     justify-content:center!important;
