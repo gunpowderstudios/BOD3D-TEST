@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.48';
+const VERSION='v12.49';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -881,6 +881,10 @@ function placeExitAndRing(x,y,fromTile){
  playSound('dragon');playTileEffect(exitKey,'dragon',1400);
  playSound('dice');
  window.BODDice3D?.roll?.(rr.rolls);
+ const exitMessage=state.player.hasRing
+  ?'You have found the Exit—and you hold the Ring of Creation! Defeat the Red Dragon to escape the dungeon.'
+  :'You have found the Exit—but none shall pass the Red Dragon without the Ring of Creation! Find the Ring, then return to face her.';
+ showModal('THE EXIT!',exitMessage,[{text:'Continue',cls:'green',fn:closeModal}]);
  log('The final dungeon tile is laid. The Exit appears and the Red Dragon guards it.','loot');
  log('Ring location roll: '+rr.rolls.join(' + ')+' = '+ringNumber+'. The Ring of Creation appears at M'+ringNumber+' and must be physically collected.','loot');
  if(found){
