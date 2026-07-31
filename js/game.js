@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.50';
+const VERSION='v12.51';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -181,7 +181,7 @@ const ITEM_MASTER=[
  {name:'Ice Staff',copies:1,type:'equipment',slot:'staff',icon:'❄',desc:'Permanent. Range 1-2. Spend 4 AP for 2 dice ranged damage. May target hidden or revealed monsters. If it survives, it charges into melee. The Dragon is immune.',use:'iceStaff',apply:p=>{p.equipment.staff={name:'Ice Staff',icon:'❄',dice:2,cost:4};}},
  {name:'Small Axe',copies:1,type:'equipment',slot:'weapon',icon:'⛏',desc:'+1 combat roll.'},
  {name:'Iron Axe',copies:1,type:'equipment',slot:'weapon',icon:'⚒',desc:'+2 combat roll.'},
- {name:'Large Steel Axe',copies:1,type:'equipment',slot:'weapon',icon:'🪓',desc:'Two-handed. +3 combat roll.'},
+ {name:'Large Steel Axe',copies:1,type:'equipment',slot:'weapon',icon:'🪓',desc:'Two-handed. Uses one inventory space. +3 combat roll.'},
  {name:'Invisibility Cloak',copies:1,type:'equipment',slot:'cloak',icon:'◌',desc:'Walk past normal monsters without fighting. Does not work on Dragon.',apply:p=>{p.equipment.cloak={name:'Invisibility Cloak',icon:'◌'};}},
  {name:'Bomb',copies:1,type:'spell',icon:'●',desc:'1 use, 1 AP: 2 dice damage to current monster.',use:'bomb'},
  {name:'Tornado',copies:1,type:'spell',icon:'↻',desc:'1 use, 1 AP: move away from current monster without losing HP.',use:'tornado'},
@@ -781,15 +781,31 @@ function isBoots(item){return !!item&&BOOTS_NAMES.has(item.name);}
 function isCloak(item){return !!item&&CLOAK_NAMES.has(item.name);}
 function isAttire(item){return isArmour(item)||isBoots(item)||isCloak(item);}
 function isHandItem(item){return !!item&&!isAttire(item)&&!isBear(item);}
-function occupiedSpaceCount(){const p=state.player;let n=p.backpack.length;n+=p.slots.armour?1:0;n+=p.slots.boots?1:0;n+=p.slots.cloak?1:0;n+=p.slots.left?1:0;n+=p.slots.right?1:0;return n;}
+function occupiedSpaceCount(){const p=state.player;const items=new Set(p.backpack);['left','right','armour','boots','cloak'].forEach(slot=>{const item=p.slots[slot];if(item)items.add(item);});return items.size;}
 function carriedCount(){return occupiedSpaceCount();}
 function allCarriedItems(){const p=state.player;const out=[...p.backpack];['left','right','armour','boots','cloak'].forEach(s=>{const it=p.slots[s];if(it&&!out.includes(it))out.push(it)});if(p.companionBear)out.push(p.companionBear);return out;}
 function syncEquipment(){const p=state.player,s=p.slots,e={};const hands=[s.left,s.right].filter(Boolean);const weapons=[...new Set(hands.filter(x=>['Steel Sword','Magic Sword','Small Axe','Iron Axe','Large Steel Axe','Morning Star'].includes(x.name)))];const weapon=weapons[0];const shield=hands.find(x=>['Steel Shield','Magic Shield'].includes(x.name));const bow=hands.find(x=>['Bow','Elven Bow'].includes(x.name));const staff=hands.find(x=>x.name==='Ice Staff');const dragonlance=hands.find(x=>x.name==='Dragonlance');const cloak=s.cloak;const torch=hands.find(x=>x.name==='Torch');if(weapon){e.weapon=weapon;e.weapons=weapons;}if(shield)e.shield=shield;if(bow)e.bow={...bow,dice:1,bonus:bow.name==='Elven Bow'?2:0};if(staff)e.staff=staff;if(dragonlance)e.dragonlance=dragonlance;if(cloak)e.cloak=cloak;if(torch)e.torch=torch;else if(p.flags)p.flags.torchFreeLay=false;if(s.armour)e.armour=s.armour;if(s.boots)e.boots=s.boots;if(p.companionBear)e.bear=p.companionBear;p.equipment=e;}
 function removeFromCurrentLocation(item){const p=state.player;const bi=p.backpack.indexOf(item);if(bi>=0)p.backpack.splice(bi,1);['left','right','armour','boots','cloak'].forEach(s=>{if(p.slots[s]===item)p.slots[s]=null});syncEquipment();}
 function moveToBackpack(item){const p=state.player;if(p.backpack.includes(item))return true;if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(item);p.backpack.push(item);syncEquipment();playSound('unequip');return true;}
 function equipToSlot(item,slot){const p=state.player;if(slot==='armour'&&!isArmour(item))return false;if(slot==='boots'&&!isBoots(item))return false;if(slot==='cloak'&&!isCloak(item))return false;if((slot==='left'||slot==='right')&&!isHandItem(item))return false;
- if(isTwoHanded(item)){const displaced=[p.slots.left,p.slots.right].filter(Boolean).filter(x=>x!==item);if(p.backpack.length+displaced.length>BACKPACK_LIMIT){toast('Not enough backpack room to free both hands');return false;}displaced.forEach(x=>{removeFromCurrentLocation(x);p.backpack.push(x)});removeFromCurrentLocation(item);p.slots.left=item;p.slots.right=item;}
- else {const old=p.slots[slot];if(old&&old!==item){if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(old);p.backpack.push(old);}if((slot==='left'||slot==='right')){const other=slot==='left'?'right':'left';if(p.slots[other]===item)p.slots[other]=null;}removeFromCurrentLocation(item);p.slots[slot]=item;}
+ const itemLeavesBackpack=p.backpack.includes(item)?1:0;
+ if(isTwoHanded(item)){
+  const displaced=[...new Set([p.slots.left,p.slots.right].filter(Boolean).filter(x=>x!==item))];
+  const projectedBackpack=p.backpack.length-itemLeavesBackpack+displaced.length;
+  if(projectedBackpack>BACKPACK_LIMIT){toast('Not enough backpack room to free both hands');return false;}
+  removeFromCurrentLocation(item);
+  displaced.forEach(x=>{removeFromCurrentLocation(x);p.backpack.push(x);});
+  p.slots.left=item;p.slots.right=item;
+ }
+ else {
+  const old=p.slots[slot];
+  const displaced=old&&old!==item?old:null;
+  const projectedBackpack=p.backpack.length-itemLeavesBackpack+(displaced?1:0);
+  if(projectedBackpack>BACKPACK_LIMIT){toast('Backpack is full');return false;}
+  removeFromCurrentLocation(item);
+  if(displaced){removeFromCurrentLocation(displaced);p.backpack.push(displaced);}
+  p.slots[slot]=item;
+ }
  syncEquipment();playSound('equip');toast(item.name+' equipped');return true;}
 function unequipItem(item){const p=state.player;if(!item)return false;if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(item);p.backpack.push(item);syncEquipment();return true;}
 function equippedSlotFor(item){const s=state.player.slots;if(s.left===item&&s.right===item)return 'both hands';if(s.left===item)return 'left hand';if(s.right===item)return 'right hand';if(s.armour===item)return 'armour';if(s.boots===item)return 'boots';if(s.cloak===item)return 'attire';if(state.player.companionBear===item)return 'companion';return null;}
