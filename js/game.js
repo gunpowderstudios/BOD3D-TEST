@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.53';
+const VERSION='v12.54';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -142,7 +142,7 @@ function showCharSelect(){
 const TILE=128,GAP=0,STEP=TILE+GAP;
 const DIRS={N:{dx:0,dy:-1,opp:'S'},E:{dx:1,dy:0,opp:'W'},S:{dx:0,dy:1,opp:'N'},W:{dx:-1,dy:0,opp:'E'}};
 const dirOrder=['N','E','S','W'];
-const TILE_BASE={straight:{N:1,S:1,E:0,W:0},corner:{N:1,E:1,S:0,W:0},t:{N:1,E:1,W:1,S:0},cross:{N:1,E:1,S:1,W:1},spike:{N:1,S:1,E:0,W:0},pool:{N:1,E:1,S:1,W:1},exit:{N:1,E:1,S:1,W:1},start:{N:1,E:1,S:1,W:1}};
+const TILE_BASE={straight:{N:1,S:1,E:0,W:0},corner:{N:1,E:1,S:0,W:0},t:{N:1,E:1,W:1,S:0},cross:{N:1,E:1,S:1,W:1},spike:{N:1,S:1,E:0,W:0},pool:{N:1,E:1,S:1,W:1},exit:{N:1,E:1,S:1,W:1},start:{N:1,E:1,S:0,W:1}};
 const TILE_LABEL={straight:'Straight',corner:'Corner',t:'T-Junction',cross:'Crossroad',spike:'Spike Trap',pool:'Healing Pool',exit:'Exit'};
 const TILE_GLYPH={spike:'▲',pool:'💧',exit:'🚪'};
 const MONSTER_MASTER=[
