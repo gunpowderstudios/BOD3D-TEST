@@ -1,6 +1,6 @@
 // BOD3D — unique item deck, end-game music and cache-version loader
 (function(){
-  const BUILD=(document.currentScript&&new URL(document.currentScript.src,location.href).searchParams.get('v'))||'12.69';
+  const BUILD=(document.currentScript&&new URL(document.currentScript.src,location.href).searchParams.get('v'))||'12.70';
   const VERSION='v'+BUILD;
   window.BOD3D_BUILD_VERSION=VERSION;
   function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
@@ -18,8 +18,7 @@
   function loadStyleOnce(selector,path,datasetName){if(document.querySelector(selector))return;const link=document.createElement('link');link.rel='stylesheet';link.href=versioned(path);link.dataset[datasetName]='1';link.onerror=()=>reportLoadFailure(path);document.head.appendChild(link);}
   function loadCombatCleanup(){loadScriptOnce('script[data-bod-combat-cleanup]','assets/combat-cleanup.js','bodCombatCleanup');}
   function loadCombatOnlyAP(){loadScriptOnce('script[data-bod-combat-only-ap]','assets/ap-combat-only.js','bodCombatOnlyAp');}
-  function loadCombatItemsMenu(){loadScriptOnce('script[data-bod-combat-items-menu]','assets/combat-items-menu.js','bodCombatItemsMenu');}
-  function loadGameplayRules(){loadScriptOnce('script[data-bod-gameplay-rules-v1165]','assets/gameplay-rules-v1165.js?v=12.69','bodGameplayRulesV1165');}
+  function loadGameplayRules(){loadScriptOnce('script[data-bod-gameplay-rules-v1165]','assets/gameplay-rules-v1165.js?v=12.70','bodGameplayRulesV1165');}
   function loadHealthHud(){loadScriptOnce('script[data-bod-health-hud]','assets/health-hud.js','bodHealthHud');}
   function loadStoryIntro(){loadScriptOnce('script[data-bod-story-intro]','assets/story-intro.js','bodStoryIntro');}
   function loadWarningScrollStyles(){loadStyleOnce('link[data-bod-warning-scroll]','css/warning-scroll.css','bodWarningScroll');}
@@ -106,7 +105,7 @@
     };
     return true;
   }
-  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadQuestLogColours();loadWarningScrollV1177();loadCarriedRingHud();loadBuyBod();loadCombatCleanup();loadCombatOnlyAP();loadCombatItemsMenu();loadEnterButtonFix();loadGameplayRules();loadHealthHud();loadStoryIntro();}
+  function loadAll(){syncVersion();loadWarningScrollStyles();loadDesktopHudStyles();loadDarkCombatStyles();loadDarkHudStyles();loadMobileActionFix();loadCombatItemsStyles();loadUiFixes();loadQuestLogColours();loadWarningScrollV1177();loadCarriedRingHud();loadBuyBod();loadCombatCleanup();loadCombatOnlyAP();loadEnterButtonFix();loadGameplayRules();loadHealthHud();loadStoryIntro();}
   function start(){loadAll();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{loadAll();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   setTimeout(syncVersion,900);
