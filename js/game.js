@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.58';
+const VERSION='v12.59';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -2209,8 +2209,10 @@ function developerBuildCompleteDungeon(withMonsters){
  state.player.facing='S';
  state.player.ap=state.player.maxAp;
 
- // Fresh random bags.
- const deck=createTileDeck();
+ // Fresh random bags. Build the developer stack defensively so it contains
+ // exactly one EXIT card, always at the bottom (drawn and laid last).
+ const generatedDeck=createTileDeck().filter(tile=>tile?.kind!=='exit');
+ const deck=[{kind:'exit'},...generatedDeck];
  state.monsterDeck=expanded(MONSTER_MASTER);
  state.itemDeck=expanded(ITEM_MASTER);
  state.tileDiscard=[];
@@ -2308,6 +2310,13 @@ function developerBuildCompleteDungeon(withMonsters){
  // the guarded Exit and the normal M2-M12 Ring location roll.
  if(lastLaid){
   placeExitAndRing(lastLaid.x,lastLaid.y,lastLaid.tile);
+  const exitTiles=Object.entries(state.tiles).filter(([,tile])=>tile?.kind==='exit');
+  if(exitTiles.length!==1){
+   // Retain only the final guarded EXIT. This should never be needed, but
+   // prevents older/generated state from displaying a second EXIT tile.
+   exitTiles.forEach(([tileKey])=>{if(tileKey!==key(lastLaid.x,lastLaid.y))delete state.tiles[tileKey];});
+   log('[TEST] Corrected duplicate EXIT state; one guarded EXIT remains.','system');
+  }
   if(withMonsters)setTimeout(()=>window.BODAssignRingGuardian?.(),0);
  }else log('[TEST] Could not place the Exit because no dungeon tiles were generated.','combat');
 
