@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.54';
+const VERSION='v12.56';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -142,7 +142,7 @@ function showCharSelect(){
 const TILE=128,GAP=0,STEP=TILE+GAP;
 const DIRS={N:{dx:0,dy:-1,opp:'S'},E:{dx:1,dy:0,opp:'W'},S:{dx:0,dy:1,opp:'N'},W:{dx:-1,dy:0,opp:'E'}};
 const dirOrder=['N','E','S','W'];
-const TILE_BASE={straight:{N:1,S:1,E:0,W:0},corner:{N:1,E:1,S:0,W:0},t:{N:1,E:1,W:1,S:0},cross:{N:1,E:1,S:1,W:1},spike:{N:1,S:1,E:0,W:0},pool:{N:1,E:1,S:1,W:1},exit:{N:1,E:1,S:1,W:1},start:{N:1,E:1,S:0,W:1}};
+const TILE_BASE={straight:{N:1,S:1,E:0,W:0},corner:{N:1,E:1,S:0,W:0},t:{N:1,E:1,W:1,S:0},cross:{N:1,E:1,S:1,W:1},spike:{N:1,S:1,E:0,W:0},pool:{N:1,E:1,S:1,W:1},exit:{N:0,E:1,S:0,W:1},start:{N:1,E:1,S:0,W:1}};
 const TILE_LABEL={straight:'Straight',corner:'Corner',t:'T-Junction',cross:'Crossroad',spike:'Spike Trap',pool:'Healing Pool',exit:'Exit'};
 const TILE_GLYPH={spike:'▲',pool:'💧',exit:'🚪'};
 const MONSTER_MASTER=[
@@ -865,8 +865,10 @@ function placeExitAndRing(x,y,fromTile){
  // Never append another tile beside it: the old fallback could put the
  // Dragon behind a wall when the final floor tile had no free open edge.
  exitTile.kind='exit';
- exitTile.opens={...TILE_BASE.exit};
- exitTile.rot=0;
+ // Preserve the rotation chosen by the player. The uploaded EXIT artwork is
+ // an east-west corridor at rotation 0; quarter turns make it north-south.
+ exitTile.rot=Number(exitTile.rot)||0;
+ exitTile.opens=openings('exit',exitTile.rot);
  exitTile.visited=!!exitTile.visited;
  delete exitTile.monsterMarker;
  delete exitTile.monsterPending;
@@ -930,6 +932,26 @@ function collectRingIfSafe(tileKey){
 }
 function canMove(dir){const p=state.player,t=getTile(p.x,p.y),d=DIRS[dir],nt=getTile(p.x+d.dx,p.y+d.dy);return t&&t.opens[dir]&&nt&&nt.opens[d.opp];}
 function canLay(dir){const p=state.player,t=getTile(p.x,p.y),d=DIRS[dir];return t&&t.opens[dir]&&!getTile(p.x+d.dx,p.y+d.dy)&&state.tileDeck.length>0;}
+function showClearedExitMessage(){
+ const p=state?.player;
+ const t=p?getTile(p.x,p.y):null;
+ if(!p||!t||t.kind!=='exit'||(t.monster&&t.monster.health>0))return false;
+ if(p.hasRing){
+  showModal(
+   'THE EXIT',
+   'You have the Ring of Creation. You may now leave the dungeon!',
+   [{text:'Leave the Dungeon',cls:'green',fn:win}]
+  );
+ }else{
+  showModal(
+   'THE EXIT',
+   'You cannot leave without the Ring of Creation. Go back and find it!',
+   [{text:'Go and Find the Ring',fn:closeModal}]
+  );
+ }
+ return true;
+}
+window.BODShowClearedExitMessage=showClearedExitMessage;
 
 function applyReacherSting(){
  const p=state.player,current=getTile(p.x,p.y);
@@ -970,8 +992,12 @@ function move(dir){if(!view3d.enabled){toast('Return to 3D to move');return;}win
   }
   openCombat(t);
  }
- else {const currentKey=key(p.x,p.y);collectRingIfSafe(currentKey);if(typeof window.collectFirkinIfSafe==='function')window.collectFirkinIfSafe(currentKey);}
- if(t.kind==='exit'&&p.hasRing&&!t.monster){win();}
+ else {
+  const currentKey=key(p.x,p.y);
+  collectRingIfSafe(currentKey);
+  if(typeof window.collectFirkinIfSafe==='function')window.collectFirkinIfSafe(currentKey);
+  if(t.kind==='exit')setTimeout(showClearedExitMessage,80);
+ }
  render();centreOnHero(false);}
 function showCloakChoice(tile){
  const m=tile.monster;
