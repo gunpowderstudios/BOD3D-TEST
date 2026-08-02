@@ -711,7 +711,7 @@ const HERO_MOVE_MS=220;
 const TILE=2.05;
 const TILE_THICKNESS=.10;
 const PHYSICAL_TILE_MM=50;
-const DRAGON_BASE_MM=60;
+const DRAGON_BASE_MM=78;
 function modelScaleForBounds(path,size){
  const modelKey=modelKeyFromPath(path);
  if(modelKey==='dragon'){
