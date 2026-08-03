@@ -658,3 +658,31 @@ body.threeMode.lightingOn #viewport::after{
   border-color:#fff;
   box-shadow:3px 3px 0 rgba(255,255,255,.35);
 }
+
+
+/* v12.80 — high-contrast standard game popups.
+   Story scroll overlays remain parchment styled. */
+#modal .card{
+  background:#050505;
+  color:#fff;
+  border-color:#fff;
+  box-shadow:6px 6px 0 rgba(255,255,255,.22);
+}
+#modal #modalTitle,
+#modal #modalBody,
+#modal .desc{color:#fff}
+#modal #modalButtons button,
+#modal #modalButtons button.green,
+#modal #modalButtons button.blue,
+#modal #modalButtons button.gold,
+#modal #modalButtons button.red{
+  background:#050505;
+  color:#fff;
+  border-color:#fff;
+  box-shadow:3px 3px 0 rgba(255,255,255,.35);
+}
+#modal #modalButtons button:hover,
+#modal #modalButtons button:focus{
+  background:#222;
+  color:#fff;
+}
