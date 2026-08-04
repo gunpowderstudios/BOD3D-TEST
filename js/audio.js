@@ -113,7 +113,7 @@
     if (!dungeonAmbienceAudio) {
       dungeonAmbienceAudio = new Audio(DUNGEON_MUSIC_PLAYLIST[dungeonMusicIndex]);
       dungeonAmbienceAudio.loop = false;
-      dungeonAmbienceAudio.volume = 0.32;
+      dungeonAmbienceAudio.volume = 0.12;
       dungeonAmbienceAudio.preload = 'auto';
       dungeonAmbienceAudio.addEventListener('ended', () => {
         dungeonMusicIndex = (dungeonMusicIndex + 1) % DUNGEON_MUSIC_PLAYLIST.length;
@@ -195,7 +195,7 @@
   const originalPlay = HTMLMediaElement.prototype.play;
   let muted = false;
   let musicEnabled = true;
-  let musicVolume = 0.4;
+  let musicVolume = 0.15;
   let effectsEnabled = true;
   let pageActive = !document.hidden;
   let endingActive = false;
@@ -205,7 +205,7 @@
     muted = localStorage.getItem(MUTE_KEY) === 'true';
     const savedMusicVolume = localStorage.getItem(MUSIC_VOLUME_KEY);
     musicEnabled = localStorage.getItem(MUSIC_KEY) !== 'false';
-    musicVolume = savedMusicVolume === null ? (musicEnabled ? 0.4 : 0) : Math.max(0, Math.min(1, Number(savedMusicVolume)));
+    musicVolume = savedMusicVolume === null ? (musicEnabled ? 0.15 : 0) : Math.max(0, Math.min(1, Number(savedMusicVolume)));
     musicEnabled = musicVolume > 0;
     effectsEnabled = localStorage.getItem(EFFECTS_KEY) !== 'false';
   } catch (_) {}
