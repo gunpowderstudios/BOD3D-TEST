@@ -1287,10 +1287,14 @@ body.combatActive .lethalBlowStatus{
  .heroSelectLogo{top:56px!important}
 }
 
-/* ===== Unified parchment-scroll button v12.84 ===== */
+/* ===== Unified parchment-scroll button v12.85 ===== */
+#modal.introScrollModal #modalButtons,
+#modal.endingScrollModal #modalButtons{
+  margin-top:30px!important;
+}
 #modal.introScrollModal #modalButtons button,
 #modal.endingScrollModal #modalButtons button{
-  background:#111!important;
+  background:#8B1F22!important;
   color:#fff!important;
   -webkit-text-fill-color:#fff!important;
   border:3px solid #fff!important;
@@ -1308,14 +1312,14 @@ body.combatActive .lethalBlowStatus{
 #modal.endingScrollModal #modalButtons button:hover,
 #modal.endingScrollModal #modalButtons button:focus,
 #modal.endingScrollModal #modalButtons button:focus-visible{
-  background:#fff!important;
-  color:#000!important;
-  -webkit-text-fill-color:#000!important;
+  background:#050505!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
 }
 #modal.introScrollModal #modalButtons button:hover *,
 #modal.introScrollModal #modalButtons button:focus *,
 #modal.endingScrollModal #modalButtons button:hover *,
 #modal.endingScrollModal #modalButtons button:focus *{
-  color:#000!important;
-  -webkit-text-fill-color:#000!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
 }
