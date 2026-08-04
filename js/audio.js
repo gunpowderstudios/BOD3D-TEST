@@ -113,7 +113,7 @@
     if (!dungeonAmbienceAudio) {
       dungeonAmbienceAudio = new Audio(DUNGEON_MUSIC_PLAYLIST[dungeonMusicIndex]);
       dungeonAmbienceAudio.loop = false;
-      dungeonAmbienceAudio.volume = 0.34;
+      dungeonAmbienceAudio.volume = 0.32;
       dungeonAmbienceAudio.preload = 'auto';
       dungeonAmbienceAudio.addEventListener('ended', () => {
         dungeonMusicIndex = (dungeonMusicIndex + 1) % DUNGEON_MUSIC_PLAYLIST.length;
@@ -287,7 +287,7 @@
     if (!endGameAudio) {
       endGameAudio = new Audio('./assets/sounds/end-game-music.mp3');
       endGameAudio.loop = true;
-      endGameAudio.volume = 0.36;
+      endGameAudio.volume = 0.32;
       endGameAudio.preload = 'auto';
       trackedMedia.add(endGameAudio);
     }
