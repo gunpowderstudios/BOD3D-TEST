@@ -687,28 +687,65 @@ body.threeMode.lightingOn #viewport::after{
   color:#fff;
 }
 
-/* v12.82 — uniform parchment-scroll controls matching the hero intro screen. */
-#modal.introScrollModal #modalTitle{display:none}
+/* v12.83 — simple monochrome character panel and universal controls. */
+.heroInfoPanel{
+  color:#fff;
+  background:#050505;
+  border:2px solid #fff;
+  box-shadow:0 10px 32px rgba(0,0,0,.72);
+  clip-path:none;
+}
+.heroInfoPanel h1,
+.selectedHeroDesc,
+.heroStat strong,
+.heroStat small,
+.heroSpecialBlock small,
+.heroSpecialBlock strong,
+.heroSpecialBlock span{
+  color:#fff;
+  -webkit-text-fill-color:#fff;
+}
+.heroStatRow{
+  border-top-color:#fff;
+  border-bottom-color:#fff;
+}
+
+.chooseHeroBtn,
 #modal.introScrollModal #modalButtons button,
 #modal.endingScrollModal #modalButtons button{
   width:min(365px,82vw);
   min-height:52px;
   margin-top:2px;
   padding:8px 22px;
-  border:1px solid #c7973e;
+  border:2px solid #fff;
   border-radius:2px;
-  background:linear-gradient(#272016,#0d0b08);
-  color:#f6d989;
-  -webkit-text-fill-color:#f6d989;
+  background:#050505;
+  color:#fff;
+  -webkit-text-fill-color:#fff;
   box-shadow:0 3px 8px #000;
   font-size:17px;
   letter-spacing:.03em;
 }
+.chooseHeroBtn:hover,
+.chooseHeroBtn:focus,
+#chooseHeroBtn:hover:not(:disabled),
+#chooseHeroBtn:focus:not(:disabled),
 #modal.introScrollModal #modalButtons button:hover,
 #modal.introScrollModal #modalButtons button:focus,
 #modal.endingScrollModal #modalButtons button:hover,
 #modal.endingScrollModal #modalButtons button:focus{
-  background:linear-gradient(#44351f,#17120b);
-  color:#fff0b3;
-  -webkit-text-fill-color:#fff0b3;
+  background:#fff!important;
+  color:#000!important;
+  -webkit-text-fill-color:#000!important;
+  border-color:#fff;
+  text-shadow:none;
+}
+#modal.introScrollModal #modalTitle{display:none}
+
+/* Standard popup buttons use the same reversible control. */
+#modal:not(.introScrollModal):not(.endingScrollModal) #modalButtons button:hover,
+#modal:not(.introScrollModal):not(.endingScrollModal) #modalButtons button:focus{
+  background:#fff;
+  color:#000;
+  -webkit-text-fill-color:#000;
 }
