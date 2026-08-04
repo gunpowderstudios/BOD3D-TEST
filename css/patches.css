@@ -1461,3 +1461,12 @@ body.combatActive #combatBtns button:not(.lethalIconBtn){
  #topbar{right:188px!important}
  #dungeonMusicOptions{top:12px!important;right:104px!important}
 }
+
+
+/* v12.91 — reserve separate desktop/mobile lanes for Menu, music, mute and fullscreen */
+@media (min-width:901px){
+ #topbar{right:158px!important}
+}
+@media (max-width:900px){
+ #topbar{right:188px!important}
+}
