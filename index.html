@@ -413,7 +413,7 @@ Changes:
 <!-- v12.61: Prevented cancelled placement from shuffling the reserved EXIT into the active stack, keeping it last after 40–50 floors; Ring guardian assignment now waits until at least 20 floor tiles are laid. -->
 <!-- v12.62: Sized the Red Dragon by its horizontal base footprint: 60 mm across on a 50 mm dungeon tile, allowing a deliberate 5 mm overlap on each side without changing other miniatures. -->
 <!-- v12.63: Increased the Red Dragon’s 60 mm base footprint by 30%, to approximately 78 mm across on a 50 mm dungeon tile. -->
-<link rel="stylesheet" href="css/patches.css?v=12.91">
+<link rel="stylesheet" href="css/patches.css?v=12.93">
 <!-- v12.79: Changed the post-monster two-item reward chooser to a high-contrast black panel with white text, borders and buttons so white spell symbols remain visible. -->
 <!-- v12.80: Standard game popups now use black panels with white text and controls; parchment remains reserved for the intro and narrative ending scrolls. -->
 <!-- v12.81: Excluded the parchment intro and ending scrolls from dark popup styling and added the uploaded illustrated Enter the dungeon button to the intro scroll. -->
@@ -428,6 +428,7 @@ Changes:
 <!-- v12.90: Added independent music/effects controls and continuous authorised rock music from assets/sounds/rock-track1.mp3. -->
 <!-- v12.91: Prevented the desktop Menu from overlapping the music control while preserving a wider mobile control lane. -->
 <!-- v12.92: Balanced the initial audio mix: effects 80%, gameplay/end music 32%, start ambience 28%. -->
+<!-- v12.93: Replaced the music toggle with a remembered 0–100% slider; zero is OFF. -->
 </head>
 <body class="lightingOn">
 <a id="buyBodButton" href="https://www.gunpowderstudios.co.uk/" target="_blank" rel="noopener noreferrer" aria-label="Buy Bag of Dungeon from Gunpowder Studios">BUY BOD</a>
@@ -584,8 +585,8 @@ Changes:
 <div id="devPanel"></div>
 
 <script src="assets/assets.js?v=12.78"></script>
-<script src="assets/reward-fix.js?v=12.92"></script>
-<script src="js/game.js?v=12.92"></script>
+<script src="assets/reward-fix.js?v=12.93"></script>
+<script src="js/game.js?v=12.93"></script>
 <script src="js/combat.js?v=12.78"></script>
 
 <script type="module" src="js/scene3d.js?v=12.78" onerror="window.BOD3DCompatibilityFail&&window.BOD3DCompatibilityFail('The 3D engine could not be loaded.')"></script>
@@ -712,7 +713,7 @@ Changes:
 
 
 <script src="js/patches.js?v=12.78"></script>
-<script src="js/audio.js?v=12.92"></script>
+<script src="js/audio.js?v=12.93"></script>
 <script src="js/ui.js?v=12.78"></script>
 <script src="js/analytics.js?v=12.88"></script>
 </body>
