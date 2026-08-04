@@ -1341,8 +1341,9 @@ body.combatActive #combatBtns button:not(.lethalIconBtn){
   min-width:150px!important;
   min-height:45px!important;
   padding:9px 14px!important;
-  font-size:clamp(23px,1.75vw,30px)!important;
+  font-size:clamp(16px,1.22vw,21px)!important;
   line-height:1.05!important;
+  white-space:nowrap!important;
 }
 body.combatActive #combatBtns{
   gap:9px!important;
@@ -1374,7 +1375,8 @@ body.combatActive #combatBtns{
     max-width:none!important;
     min-height:44px!important;
     padding:7px 8px!important;
-    font-size:18px!important;
+    font-size:13px!important;
+    white-space:nowrap!important;
   }
   #modal:not(.introScrollModal):not(.endingScrollModal) #modalTitle{font-size:27px!important}
   #modal:not(.introScrollModal):not(.endingScrollModal) #modalBody{font-size:20px!important}
@@ -1383,4 +1385,14 @@ body.combatActive #combatBtns{
     padding:7px 8px!important;
     font-size:16px!important;
   }
+}
+
+
+/* v12.87 — keep compact red combat-button labels on one line. */
+body.combatActive #combatBtns button:not(.lethalIconBtn){
+  font-size:clamp(16px,1.22vw,21px)!important;
+  white-space:nowrap!important;
+}
+@media(max-width:800px){
+  body.combatActive #combatBtns button:not(.lethalIconBtn){font-size:13px!important}
 }
