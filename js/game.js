@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v12.81';
+const VERSION='v12.82';
 const visibleBuildVersion=document.getElementById('visibleBuildVersion');
 if(visibleBuildVersion)visibleBuildVersion.textContent=VERSION;
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
@@ -753,7 +753,7 @@ function createTileDeck(){
   return [{kind:'exit'},...shuffle(deck)];
 }
 function showTesterWarning(){
- showModal('A WARNING FROM THE DUNGEON','',[{text:'Enter the dungeon',cls:'green',fn:closeModal}]);
+ showModal('A WARNING FROM THE DUNGEON','',[{text:'Enter the Dungeon',cls:'green',fn:closeModal}]);
  document.getElementById('modal')?.classList.add('introScrollModal');
  const body=document.getElementById('modalBody');
  if(body)body.innerHTML=`<div class="testerWarningScroll"><div style="font-size:28px;font-weight:700;margin-bottom:28px;">A WARNING FROM THE DUNGEON</div>You have <b>ONE LIFE!</b> If your hero falls, the dungeon claims you and the game ends.<br><br>Your quest: Get in, get the Ring, and try to get out alive.<br><br><span style="color:#246B2F;font-weight:bold;">Advice for new adventurers! Hmm, advice? Well, we can’t offer you much—this is your journey, but you’re braver than you look! Anyway, nobody has ever returned from these dungeons. Not that we want to worry you! The rumours say that the Ring may be hidden on one of the large monsters; the Red Dragon may fry you without warning (look out for her at the Exit); and, finally, if you’re brave enough, you might just meet a friend! See the story below…</span><br>Good luck, brave adventurer. You’ll need it.</div>`;
