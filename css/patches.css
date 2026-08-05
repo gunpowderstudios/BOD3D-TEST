@@ -1547,3 +1547,40 @@ body.combatActive #combatBtns button:not(.lethalIconBtn){
  color:#ffd84a!important;
  -webkit-text-fill-color:#ffd84a!important;
 }
+
+
+/* v12.97 — mobile right-side order: Sound, Fullscreen, Menu */
+@media (max-width:900px){
+ #topbar{right:142px!important}
+ #dungeonSoundToggle{
+  right:104px!important;
+ }
+ #fullscreenBtn{
+  position:fixed!important;
+  top:12px!important;
+  right:58px!important;
+  z-index:5000!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:0!important;
+ }
+ #menuBtn{
+  position:fixed!important;
+  top:12px!important;
+  right:12px!important;
+  left:auto!important;
+  z-index:5000!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:38px!important;
+  height:38px!important;
+  min-width:38px!important;
+  min-height:38px!important;
+  margin:0!important;
+  padding:0!important;
+ }
+}
