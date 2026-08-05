@@ -1620,3 +1620,17 @@ body.combatActive #combatBtns button:not(.lethalIconBtn){
   font:700 20px/1 "Alegreya Sans",Arial,sans-serif;
  }
 }
+
+
+/* v12.99 — fullscreen is desktop-only; close mobile control gaps */
+@media (max-width:900px){
+ #homeFullscreenBtn,
+ #fullscreenBtn{
+  display:none!important;
+  visibility:hidden!important;
+ }
+ #topbar{right:142px!important}
+ #menuBtn{right:12px!important}
+ #dungeonSoundToggle{right:58px!important}
+ #northUpBtn{right:104px!important}
+}
