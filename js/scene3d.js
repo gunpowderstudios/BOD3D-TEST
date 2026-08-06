@@ -2856,10 +2856,10 @@ function animate(now){
     if(pulseTime>=1){
      combatScene.attackPulseStarted=null;
     }else{
-     // A quick tabletop attack: sweep left, back through the target, then settle.
-     // The sine wave starts and ends at zero, so the miniature never drifts.
+     // A quick tabletop attack: turn 45 degrees left, then return to target.
+     // The half-sine starts and ends at zero, so the miniature never drifts.
      lunge=Math.sin(Math.PI*pulseTime)*.14;
-     swipeAngle=Math.sin(Math.PI*2*pulseTime)*THREE.MathUtils.degToRad(15);
+     swipeAngle=-Math.sin(Math.PI*pulseTime)*THREE.MathUtils.degToRad(45);
     }
    }
 
