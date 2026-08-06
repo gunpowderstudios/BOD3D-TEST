@@ -33,11 +33,26 @@
   const START_AMBIENCE_PATH='./assets/sounds/distant-monsters.mp3';
   const DUNGEON_AMBIENCE_PATH='./assets/sounds/dungeon-sounds.mp3';
   const RADIO_TRACK_KEY='bod3dRadioTrack';
-  const RADIO_CANDIDATES=Array.from({length:10},(_,index)=>({
-    number:index+1,
-    file:'./assets/sounds/rock-track'+(index+1)+'.mp3',
-    title:'Rock Track '+(index+1)
-  }));
+  const RADIO_CANDIDATES=[
+    {
+      number:1,
+      file:'./assets/radio/01-rock-track1.mp3',
+      title:'Rock Track 1',
+      artist:'',
+      artistUrl:'',
+      licence:'',
+      licenceUrl:''
+    },
+    {
+      number:2,
+      file:'./assets/radio/02-burn-the-world-waltz.mp3',
+      title:'Burn The World Waltz',
+      artist:'Kevin MacLeod',
+      artistUrl:'https://incompetech.com/',
+      licence:'Creative Commons Attribution 4.0',
+      licenceUrl:'https://creativecommons.org/licenses/by/4.0/'
+    }
+  ];
   const END_MUSIC_PATH='./assets/sounds/end-game-music.mp3';
 
   let distantAudio=null;
@@ -97,7 +112,7 @@
     if(radioDiscoveryPromise&&!force)return radioDiscoveryPromise;
     radioDiscoveryPromise=Promise.all(RADIO_CANDIDATES.map(async track=>{
       try{
-        const response=await fetch(track.file+'?radio-check=13.01',{method:'HEAD',cache:'no-store'});
+        const response=await fetch(track.file+'?radio-check=13.02',{method:'HEAD',cache:'no-store'});
         return response.ok?track:null;
       }catch(_){return null;}
     })).then(results=>{
@@ -314,13 +329,21 @@
 
   function radioPanelHTML(){
     const track=currentRadioTrack();
-    const list=availableRadioTracks.map((item,index)=>
-      '<button type="button" class="radioTrackButton '+(index===rockIndex?'active':'')+
-      '" onclick="BODRadioSelect('+index+')">'+item.title+'</button>'
-    ).join('');
+    const list=availableRadioTracks.map((item,index)=>{
+      const artist=item.artist?' <span class="radioTrackArtist">— '+item.artist+'</span>':'';
+      return '<button type="button" class="radioTrackButton '+(index===rockIndex?'active':'')+
+        '" onclick="BODRadioSelect('+index+')"><span>'+item.title+'</span>'+artist+'</button>';
+    }).join('');
+    const artistLine=track&&track.artist
+      ? '<div class="radioArtist">by <a href="'+track.artistUrl+'" target="_blank" rel="noopener noreferrer">'+track.artist+'</a></div>'
+      : '';
+    const licenceLine=track&&track.licence
+      ? '<div class="radioLicence"><a href="'+track.licenceUrl+'" target="_blank" rel="license noopener noreferrer">'+track.licence+'</a></div>'
+      : '';
     return '<section class="dungeonRadio" aria-label="Dungeon Radio">'+
       '<div class="dungeonRadioTitle">DUNGEON RADIO</div>'+
-      '<div class="radioNowPlaying">Now playing: <b>'+(track?track.title:'No tracks uploaded')+'</b></div>'+
+      '<div class="radioNowPlaying"><span>Now playing</span><b>'+(track?track.title:'No tracks uploaded')+'</b></div>'+
+      artistLine+licenceLine+
       '<div class="radioTransport">'+
        '<button type="button" onclick="BODRadioPrevious()" aria-label="Previous track">◀</button>'+
        '<button type="button" onclick="BODRadioTogglePlay()">'+(radioPaused?'PLAY':'PAUSE')+'</button>'+
