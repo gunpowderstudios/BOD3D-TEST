@@ -1757,3 +1757,31 @@ body.combatActive #combatBtns button:not(.lethalIconBtn){
  color:#E9BB00;
  border-color:#E9BB00;
 }
+
+.radioNowPlaying span{
+ display:block;
+ margin-bottom:2px;
+ font-size:.82em;
+ opacity:.72;
+ text-transform:uppercase;
+ letter-spacing:.06em;
+}
+.radioNowPlaying b{
+ display:block;
+ color:#fff;
+ font-size:1.08em;
+}
+.radioArtist,
+.radioLicence{
+ margin:-7px 0 10px;
+ font-size:.9em;
+}
+.radioLicence{margin-top:-7px}
+.dungeonRadio a{
+ color:#E9BB00;
+ text-decoration:underline;
+}
+.radioTrackArtist{
+ font-weight:500;
+ opacity:.82;
+}
