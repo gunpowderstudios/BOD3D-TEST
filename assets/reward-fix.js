@@ -1,9 +1,10 @@
 // BOD3D — unique item deck, end-game music and cache-version loader
 (function(){
-  const BUILD=(document.currentScript&&new URL(document.currentScript.src,location.href).searchParams.get('v'))||'12.76';
-  const VERSION='v'+BUILD;
+  const VERSION=document.documentElement.dataset.buildVersion||'development';
   window.BOD3D_BUILD_VERSION=VERSION;
-  function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
+  // index.html owns the visible build label. This legacy reward helper must
+  // never overwrite it from a cached script URL.
+  function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';}
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
