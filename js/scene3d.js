@@ -2856,10 +2856,21 @@ function animate(now){
     if(pulseTime>=1){
      combatScene.attackPulseStarted=null;
     }else{
-     // A quick tabletop attack: turn 45 degrees left, then return to target.
-     // The half-sine starts and ends at zero, so the miniature never drifts.
+     // Reach 45 degrees left in 150 ms, hold for 150 ms, then return
+     // over 200 ms. The full attack still completes in exactly 500 ms.
      lunge=Math.sin(Math.PI*pulseTime)*.14;
-     swipeAngle=-Math.sin(Math.PI*pulseTime)*THREE.MathUtils.degToRad(45);
+     const fullSwipe=THREE.MathUtils.degToRad(45);
+     if(pulseTime<.3){
+      const turnT=pulseTime/.3;
+      const easedTurn=turnT*turnT*(3-2*turnT);
+      swipeAngle=-fullSwipe*easedTurn;
+     }else if(pulseTime<.6){
+      swipeAngle=-fullSwipe;
+     }else{
+      const returnT=(pulseTime-.6)/.4;
+      const easedReturn=returnT*returnT*(3-2*returnT);
+      swipeAngle=-fullSwipe*(1-easedReturn);
+     }
     }
    }
 
