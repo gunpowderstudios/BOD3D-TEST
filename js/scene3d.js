@@ -2849,14 +2849,17 @@ function animate(now){
 
   if(hero.parent===boardGroup&&monster.parent===boardGroup){
    let lunge=0;
+   let swipeAngle=0;
 
    if(combatScene.attackPulseStarted!==null){
-    const pulseTime=(now-combatScene.attackPulseStarted)/360;
+    const pulseTime=(now-combatScene.attackPulseStarted)/500;
     if(pulseTime>=1){
      combatScene.attackPulseStarted=null;
     }else{
-     // Quick advance and retreat, like moving a tabletop miniature to attack.
-     lunge=Math.sin(Math.PI*pulseTime)*.18;
+     // A quick tabletop attack: sweep left, back through the target, then settle.
+     // The sine wave starts and ends at zero, so the miniature never drifts.
+     lunge=Math.sin(Math.PI*pulseTime)*.14;
+     swipeAngle=Math.sin(Math.PI*2*pulseTime)*THREE.MathUtils.degToRad(15);
     }
    }
 
@@ -2878,7 +2881,7 @@ function animate(now){
     monster.position.y=TILE_THICKNESS;
    }
 
-   hero.rotation.y=yawTowards(hero.position,monster.position);
+   hero.rotation.y=yawTowards(hero.position,monster.position)+swipeAngle;
    monster.rotation.y=yawTowards(monster.position,hero.position);
    heroRotationCurrent=hero.rotation.y;
    heroPositionCurrent={
