@@ -1,7 +1,7 @@
 // Bag of Dungeon 3D — core game logic (characters, decks, tiles, movement, inventory, items, saving)
 // Split out of index.html for easier editing. Loads before combat.js and scene3d.js.
 
-const VERSION='v13.04';
+const VERSION='v13.05';
 // The visible build label is owned by index.html. Keeping it out of cached
 // JavaScript prevents an older game.js from replacing the current page version.
 document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';
