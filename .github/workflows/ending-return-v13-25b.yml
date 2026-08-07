@@ -1,0 +1,90 @@
+name: Ending scroll return v13.25
+on:
+  push:
+    paths:
+      - '.github/workflows/ending-return-v13-25b.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch ending navigation
+        shell: python
+        run: |
+          from pathlib import Path
+          p=Path('js/game.js')
+          s=p.read_text()
+          old="""function win(){
+ state.gameOver=true;
+ sndWin();
+ closeCombat();
+ window.startEndGameMusic?.();
+ const rescuedFirkin=!!state.player.companionFirkin;
+ showModal('YOU ESCAPED!','',[{text:'New Game',cls:'green',fn:()=>{window.stopEndGameMusic?.();showCharSelect();}}]);
+ document.getElementById('modal')?.classList.add('endingScrollModal');
+ const body=document.getElementById('modalBody');
+ if(body)body.innerHTML=endingScrollHTML(rescuedFirkin);
+}
+"""
+          new="""function showWinEnding(){
+ const rescuedFirkin=!!state.player.companionFirkin;
+ showModal('YOU ESCAPED!','',[{text:'New Game',cls:'green',fn:()=>{window.stopEndGameMusic?.();showCharSelect();}}]);
+ document.getElementById('modal')?.classList.add('endingScrollModal');
+ const body=document.getElementById('modalBody');
+ if(body){body.innerHTML=endingScrollHTML(rescuedFirkin);body.scrollTop=0;}
+}
+function win(){
+ state.gameOver=true;
+ state.won=true;
+ sndWin();
+ closeCombat();
+ window.startEndGameMusic?.();
+ showWinEnding();
+}
+"""
+          if old not in s:
+              raise SystemExit('win block not found')
+          s=s.replace(old,new,1)
+          oldq="""function showQuestLogViewer(fromGameOver=false){
+ const buttons=fromGameOver
+  ?[{text:'Back to Game Over',fn:showGameOverModal},{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]
+  :[{text:'Close',fn:closeModal}];
+"""
+          newq="""function showQuestLogViewer(fromGameOver=false){
+ const buttons=state?.won
+  ?[{text:'Back to Ending',fn:showWinEnding},{text:'New Game',cls:'green',fn:()=>{window.stopEndGameMusic?.();showCharSelect();}}]
+  :(fromGameOver
+   ?[{text:'Back to Game Over',fn:showGameOverModal},{text:'New Game',cls:'green',fn:()=>{showCharSelect();}}]
+   :[{text:'Close',fn:closeModal}]);
+"""
+          if oldq not in s:
+              raise SystemExit('quest log block not found')
+          p.write_text(s.replace(oldq,newq,1))
+          i=Path('index.html')
+          h=i.read_text()
+          versions=['v13.24','v13.23','v13.22']
+          changed=False
+          for v in versions:
+              token='data-build-version="'+v+'"'
+              if token in h:
+                  h=h.replace(token,'data-build-version="v13.25"',1)
+                  changed=True
+                  break
+          if not changed:
+              raise SystemExit('expected build version not found')
+          marker='js/game.js?cache='
+          pos=h.find(marker)
+          if pos<0:
+              raise SystemExit('game.js script not found')
+          end=h.find('"',pos)
+          h=h[:pos]+'js/game.js?cache=20260807-ending-return-v1325'+h[end:]
+          i.write_text(h)
+      - name: Commit
+        run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add js/game.js index.html
+          git commit -m "Allow Quest Log to return to ending scroll v13.25"
+          git push
