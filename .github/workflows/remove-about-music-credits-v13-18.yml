@@ -1,0 +1,35 @@
+name: Remove duplicated About music credits TEST v13.18
+on:
+  push:
+    paths:
+      - '.github/workflows/remove-about-music-credits-v13-18.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove duplicated music credit and bump TEST version
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('js/game.js')
+          s=p.read_text()
+          old='''      <div style="font-size:20px;font-weight:bold">Music Credits</div>\n      <div><b>“Burn The World Waltz”</b> — <a href="https://incompetech.com/" target="_blank" rel="noopener noreferrer">Kevin MacLeod (incompetech.com)</a><br>Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="license noopener noreferrer">Creative Commons Attribution 4.0</a>.</div>\n'''
+          if old not in s:
+              raise SystemExit('Expected About music credit block not found')
+          p.write_text(s.replace(old,'',1))
+
+          h=Path('index.html')
+          t=h.read_text().replace('data-build-version="v13.17"','data-build-version="v13.18"',1)
+          t=t.replace('js/game.js?cache=20260807-radio-v1317','js/game.js?cache=20260807-about-clean-v1318')
+          h.write_text(t)
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add js/game.js index.html
+          git commit -m "Remove duplicate music credits from About v13.18"
+          git push
