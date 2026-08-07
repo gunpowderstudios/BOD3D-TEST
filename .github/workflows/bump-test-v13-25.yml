@@ -1,4 +1,4 @@
-name: Bump TEST to v13.25
+name: Apply TEST v13.26 tile drop
 on:
   push:
     paths:
@@ -6,23 +6,16 @@ on:
 permissions:
   contents: write
 jobs:
-  bump:
+  patch:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Bump version and dark-combat cache tag
-        shell: python
-        run: |
-          from pathlib import Path
-          i=Path('index.html')
-          h=i.read_text()
-          h=h.replace('data-build-version="v13.24"','data-build-version="v13.25"',1)
-          h=h.replace('css/dark-combat.css?v=11.45','css/dark-combat.css?v=13.25',1)
-          i.write_text(h)
+      - name: Apply tile drop patch
+        run: python tools/tile_drop_patch_v1326.py
       - name: Commit
         run: |
           git config user.name "Gunpowder"
           git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
-          git add index.html
-          git commit -m "Bump TEST build to v13.25"
+          git add js/scene3d.js js/game.js index.html
+          git commit -m "Drop newly placed tiles from 10mm with fade and impact sound v13.26"
           git push
