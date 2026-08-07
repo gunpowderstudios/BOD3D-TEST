@@ -1931,6 +1931,11 @@ function stageCombatScene(tileKey){
   .18,
   .45
  );
+ const monsterLungeDistance=THREE.MathUtils.clamp(
+  Math.min(monsterSize.x,monsterSize.z)*.5,
+  .18,
+  .5
+ );
  const monsterRadius=Math.max(monsterSize.x,monsterSize.z)*.5;
  const requiredDistance=heroRadius+monsterRadius+.24;
  const separation=THREE.MathUtils.clamp(
@@ -2035,15 +2040,18 @@ function stageCombatScene(tileKey){
   monsterCombatPosition:monsterTarget.clone(),
   savedCamera,
   heroLungeDistance,
-  attackPulseStarted:null
+  monsterLungeDistance,
+  attackPulseStarted:null,
+  attackPulseType:null
  };
  cameraLockedToHero=false;
  lastCameraHeroPosition=null;
  startCameraTween(cinematicPosition,encounterTarget,620);
  return true;
 }
-function triggerCombatPulse(){
+function triggerCombatPulse(attacker='hero'){
  if(!combatScene||!combatScene.hero||!combatScene.monster)return;
+ combatScene.attackPulseType=['monster','both'].includes(attacker)?attacker:'hero';
  combatScene.attackPulseStarted=performance.now();
 }
 
@@ -2856,53 +2864,64 @@ function animate(now){
   const monsterBase=combatScene.monsterCombatPosition;
 
   if(hero.parent===boardGroup&&monster.parent===boardGroup){
-   let lunge=0;
+   let pulseProgress=0;
    let swipeAngle=0;
+   let heroLunge=0;
+   let monsterLunge=0;
+   const pulseType=combatScene.attackPulseType||'hero';
 
    if(combatScene.attackPulseStarted!==null){
     const pulseTime=(now-combatScene.attackPulseStarted)/500;
     if(pulseTime>=1){
      combatScene.attackPulseStarted=null;
+     combatScene.attackPulseType=null;
     }else{
-     // Reach 45 degrees counter-clockwise/left in 150 ms, hold for 150 ms, then return
-     // over 200 ms. The full attack still completes in exactly 500 ms.
-     // Move forward by half the hero miniature's measured depth, then back.
-     lunge=Math.sin(Math.PI*pulseTime)*(combatScene.heroLungeDistance||.24);
+     pulseProgress=pulseTime;
+     // Reach 45 degrees counter-clockwise/left in 150 ms, hold for 150 ms,
+     // then rotate and lunge back over 200 ms.
+     const lungeWave=Math.sin(Math.PI*pulseProgress);
+     if(pulseType==='hero'||pulseType==='both'){
+      heroLunge=lungeWave*(combatScene.heroLungeDistance||.24);
+     }
+     if(pulseType==='monster'||pulseType==='both'){
+      monsterLunge=lungeWave*(combatScene.monsterLungeDistance||.24);
+     }
      const fullSwipe=THREE.MathUtils.degToRad(45);
-     if(pulseTime<.3){
-      const turnT=pulseTime/.3;
+     if(pulseProgress<.3){
+      const turnT=pulseProgress/.3;
       const easedTurn=turnT*turnT*(3-2*turnT);
       swipeAngle=fullSwipe*easedTurn;
-     }else if(pulseTime<.6){
+     }else if(pulseProgress<.6){
       swipeAngle=fullSwipe;
      }else{
-      const returnT=(pulseTime-.6)/.4;
+      const returnT=(pulseProgress-.6)/.4;
       const easedReturn=returnT*returnT*(3-2*returnT);
       swipeAngle=fullSwipe*(1-easedReturn);
      }
     }
    }
 
-   const attackDirection=monsterBase.clone().sub(heroBase);
-   attackDirection.y=0;
-   if(attackDirection.lengthSq()>.0001)attackDirection.normalize();
+   const heroAttackDirection=monsterBase.clone().sub(heroBase);
+   heroAttackDirection.y=0;
+   if(heroAttackDirection.lengthSq()>.0001)heroAttackDirection.normalize();
+   const monsterAttackDirection=heroAttackDirection.clone().negate();
 
-   hero.position.copy(heroBase).addScaledVector(attackDirection,lunge);
+   hero.position.copy(heroBase).addScaledVector(heroAttackDirection,heroLunge);
 
-   // Do not overwrite the reveal-drop Y animation. The combat pose loop used to
-   // copy the monster's full saved combat position every frame, which pinned a
-   // freshly revealed monster in mid-air. While the drop is active, only hold
-   // its horizontal fighting position; the drop animator owns Y until landing.
+   // Do not overwrite the reveal-drop Y animation. While the drop is active,
+   // only the monster's horizontal fighting position is controlled here.
    if(monsterIsDropping(monster)){
-    monster.position.x=monsterBase.x;
-    monster.position.z=monsterBase.z;
+    monster.position.x=monsterBase.x+monsterAttackDirection.x*monsterLunge;
+    monster.position.z=monsterBase.z+monsterAttackDirection.z*monsterLunge;
    }else{
-    monster.position.copy(monsterBase);
+    monster.position.copy(monsterBase).addScaledVector(monsterAttackDirection,monsterLunge);
     monster.position.y=TILE_THICKNESS;
    }
 
-   hero.rotation.y=yawTowards(hero.position,monster.position)+swipeAngle;
-   monster.rotation.y=yawTowards(monster.position,hero.position);
+   const heroSwiping=(pulseType==='hero'||pulseType==='both')&&pulseProgress>0;
+   const monsterSwiping=(pulseType==='monster'||pulseType==='both')&&pulseProgress>0;
+   hero.rotation.y=yawTowards(hero.position,monster.position)+(heroSwiping?swipeAngle:0);
+   monster.rotation.y=yawTowards(monster.position,hero.position)+(monsterSwiping?swipeAngle:0);
    heroRotationCurrent=hero.rotation.y;
    heroPositionCurrent={
     x:hero.position.x,
