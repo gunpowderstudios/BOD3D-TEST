@@ -56,11 +56,15 @@ scene.write_text(s.replace(old,new,1))
 
 game=Path('js/game.js')
 g=game.read_text()
-old=" p.ap-=1;\n sndTile();log('Placed '+TILE_LABEL[tile.kind]+(tile.itemMarker?' with item marker':'')+' to the '+placement.dir+'.','system');"
-new=" p.ap-=1;\n window.BOD3D?.queueTileDrop?.(key(nx,ny));log('Placed '+TILE_LABEL[tile.kind]+(tile.itemMarker?' with item marker':'')+' to the '+placement.dir+'.','system');"
-if old not in g:
-    raise SystemExit('placement sound block not found')
-game.write_text(g.replace(old,new,1))
+place_start=g.find("document.getElementById('placeBtn').onclick")
+if place_start<0:
+    raise SystemExit('placement handler not found')
+place_end=g.find('function placeExitAndRing',place_start)
+snd_pos=g.find('sndTile();',place_start)
+if snd_pos<0 or (place_end>=0 and snd_pos>place_end):
+    raise SystemExit('placement sndTile call not found')
+g=g[:snd_pos]+"window.BOD3D?.queueTileDrop?.(key(nx,ny));"+g[snd_pos+len('sndTile();'):]
+game.write_text(g)
 
 index=Path('index.html')
 h=index.read_text()
