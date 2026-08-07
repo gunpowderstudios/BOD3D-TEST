@@ -537,7 +537,6 @@ function fightRound(){
  combat.rolling=true;
  const pr=roll(pDice()),mr=roll(m.dice);
  combat.pendingDiceRoll={pr,mr};
- window.BOD3D?.combatPulse?.();
  showDice(Array.from({length:pDice()},()=>'?'),Array.from({length:m.dice},()=>'?'),true);
  document.getElementById('combatLog').textContent='Rolling dice...';
  playSound('dice');
@@ -576,10 +575,26 @@ function resolveFightRound(){
  combat.mustFightRound=false;
  document.getElementById('combatLog').textContent=text;
  log(text,'combat');
- if(crit){if(damageToMonster>0)playUsedItemSounds(meleeItemsUsed(p,m),'sword');playSound('critical');playCurrentTileEffect('critical',850);showCombatImpact('monster',m.health<=0?'kill':'critical',damageToMonster);}
- else if(damageToMonster>0){playUsedItemSounds(meleeItemsUsed(p,m),'sword');playCurrentTileEffect('hit',650);showCombatImpact('monster',m.health<=0?'kill':'hit',damageToMonster);}
- else if(mt>pt){const defenceItems=[p.equipment.armour,p.equipment.shield].filter(Boolean);if(Math.max(0,mt-pt)>damageToHero&&defenceItems.length)playUsedItemSounds(defenceItems);playSound('hit');showCombatImpact('hero',p.health<=0?'kill':'hit',damageToHero);}
- else{showCombatImpact('monster','miss',0);}
+ const attackOutcome=damageToMonster>0?'hero':(mt>pt?'monster':'both');
+ window.BOD3D?.combatPulse?.(attackOutcome);
+ if(damageToMonster>0){
+  playUsedItemSounds(meleeItemsUsed(p,m),'sword');
+  if(crit){playSound('critical');playCurrentTileEffect('critical',850);}
+  else playCurrentTileEffect('hit',650);
+  showCombatImpact('monster',m.health<=0?'kill':(crit?'critical':'hit'),damageToMonster);
+ }
+ else if(mt>pt){
+  sndMonsterCombat(m.name);
+  const defenceItems=[p.equipment.armour,p.equipment.shield].filter(Boolean);
+  if(Math.max(0,mt-pt)>damageToHero&&defenceItems.length)playUsedItemSounds(defenceItems);
+  playSound('hit');
+  showCombatImpact('hero',p.health<=0?'kill':'hit',damageToHero);
+ }
+ else{
+  // Both miniatures meet at the middle of their 0.5-second lunges.
+  setTimeout(()=>playSound('clash'),180);
+  showCombatImpact('monster','miss',0);
+ }
  if(m.health<=0){log('KILLING BLOW: your total of '+pt+' defeats the '+m.name+' (monster total '+mt+').','combat');setTimeout(()=>killMonster(),combatImpactDuration('kill'));return;}
  if(p.health<=0){const rawDamage=Math.max(0,mt-pt);const blocked=Math.max(0,rawDamage-damageToHero);const finalDetail=text+(blocked?' Your armour blocked '+blocked+' damage.':'')+' Final damage: '+damageToHero+'.';recordFinalBlow('Slain by the '+m.name,finalDetail);playSound('heroHurt');log('FATAL BLOW: '+m.name+' scores '+mt+' against your '+pt+' and defeats you.','combat');setTimeout(()=>death(),combatImpactDuration('kill'));return;}
  if(mt>pt)playSound('heroHurt');
@@ -797,7 +812,6 @@ death=function(){window.BODDice3D?.clear?.();return deathWithoutDiceCleanup.appl
         log((state.charDef?.name||'The fighter')+' uses LETHAL BLOW! Combat total doubled from '+normalTotal+' to '+doubledTotal+'.','combat');
       }
       combat.pendingDiceRoll={pr,mr};
-      window.BOD3D?.combatPulse?.();
       showDice(Array.from({length:pDice()},()=>'?'),Array.from({length:m.dice},()=>'?'),true);
       document.getElementById('combatLog').textContent=useLethal?'LETHAL BLOW! Rolling doubled attack...':'Rolling dice...';
       playSound('dice');window.BODDice3D?.rollCombat?.(pr.rolls,mr.rolls);renderCombat();
