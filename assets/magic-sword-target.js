@@ -6,14 +6,15 @@
 
   let armed=false;
 
+  function gameState(){return typeof state!=='undefined'?state:null;}
   function equippedMagicSword(){
-    const p=window.state?.player;
+    const p=gameState()?.player;
     if(!p)return null;
     return [p.slots?.left,p.slots?.right].find(item=>item?.name==='Magic Sword')||null;
   }
 
   function isAdjacentConnected(tileKey){
-    const p=window.state?.player;
+    const p=gameState()?.player;
     if(!p||!tileKey)return false;
     const parts=String(tileKey).split(',').map(Number);
     if(parts.length!==2||parts.some(n=>!Number.isFinite(n)))return false;
@@ -23,56 +24,49 @@
     const dir=dx===1?'E':dx===-1?'W':dy===1?'S':'N';
     const current=typeof getTile==='function'?getTile(p.x,p.y):null;
     const target=typeof getTile==='function'?getTile(tx,ty):null;
-    const d=window.DIRS?.[dir]||((typeof DIRS!=='undefined')?DIRS[dir]:null);
+    const d=(typeof DIRS!=='undefined')?DIRS[dir]:null;
     return !!(current&&target&&d&&current.opens?.[dir]&&target.opens?.[d.opp]);
   }
 
   function reveal(tileKey){
     if(!armed)return false;
     const sword=equippedMagicSword();
-    if(!sword){armed=false;toast?.('Equip the Magic Sword first');return true;}
+    if(!sword){armed=false;if(typeof toast==='function')toast('Equip the Magic Sword first');return true;}
     if(!isAdjacentConnected(tileKey)){
-      toast?.('Choose an adjacent connected monster');
+      if(typeof toast==='function')toast('Choose an adjacent connected monster');
       return true;
     }
-    const t=window.state?.tiles?.[tileKey];
-    if(!t||( !t.monsterPending && !(t.monster&&t.monster.health>0&&!t.monster.revealed) )){
-      toast?.('That is not an unidentified adjacent monster');
+    const t=gameState()?.tiles?.[tileKey];
+    if(!t||(!t.monsterPending&&!(t.monster&&t.monster.health>0&&!t.monster.revealed))){
+      if(typeof toast==='function')toast('That is not an unidentified adjacent monster');
       return true;
     }
-    if(t.monsterPending&&!t.monster){
-      t.monster=drawMonster();
-      t.monsterPending=false;
-    }
-    if(!t.monster){toast?.('No monster there');return true;}
+    if(t.monsterPending&&!t.monster){t.monster=drawMonster();t.monsterPending=false;}
+    if(!t.monster){if(typeof toast==='function')toast('No monster there');return true;}
     armed=false;
     t.monster.peeked=true;
-    playItemSound?.(sword);
-    showModal(
-      'MAGIC SWORD',
-      t.monster.name+'\nHealth '+t.monster.health+'/'+t.monster.maxHealth+'\nCombat '+t.monster.dice+'d6+'+t.monster.mod,
-      [{text:'Close',fn:closeModal}]
-    );
+    if(typeof playItemSound==='function')playItemSound(sword);
+    showModal('MAGIC SWORD',t.monster.name+'\nHealth '+t.monster.health+'/'+t.monster.maxHealth+'\nCombat '+t.monster.dice+'d6+'+t.monster.mod,[{text:'Close',fn:closeModal}]);
     if(typeof render==='function')render();
     return true;
   }
 
   function arm(){
     if(!equippedMagicSword()){
-      toast?.('Equip the Magic Sword first');
+      if(typeof toast==='function')toast('Equip the Magic Sword first');
       return;
     }
-    const p=window.state.player;
+    const p=gameState().player;
     let found=false;
     for(const [dir,d] of Object.entries(typeof DIRS!=='undefined'?DIRS:{})){
       const t=typeof getTile==='function'?getTile(p.x+d.dx,p.y+d.dy):null;
       const current=typeof getTile==='function'?getTile(p.x,p.y):null;
       if(current&&t&&current.opens?.[dir]&&t.opens?.[d.opp]&&(t.monsterPending||(t.monster&&t.monster.health>0&&!t.monster.revealed))){found=true;break;}
     }
-    if(!found){toast?.('No hidden monster on an adjacent connected tile');return;}
+    if(!found){if(typeof toast==='function')toast('No hidden monster on an adjacent connected tile');return;}
     armed=true;
-    closeModal?.();
-    toast?.('Magic Sword ready — click the adjacent monster');
+    if(typeof closeModal==='function')closeModal();
+    if(typeof toast==='function')toast('Magic Sword ready — click the adjacent monster');
   }
 
   function addUseButton(){
@@ -91,20 +85,17 @@
   if(typeof originalInspectCarried==='function'){
     window.inspectCarried=function(slot){
       originalInspectCarried(slot);
-      const item=window.state?.player?.slots?.[slot];
+      const item=gameState()?.player?.slots?.[slot];
       if(item?.name==='Magic Sword')addUseButton();
     };
   }
 
   const originalAction=window.BOD3DAction;
   window.BOD3DAction=function(type,tileKey){
-    if(armed&&(type==='hidden'||type==='monster')){
-      if(reveal(tileKey))return;
-    }
+    if(armed&&(type==='hidden'||type==='monster')){if(reveal(tileKey))return;}
     return originalAction?.apply(this,arguments);
   };
 
-  // 2D map support: intercept hidden monster markers while armed.
   document.addEventListener('click',event=>{
     if(!armed)return;
     const marker=event.target.closest?.('.hiddenMonster');
