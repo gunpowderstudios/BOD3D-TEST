@@ -38,11 +38,10 @@ function animateTileDrop(tileKey,tileBody,topMesh,sideMaterial,topMaterial){
 if old not in s:
     raise SystemExit('constants block not found')
 s=s.replace(old,new,1)
-old=" markClickable(mesh,'tile',key);\n boardGroup.add(mesh);\n\n const darkness=darknessForTile(x,y);\n"
-new=" markClickable(mesh,'tile',key);\n boardGroup.add(mesh);\n animateTileDrop(key,tileBody,mesh,sideMaterial,topMaterial);\n\n const darkness=darknessForTile(x,y);\n"
-if old not in s:
+needle="boardGroup.add(mesh);\n\n const darkness=darknessForTile(x,y);"
+if needle not in s:
     raise SystemExit('tile insertion point not found')
-s=s.replace(old,new,1)
+s=s.replace(needle,"boardGroup.add(mesh);\n animateTileDrop(key,tileBody,mesh,sideMaterial,topMaterial);\n\n const darkness=darknessForTile(x,y);",1)
 old="window.BOD3D={\n render:renderBoard,\n clearDice3D,\n"
 new="window.BOD3D={\n render:renderBoard,\n clearDice3D,\n queueTileDrop,\n"
 if old not in s:
