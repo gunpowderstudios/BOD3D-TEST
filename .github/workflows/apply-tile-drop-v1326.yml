@@ -17,3 +17,4 @@ jobs:
           git add js/scene3d.js js/game.js index.html
           git commit -m "Tile drop animation v13.26"
           git push
+# retry after robust insertion match
