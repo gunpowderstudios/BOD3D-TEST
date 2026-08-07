@@ -400,12 +400,23 @@ function monsterLandSoundKey(name){
   .replace(/^-+|-+$/g,'');
 }
 
+function itemSoundKey(name){
+ return 'item-'+String(name||'item')
+  .toLowerCase()
+  .replace(/[’']/g,'')
+  .replace(/&/g,'and')
+  .replace(/[^a-z0-9]+/g,'-')
+  .replace(/^-+|-+$/g,'');
+}
+
 const SOUND_DEFS=[
  ['move','Footstep / movement'],['reacherSting','Reacher sting'],['tilePlace','Tile placed'],['pickup','Item found / picked up'],['equip','Equip item'],['unequip','Unequip item'],['drop','Drop item'],['dice','Dice roll'],['hit','Combat hit'],['critical','Critical hit'],['sword','Hand weapon attack'],['bow','Bow shot'],['arrowHit','Arrow hit'],['spell','Generic spell'],['fireball','Fireball'],['ice','Ice Staff'],['heal','Healing / potion'],['teleport','Teleport'],['trap','Old Spikey'],['monsterReveal','Monster revealed'],['monsterDie','Monster defeated'],['heroHurt','Hero hurt'],['run','Run away'],['ring','Ring found'],['dragon','Dragon reveal / roar'],['win','Victory'],['endGameMusic','End-game scroll music'],['lose','Defeat'],['click','UI click'],
  // One landing-thud sound per monster, played when its reveal drop-in
  // animation hits the floor. File names follow the usual kebab convention,
  // e.g. Goblin -> assets/sounds/goblin.mp3, Giant Snake -> giant-snake.mp3.
- ...MONSTER_MASTER.map(m=>[monsterLandSoundKey(m.name),m.name+' lands'])
+ ...MONSTER_MASTER.map(m=>[monsterLandSoundKey(m.name),m.name+' lands']),
+ // Every item can use a matching uploaded file, e.g. item-magic-sword.mp3.
+ ...ITEM_MASTER.map(item=>[itemSoundKey(item.name),item.name+' found'])
 ];
 let USER_SOUNDS={},soundVolume=.8;
 function loadSounds(){try{USER_SOUNDS=JSON.parse(localStorage.getItem('bodDigitalSoundsV45')||'{}')}catch(e){USER_SOUNDS={}};soundVolume=Number(window.__BOD_EFFECTS_VOLUME__??'.30');soundOn=true;}
@@ -539,9 +550,54 @@ async function playSound(key){
  }
 }
 
+function fallbackItemSound(item){
+ const name=String(item?.name||'').toLowerCase();
+ const type=String(item?.type||'').toLowerCase();
+
+ if(/bear/.test(name)){
+  beep(115,.16,'sawtooth',.11);beep(82,.24,'sawtooth',.09,.09);
+ }else if(/armour|shield/.test(name)){
+  beep(190,.055,'square',.09);beep(360,.12,'triangle',.08,.04);
+ }else if(/boots/.test(name)){
+  beep(145,.055,'square',.07);beep(115,.065,'square',.065,.07);
+ }else if(/sword|axe|dagger|lance|morning star/.test(name)){
+  beep(760,.035,'sawtooth',.075);beep(240,.11,'triangle',.085,.025);
+ }else if(/bow/.test(name)){
+  beep(720,.045,'triangle',.08);beep(190,.13,'sawtooth',.055,.035);
+ }else if(/potion|vampire/.test(name)){
+  beep(420,.08,'sine',.07);beep(610,.1,'sine',.075,.07);beep(790,.11,'sine',.065,.14);
+ }else if(/fireball|bomb/.test(name)){
+  beep(165,.18,'sawtooth',.105);beep(75,.25,'sawtooth',.09,.055);
+ }else if(/ice/.test(name)){
+  beep(920,.09,'triangle',.075);beep(1260,.13,'sine',.06,.065);
+ }else if(/torch/.test(name)){
+  beep(240,.045,'sawtooth',.05);beep(330,.035,'square',.045,.04);beep(205,.055,'sawtooth',.04,.075);
+ }else if(/chest|insurance/.test(name)){
+  beep(170,.055,'square',.075);beep(470,.075,'triangle',.07,.055);
+ }else if(/teeth|claw|skull/.test(name)){
+  beep(310,.11,'sawtooth',.075);beep(155,.18,'triangle',.065,.07);
+ }else if(/crystal|cloak|tornado|vine|magic|spell/.test(name)||type==='spell'){
+  beep(430,.075,'triangle',.075);beep(690,.09,'triangle',.07,.055);beep(970,.12,'sine',.055,.12);
+ }else{
+  beep(560,.07,'triangle',.075);beep(820,.1,'triangle',.065,.065);
+ }
+}
+
+async function playItemSound(item){
+ const effectsLevel=Number(window.__BOD_EFFECTS_VOLUME__??soundVolume);
+ if(!item||!soundOn||effectsLevel<=0)return;
+ const soundKey=itemSoundKey(item.name);
+ if(USER_SOUNDS[soundKey]||await resolveGitHubSound(soundKey)){
+  playSound(soundKey);
+  return;
+ }
+ fallbackItemSound(item);
+}
+window.BODPlayItemSound=playItemSound;
+
 function sndMove(){playSound('move')}
 function sndTile(){playSound('tilePlace')}
-function sndItem(){playSound('pickup')}
+function sndItem(item=null){if(item)playItemSound(item);else playSound('pickup')}
 function sndHit(){playSound('hit')}
 function sndSpell(){playSound('spell')}
 async function sndMonster(monsterName=''){
@@ -806,9 +862,9 @@ function equipToSlot(item,slot){const p=state.player;if(slot==='armour'&&!isArmo
 function unequipItem(item){const p=state.player;if(!item)return false;if(p.backpack.length>=BACKPACK_LIMIT){toast('Backpack is full');return false;}removeFromCurrentLocation(item);p.backpack.push(item);syncEquipment();return true;}
 function equippedSlotFor(item){const s=state.player.slots;if(s.left===item&&s.right===item)return 'both hands';if(s.left===item)return 'left hand';if(s.right===item)return 'right hand';if(s.armour===item)return 'armour';if(s.boots===item)return 'boots';if(s.cloak===item)return 'attire';if(state.player.companionBear===item)return 'companion';return null;}
 function carriedHas(item){return allCarriedItems().includes(item);}
-function addToInventory(item,tile=getTile(state.player.x,state.player.y)){if(!item)return false;if(isBear(item)){showModal('You found the Loyal Bear!','The Loyal Bear joins you as a companion and adds +1 combat die. He takes no inventory space and remains with you until game over.',[{text:'Continue',cls:'green',fn:()=>{closeModal();state.player.companionBear=item;syncEquipment();sndItem();log('Loyal Bear joins you and uses no inventory space.','loot');render();}}]);return true;}pendingItemQueue.push({item,tile});if(pendingItemQueue.length===1)processPendingItem();return true;}
+function addToInventory(item,tile=getTile(state.player.x,state.player.y)){if(!item)return false;if(isBear(item)){playItemSound(item);showModal('You found the Loyal Bear!','The Loyal Bear joins you as a companion and adds +1 combat die. He takes no inventory space and remains with you until game over.',[{text:'Continue',cls:'green',fn:()=>{closeModal();state.player.companionBear=item;syncEquipment();sndItem();log('Loyal Bear joins you and uses no inventory space.','loot');render();}}]);return true;}pendingItemQueue.push({item,tile});if(pendingItemQueue.length===1)processPendingItem();return true;}
 function processPendingItem(){if(!pendingItemQueue.length)return;const {item,tile}=pendingItemQueue[0];const p=state.player;const buttons=[];if(isArmour(item)&&!p.slots.armour)buttons.push({text:'Wear Armour',cls:'green',fn:()=>finishPlaceNew(item,()=>equipToSlot(item,'armour'))});if(isBoots(item)&&!p.slots.boots)buttons.push({text:'Wear Boots',cls:'green',fn:()=>finishPlaceNew(item,()=>equipToSlot(item,'boots'))});if(isCloak(item)&&!p.slots.cloak)buttons.push({text:'Wear Attire',cls:'green',fn:()=>finishPlaceNew(item,()=>equipToSlot(item,'cloak'))});if(isHandItem(item)){if(!p.slots.left)buttons.push({text:isTwoHanded(item)?'Equip Both Hands':'Equip Left Hand',cls:'green',fn:()=>finishPlaceNew(item,()=>equipToSlot(item,'left'))});if(!isTwoHanded(item)&&!p.slots.right)buttons.push({text:'Equip Right Hand',cls:'green',fn:()=>finishPlaceNew(item,()=>equipToSlot(item,'right'))});}
- if(p.backpack.length<BACKPACK_LIMIT)buttons.push({text:'Put in Backpack',fn:()=>finishPlaceNew(item,()=>{p.backpack.push(item);syncEquipment();return true;})});buttons.push({text:'Leave on Tile',cls:'red',fn:()=>finishPlaceNew(item,()=>{tile.droppedItems=tile.droppedItems||[];tile.droppedItems.push(item);return true;})});showModal('You found '+item.name,(item.desc||'Choose where to place this item.')+'\n\nInventory spaces used: '+occupiedSpaceCount()+'/8',buttons);}
+ if(p.backpack.length<BACKPACK_LIMIT)buttons.push({text:'Put in Backpack',fn:()=>finishPlaceNew(item,()=>{p.backpack.push(item);syncEquipment();return true;})});buttons.push({text:'Leave on Tile',cls:'red',fn:()=>finishPlaceNew(item,()=>{tile.droppedItems=tile.droppedItems||[];tile.droppedItems.push(item);return true;})});playItemSound(item);showModal('You found '+item.name,(item.desc||'Choose where to place this item.')+'\n\nInventory spaces used: '+occupiedSpaceCount()+'/8',buttons);}
 function finishPlaceNew(item,fn){const ok=fn();if(ok===false)return;closeModal();sndItem();log('Placed '+item.name+'.','loot');pendingItemQueue.shift();render();setTimeout(processPendingItem,30);}
 function dropItemObject(item){const p=state.player;if(p.companionBear===item)p.companionBear=null;removeFromCurrentLocation(item);const t=getTile(p.x,p.y);t.droppedItems=t.droppedItems||[];t.droppedItems.push(item);syncEquipment();playSound('drop');log('Dropped '+item.name+' on this tile.','system');closeModal();render();}
 function dropItem(idx){const item=allCarriedItems()[idx];if(item)dropItemObject(item);}
@@ -1173,7 +1229,7 @@ function openMenu(){
   ]);
 }
 
-function showModal(title,body,buttons){const modal=document.getElementById('modal');modal.classList.remove('modalEdge','questLogModal','rewardChoiceModal','introScrollModal','endingScrollModal','aboutModal');document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').textContent=body;const mb=document.getElementById('modalButtons');mb.innerHTML='';buttons.forEach(x=>addBtn(mb,x.text,x.cls,x.fn));const edgeInfo=buttons.length===1&&/^(Close|Continue)$/.test(buttons[0].text||'')&&String(body||'').length<360;modal.classList.toggle('modalEdge',edgeInfo);modal.classList.add('open');}
+function showModal(title,body,buttons){const modal=document.getElementById('modal');modal.classList.remove('modalEdge','questLogModal','rewardChoiceModal','introScrollModal','endingScrollModal','aboutModal');document.getElementById('modalTitle').textContent=title;document.getElementById('modalBody').textContent=body;const mb=document.getElementById('modalButtons');mb.innerHTML='';buttons.forEach(x=>addBtn(mb,x.text,x.cls,x.fn));const edgeInfo=buttons.length===1&&/^(Close|Continue)$/.test(buttons[0].text||'')&&String(body||'').length<360;modal.classList.toggle('modalEdge',edgeInfo);modal.dataset.backdropClose=buttons.some(x=>String(x.text||'').trim()==='Close')?'1':'0';if(!modal.dataset.backdropCloseWired){modal.dataset.backdropCloseWired='1';modal.addEventListener('click',event=>{if(event.target===modal&&modal.dataset.backdropClose==='1')closeModal();});}modal.classList.add('open');}
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.style.display='block';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',1500)}
 function log(msg,cls){const d=document.createElement('div');d.className='logline '+(cls||'');d.textContent=msg;document.getElementById('log').appendChild(d);document.getElementById('log').scrollTop=99999;}
@@ -1292,7 +1348,7 @@ function magicSwordPeekHTML(){const p=state.player;let rows=[];for(const dir of 
 window.peekMonster=function(dir){const p=state.player,d=DIRS[dir],t=getTile(p.x+d.dx,p.y+d.dy);if(!t)return;if(t.monsterPending&&!t.monster){t.monster=drawMonster();t.monsterPending=false;}if(t.monster){t.monster.peeked=true;showModal('Magic Sword: '+dir,t.monster.name+'\nHealth '+t.monster.maxHealth+'\nCombat '+t.monster.dice+'d6+'+t.monster.mod,[{text:'Close',fn:closeModal}]);render();}};
 function carriedAt(slot){return state.player.slots[slot];}
 window.inspectCarried=function(slot){const item=carriedAt(slot);if(item)inspectItemObject(item);};window.inspectBackpack=function(idx){const item=state.player.backpack[idx];if(item)inspectItemObject(item);};window.inspectBear=function(){if(state.player.companionBear)inspectItemObject(state.player.companionBear);};window.inspectFirkin=function(){if(!state.player.companionFirkin)return;showModal('Firkin','Rose’s rescued husband. Firkin adds +1 to every melee attack roll and can fight alongside the Loyal Bear. He does not affect ranged attacks.',[{text:'Close',fn:closeModal}]);};
-function inspectItemObject(item){const buttons=[];const eq=equippedSlotFor(item);if(item.type==='equipment'||isHandItem(item)||isAttire(item)){if(eq&&eq!=='companion')buttons.push({text:'Move to Backpack',fn:()=>{if(unequipItem(item)){closeModal();render();}}});if(isArmour(item)&&eq!=='armour')buttons.push({text:'Wear Armour',cls:'green',fn:()=>{if(equipToSlot(item,'armour')){closeModal();render();}}});else if(isBoots(item)&&eq!=='boots')buttons.push({text:'Wear Boots',cls:'green',fn:()=>{if(equipToSlot(item,'boots')){closeModal();render();}}});else if(isCloak(item)&&eq!=='attire')buttons.push({text:'Wear Attire',cls:'green',fn:()=>{if(equipToSlot(item,'cloak')){closeModal();render();}}});else if(isHandItem(item)&&eq!=='both hands'){buttons.push({text:isTwoHanded(item)?'Equip Both Hands':'Equip Left Hand',cls:'green',fn:()=>{if(equipToSlot(item,'left')){closeModal();render();}}});if(!isTwoHanded(item))buttons.push({text:'Equip Right Hand',cls:'green',fn:()=>{if(equipToSlot(item,'right')){closeModal();render();}}});}}
+function inspectItemObject(item){playItemSound(item);const buttons=[];const eq=equippedSlotFor(item);if(item.type==='equipment'||isHandItem(item)||isAttire(item)){if(eq&&eq!=='companion')buttons.push({text:'Move to Backpack',fn:()=>{if(unequipItem(item)){closeModal();render();}}});if(isArmour(item)&&eq!=='armour')buttons.push({text:'Wear Armour',cls:'green',fn:()=>{if(equipToSlot(item,'armour')){closeModal();render();}}});else if(isBoots(item)&&eq!=='boots')buttons.push({text:'Wear Boots',cls:'green',fn:()=>{if(equipToSlot(item,'boots')){closeModal();render();}}});else if(isCloak(item)&&eq!=='attire')buttons.push({text:'Wear Attire',cls:'green',fn:()=>{if(equipToSlot(item,'cloak')){closeModal();render();}}});else if(isHandItem(item)&&eq!=='both hands'){buttons.push({text:isTwoHanded(item)?'Equip Both Hands':'Equip Left Hand',cls:'green',fn:()=>{if(equipToSlot(item,'left')){closeModal();render();}}});if(!isTwoHanded(item))buttons.push({text:'Equip Right Hand',cls:'green',fn:()=>{if(equipToSlot(item,'right')){closeModal();render();}}});}}
  if(!isChest(item)&&(item.type==='spell'||item.type==='consumable'||item.use))buttons.push({text:'Use',cls:'green',fn:()=>{closeModal();useItemObject(item);}});buttons.push({text:'Drop',cls:'red',fn:()=>dropItemObject(item)});buttons.push({text:'Close',fn:closeModal});showModal(item.name,(item.desc||'Item')+(eq?'\n\nActive: '+eq:''),buttons);}
 function useItemObject(item){if(item.use==='iceStaff'){useItem(item);return;}useItem(item,()=>{removeFromCurrentLocation(item);state.itemDiscard.push(item);syncEquipment();render();});}
 function useInventoryIndex(idx){const item=allCarriedItems()[idx];if(item)useItemObject(item);}
