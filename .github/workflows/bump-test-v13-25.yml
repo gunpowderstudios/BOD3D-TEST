@@ -1,0 +1,28 @@
+name: Bump TEST to v13.25
+on:
+  push:
+    paths:
+      - '.github/workflows/bump-test-v13-25.yml'
+permissions:
+  contents: write
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump version and dark-combat cache tag
+        shell: python
+        run: |
+          from pathlib import Path
+          i=Path('index.html')
+          h=i.read_text()
+          h=h.replace('data-build-version="v13.24"','data-build-version="v13.25"',1)
+          h=h.replace('css/dark-combat.css?v=11.45','css/dark-combat.css?v=13.25',1)
+          i.write_text(h)
+      - name: Commit
+        run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add index.html
+          git commit -m "Bump TEST build to v13.25"
+          git push
