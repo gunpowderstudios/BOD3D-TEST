@@ -1924,6 +1924,13 @@ function stageCombatScene(tileKey){
   .getSize(new THREE.Vector3());
 
  const heroRadius=Math.max(heroSize.x,heroSize.z)*.5;
+ // Lunge by roughly half the miniature's body depth. Use the smaller
+ // footprint axis so long swords, axes or staffs do not exaggerate the move.
+ const heroLungeDistance=THREE.MathUtils.clamp(
+  Math.min(heroSize.x,heroSize.z)*.5,
+  .18,
+  .45
+ );
  const monsterRadius=Math.max(monsterSize.x,monsterSize.z)*.5;
  const requiredDistance=heroRadius+monsterRadius+.24;
  const separation=THREE.MathUtils.clamp(
@@ -2027,6 +2034,7 @@ function stageCombatScene(tileKey){
   heroCombatPosition:heroTarget.clone(),
   monsterCombatPosition:monsterTarget.clone(),
   savedCamera,
+  heroLungeDistance,
   attackPulseStarted:null
  };
  cameraLockedToHero=false;
@@ -2858,7 +2866,8 @@ function animate(now){
     }else{
      // Reach 45 degrees counter-clockwise/left in 150 ms, hold for 150 ms, then return
      // over 200 ms. The full attack still completes in exactly 500 ms.
-     lunge=Math.sin(Math.PI*pulseTime)*.14;
+     // Move forward by half the hero miniature's measured depth, then back.
+     lunge=Math.sin(Math.PI*pulseTime)*(combatScene.heroLungeDistance||.24);
      const fullSwipe=THREE.MathUtils.degToRad(45);
      if(pulseTime<.3){
       const turnT=pulseTime/.3;
