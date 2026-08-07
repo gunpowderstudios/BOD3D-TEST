@@ -5,6 +5,14 @@
   // index.html owns the visible build label. This legacy reward helper must
   // never overwrite it from a cached script URL.
   function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';}
+  function loadMagicSwordPatch(){
+    if(window.__bodMagicSwordPatchRequested)return;
+    window.__bodMagicSwordPatchRequested=true;
+    const script=document.createElement('script');
+    script.src='assets/magic-sword-target.js?v=13.24b';
+    script.defer=true;
+    document.head.appendChild(script);
+  }
   function installRewards(){
     if(window.__bodSequentialRewardsInstalled)return true;
     if(typeof awardItem!=='function'||typeof drawItem!=='function')return false;
@@ -32,7 +40,7 @@
         }))
       );
       document.getElementById('modal')?.classList.add('rewardChoiceModal');
-  const body=document.getElementById('modalBody');
+      const body=document.getElementById('modalBody');
       if(body){
         body.innerHTML=
           '<div style="margin-bottom:14px">This powerful monster carried two items. Choose one—the other goes back in the bag.</div>'+
@@ -78,7 +86,16 @@
     };
     return true;
   }
-  function start(){syncVersion();if(installRewards())return;let attempts=0;const timer=setInterval(()=>{syncVersion();if(installRewards()||++attempts>240)clearInterval(timer);},50);}
+  function start(){
+    syncVersion();
+    if(installRewards()){loadMagicSwordPatch();return;}
+    let attempts=0;
+    const timer=setInterval(()=>{
+      syncVersion();
+      if(installRewards()){loadMagicSwordPatch();clearInterval(timer);return;}
+      if(++attempts>240)clearInterval(timer);
+    },50);
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   setTimeout(syncVersion,900);
 })();
