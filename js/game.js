@@ -1101,7 +1101,7 @@ function promptOldSpikey(tile){
  const carried=allCarriedItems().filter(x=>!isBear(x));
  const buttons=[];
  if(carried.length)buttons.push({text:'Destroy an Item',cls:'red',fn:()=>chooseSpikeSacrifice(tile)});
- buttons.push({text:'Roll the Dice',cls:'green',fn:async()=>{closeModal();const triggerRoll=roll(1);const trigger=triggerRoll.total;const triggerLimit=state.player.equipment.boots?.name==='Magic Boots'?1:2;playSound('dice');const triggerDice=window.BODDice3D?.roll?.(triggerRoll.rolls,'hero');if(triggerDice&&typeof triggerDice.then==='function')await triggerDice;if(trigger<=triggerLimit){const dmgRoll=roll(1);const dmg=dmgRoll.total;const damageDice=window.BODDice3D?.roll?.(dmgRoll.rolls,'hero');if(damageDice&&typeof damageDice.then==='function')await damageDice;state.player.health-=dmg;playSound('trap');playSound('hit');playSound('heroHurt');showCombatImpact('hero',state.player.health<=0?'kill':'hit',dmg);playCurrentTileEffect('trap',900);log('Old Spikey rolls '+trigger+' and springs! You take '+dmg+' direct damage.','combat');if(state.player.health<=0){recordFinalBlow('Killed by Old Spikey','Old Spikey rolled '+trigger+' and sprang! The damage die rolled '+dmg+', causing '+dmg+' direct damage.');death();return;}}else log('Old Spikey rolls '+trigger+'. You cross safely.','system');render();}});
+ buttons.push({text:'Roll the Dice',cls:'green',fn:async()=>{closeModal();const triggerRoll=roll(1);const trigger=triggerRoll.total;const triggerLimit=state.player.equipment.boots?.name==='Magic Boots'?1:2;playSound('dice');const triggerDice=window.BODDice3D?.roll?.(triggerRoll.rolls,'hero');if(triggerDice&&typeof triggerDice.then==='function')await triggerDice;if(state.player.equipment.boots?.name==='Magic Boots'&&trigger===2)playItemSound(state.player.equipment.boots);if(trigger<=triggerLimit){const dmgRoll=roll(1);const dmg=dmgRoll.total;const damageDice=window.BODDice3D?.roll?.(dmgRoll.rolls,'hero');if(damageDice&&typeof damageDice.then==='function')await damageDice;state.player.health-=dmg;playSound('trap');playSound('hit');playSound('heroHurt');showCombatImpact('hero',state.player.health<=0?'kill':'hit',dmg);playCurrentTileEffect('trap',900);log('Old Spikey rolls '+trigger+' and springs! You take '+dmg+' direct damage.','combat');if(state.player.health<=0){recordFinalBlow('Killed by Old Spikey','Old Spikey rolled '+trigger+' and sprang! The damage die rolled '+dmg+', causing '+dmg+' direct damage.');death();return;}}else log('Old Spikey rolls '+trigger+'. You cross safely.','system');render();}});
  showModal('Old Spikey','Destroy one carried item to jam the mechanism, or roll a die. '+(state.player.equipment.boots?.name==='Magic Boots'?'Your Magic Boots help you pass: only a 1 springs the trap.':'On 1–2 the trap springs and deals one die of direct damage.'),buttons);
 }
 function chooseSpikeSacrifice(tile){const items=allCarriedItems().filter(x=>!isBear(x));showModal('Jam Old Spikey','Choose an item to destroy.',items.map(it=>({text:it.name,cls:'red',fn:()=>{dropDestroyedItem(it);closeModal();log('Destroyed '+it.name+' to jam Old Spikey.','system');render();}})).concat([{text:'Back',fn:()=>promptOldSpikey(tile)}]));}
@@ -1130,7 +1130,7 @@ function useItem(it,consume){const p=state.player,m=combat?.tile?.monster;let us
  if(['bomb','skull','vine','vampire','claw'].includes(it.use)&&m){let dmg=0,cost=0;if(it.use==='bomb'){dmg=roll(2).total;cost=1;}if(it.use==='skull'){dmg=roll(1).total;}if(it.use==='vine'){dmg=roll(1).total;cost=1;combat.monsterSkip=true;window.BOD3D?.playEffect?.('vine');}if(it.use==='vampire'){dmg=5;p.health=Math.min(p.maxHealth,p.health+5);}if(it.use==='claw'){if(m.isDragon){toast("Witch’s Claw has no effect on the Red Dragon!");return;}m.mod=0;dmg=0;}if(p.ap<cost){toast('Not enough AP');return;}p.ap-=cost;m.health-=dmg;msg=it.use==='claw'?it.name+' used. '+m.name+' loses its Combat bonus for this fight.':it.name+' used. '+(dmg?m.name+' takes '+dmg+' damage.':'Monster weakened.');used=true;}
  if(it.use==='tornado'&&combat){
  if(combat.noEscape){toast('There is no escape from this fight!');return;}
- msg='Tornado carries you safely away.';window.BOD3D?.playEffect?.('tornado');
+ msg='Tornado carries you safely away.';playItemSound(it);window.BOD3D?.playEffect?.('tornado');
  used=true;
  consume?.();
  const oldCombat=combat;
@@ -1152,7 +1152,7 @@ function useItem(it,consume){const p=state.player,m=combat?.tile?.monster;let us
  if(it.use==='smallChest'){const r=roll(1).total;if(r<=2){p.health-=2;msg='Chest trap! Take 2 damage.';if(p.health<=0)recordFinalBlow('Killed by a trapped Small Chest','The chest trap caused 2 direct damage.');}else{awardItem();msg='Small Chest opened: draw 1 item.';}used=true;}
  if(it.use==='largeChest'){const r=roll(1).total;if(r<=2){p.health-=5;msg='TRAPPED! Take 5 damage.';if(p.health<=0)recordFinalBlow('Killed by a trapped Large Chest','The chest trap caused 5 direct damage.');}else{awardItem();awardItem();msg='Large Chest opened: draw 2 items.';}used=true;}
  if(it.use==='teleport'){showTeleport(it);used=false;}
- if(msg){if(it.use==='fireball'){playSound('spell');playCurrentTileEffect('fireball',1000);}else if(it.use==='bomb'){playCurrentTileEffect('explosion',950);sndSpell();}else if(it.name==='Ice Staff'){playSound('spell');playCurrentTileEffect('ice',900);}else if(it.use==='healthPotion'){playSound('heal');playCurrentTileEffect('heal',1000);}else if(it.use==='teleport')playSound('teleport');else sndSpell();log(msg,it.use==='healthPotion'?'heal':'loot');toast(msg);} if(used&&consume)consume(); if(m&&m.health<=0){killMonster();return;} if(p.health<=0){death();return;}render();if(combat)renderCombat();}
+ if(msg){playItemSound(it);if(it.use==='fireball'){playCurrentTileEffect('fireball',1000);}else if(it.use==='bomb'){playCurrentTileEffect('explosion',950);}else if(it.name==='Ice Staff'){playCurrentTileEffect('ice',900);}else if(it.use==='healthPotion'){playCurrentTileEffect('heal',1000);}log(msg,it.use==='healthPotion'?'heal':'loot');toast(msg);} if(used&&consume)consume(); if(m&&m.health<=0){killMonster();return;} if(p.health<=0){death();return;}render();if(combat)renderCombat();}
 function showTeleport(item){
  if(!item||!carriedHas(item)){toast('Teleport Crystal is not being carried');return;}
  teleportItem=item;
@@ -1176,7 +1176,7 @@ function teleportToTile(tileKey,event){
  state.player.x=x;state.player.y=y;state.player.prevX=x;state.player.prevY=y;
 }
  removeFromCurrentLocation(crystal);state.itemDiscard.push(crystal);syncEquipment();
- playSound('teleport');playTileEffect(tileKey,'teleport',1000);log('Teleported to '+tileKey+'.','system');render();centreOnHero(false);
+ playItemSound(crystal);playTileEffect(tileKey,'teleport',1000);log('Teleported to '+tileKey+'.','system');render();centreOnHero(false);
 }
 function removeNamed(arr,name){const i=arr.findIndex(x=>x.name===name);if(i>=0)arr.splice(i,1);}
 function endTurn(automatic=false){
