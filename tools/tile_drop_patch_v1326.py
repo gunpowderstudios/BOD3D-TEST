@@ -38,10 +38,16 @@ function animateTileDrop(tileKey,tileBody,topMesh,sideMaterial,topMaterial){
 if old not in s:
     raise SystemExit('constants block not found')
 s=s.replace(old,new,1)
-needle="boardGroup.add(mesh);\n\n const darkness=darknessForTile(x,y);"
-if needle not in s:
-    raise SystemExit('tile insertion point not found')
-s=s.replace(needle,"boardGroup.add(mesh);\n animateTileDrop(key,tileBody,mesh,sideMaterial,topMaterial);\n\n const darkness=darknessForTile(x,y);",1)
+
+add_tile=s.find('async function addTile(')
+if add_tile<0:
+    raise SystemExit('addTile function not found')
+mesh_add=s.find('boardGroup.add(mesh);',add_tile)
+if mesh_add<0:
+    raise SystemExit('tile mesh add not found')
+insert_at=mesh_add+len('boardGroup.add(mesh);')
+s=s[:insert_at]+"\n animateTileDrop(key,tileBody,mesh,sideMaterial,topMaterial);"+s[insert_at:]
+
 old="window.BOD3D={\n render:renderBoard,\n clearDice3D,\n"
 new="window.BOD3D={\n render:renderBoard,\n clearDice3D,\n queueTileDrop,\n"
 if old not in s:
