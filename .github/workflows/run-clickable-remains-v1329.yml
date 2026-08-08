@@ -1,0 +1,19 @@
+name: Run clickable remains v13.29
+on:
+  push:
+    paths:
+      - '.github/workflows/run-clickable-remains-v1329.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python tools/clickable_remains_patch_v1329.py
+      - run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add js/game.js js/combat.js js/scene3d.js index.html
+          git commit -m "Add clickable 2D and 3D battle remains v13.29"
+          git push
