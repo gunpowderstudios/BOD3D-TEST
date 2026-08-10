@@ -1,0 +1,21 @@
+name: Combat commentary colours v13.35
+on:
+  push:
+    paths:
+      - '.github/workflows/combat-commentary-colours-v1335.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply patch
+        run: python .github/scripts/combat_commentary_colours_v1335.py
+      - name: Commit TEST v13.35
+        run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add js/combat.js css/dark-combat.css index.html
+          git commit -m "Colour-code desktop combat commentary v13.35"
+          git push
