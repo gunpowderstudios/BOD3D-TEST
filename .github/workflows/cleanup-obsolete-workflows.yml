@@ -1,0 +1,21 @@
+name: Clean obsolete one-shot workflows
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-obsolete-workflows.yml'
+permissions:
+  contents: write
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove obsolete version-specific workflows
+        run: rm -f .github/workflows/*.yml .github/workflows/*.yaml
+      - name: Commit workflow cleanup
+        run: |
+          git config user.name "Gunpowder"
+          git config user.email "38918114+gunpowderstudios@users.noreply.github.com"
+          git add -A .github/workflows
+          git commit -m "Remove obsolete one-shot GitHub Actions workflows"
+          git push
