@@ -253,3 +253,41 @@ window.RESPAWN_CAMERA_DELAY_MS=2000;
 window.RESPAWN_CENTER_ON_START=true;
 
 
+// ==================== Victory Quest Log (v13.39) ====================
+// Adds Quest Log above New Game on both successful ending scrolls.
+(function(){
+ function showVictoryEnding(rescuedFirkin){
+  showModal('YOU ESCAPED!','',[
+   {text:'Quest Log',fn:()=>showVictoryQuestLog(rescuedFirkin)},
+   {text:'New Game',cls:'green',fn:()=>{window.stopEndGameMusic?.();showCharSelect();}}
+  ]);
+  document.getElementById('modal')?.classList.add('endingScrollModal');
+  const body=document.getElementById('modalBody');
+  if(body){body.innerHTML=endingScrollHTML(rescuedFirkin);body.scrollTop=0;}
+ }
+
+ function showVictoryQuestLog(rescuedFirkin){
+  showModal('QUEST LOG','',[
+   {text:'Back to Ending',fn:()=>showVictoryEnding(rescuedFirkin)},
+   {text:'New Game',cls:'green',fn:()=>{window.stopEndGameMusic?.();showCharSelect();}}
+  ]);
+  const modal=document.getElementById('modal');
+  modal?.classList.remove('modalEdge','endingScrollModal');
+  modal?.classList.add('questLogModal');
+  const body=document.getElementById('modalBody');
+  if(body){
+   const html=typeof questLogEntriesHTML==='function'?questLogEntriesHTML():'';
+   body.innerHTML='<div id="questLogViewer" style="height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#080808;border:3px solid #1b1208;border-radius:8px;padding:10px;text-align:left;font-size:15px;line-height:1.35">'+(html||'<div style="color:#fff">No quest entries recorded.</div>')+'</div>';
+   const scroller=document.getElementById('questLogViewer');
+   if(scroller)scroller.scrollTop=scroller.scrollHeight;
+  }
+ }
+
+ win=function(){
+  state.gameOver=true;
+  sndWin();
+  closeCombat();
+  window.startEndGameMusic?.();
+  showVictoryEnding(!!state.player.companionFirkin);
+ };
+})();
