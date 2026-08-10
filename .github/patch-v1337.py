@@ -1,0 +1,33 @@
+from pathlib import Path
+import re
+
+p=Path('js/scene3d.js')
+s=p.read_text()
+old=""" const encounterSphere=encounterBounds.getBoundingSphere(new THREE.Sphere());
+ const vFov=THREE.MathUtils.degToRad(camera.fov||50);"""
+new=""" const encounterSphere=encounterBounds.getBoundingSphere(new THREE.Sphere());
+ // Desktop combat uses the real free centre between the left character sheet and
+ // the right monster-info panel. A small camera-target bias makes the miniatures
+ // appear centred in that usable space rather than centred in the whole canvas.
+ const framingTarget=encounterTarget.clone();
+ if(!mobileCombat){
+  const desktopInfoBias=THREE.MathUtils.clamp(encounterSphere.radius*.38,.35,.85);
+  framingTarget.addScaledVector(right,desktopInfoBias);
+ }
+ const vFov=THREE.MathUtils.degToRad(camera.fov||50);"""
+if old not in s:
+    raise SystemExit('combat sphere marker not found')
+s=s.replace(old,new,1)
+s=s.replace("const fitMargin=mobileCombat?1.55:1.42;","const fitMargin=mobileCombat?1.55:1.24;",1)
+s=s.replace("mobileCombat?7.6:6.2,\n  encounterSize.x*(mobileCombat?2.9:2.45),\n  encounterSize.z*(mobileCombat?2.9:2.45),\n  encounterSize.y*(mobileCombat?2.45:2.05),","mobileCombat?7.6:5.2,\n  encounterSize.x*(mobileCombat?2.9:2.15),\n  encounterSize.z*(mobileCombat?2.9:2.15),\n  encounterSize.y*(mobileCombat?2.45:1.82),",1)
+s=s.replace("mobileCombat?5.5:4.2,\n  encounterSize.y*(mobileCombat?1.5:1.25)+(mobileCombat?2.6:2.15),\n  encounterSphere.radius*(mobileCombat?1.55:1.35)+2.0","mobileCombat?5.5:3.8,\n  encounterSize.y*(mobileCombat?1.5:1.15)+(mobileCombat?2.6:1.9),\n  encounterSphere.radius*(mobileCombat?1.55:1.2)+(mobileCombat?2.0:1.8)",1)
+s=s.replace("const heightAboveTarget=Math.max(.1,baseCameraHeight-encounterTarget.y);","const heightAboveTarget=Math.max(.1,baseCameraHeight-framingTarget.y);",1)
+s=s.replace("const cinematicPosition=encounterTarget.clone()\n  .addScaledVector(forward.clone().negate(),combatHorizontalDistance);\n cinematicPosition.y=encounterTarget.y+combatVerticalDistance;","const cinematicPosition=framingTarget.clone()\n  .addScaledVector(forward.clone().negate(),combatHorizontalDistance);\n cinematicPosition.y=framingTarget.y+combatVerticalDistance;",1)
+s=s.replace("startCameraTween(cinematicPosition,encounterTarget,620);","startCameraTween(cinematicPosition,framingTarget,620);",1)
+p.write_text(s)
+
+h=Path('index.html')
+t=h.read_text()
+t=re.sub(r'data-build-version="v[0-9.]+"','data-build-version="v13.37"',t,count=1)
+t=re.sub(r'js/scene3d\.js\?cache=[^"\']+','js/scene3d.js?cache=20260810-v1337',t,count=1)
+h.write_text(t)
