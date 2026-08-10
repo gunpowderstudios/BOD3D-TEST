@@ -473,7 +473,23 @@ function updateDesktopCombatCommentary(){
  if(commentary.dataset.message===latest)return;
  commentary.dataset.message=latest;
  commentary.textContent=latest;
- commentary.classList.remove('commentaryIn');
+ const lower=latest.toLowerCase();
+ commentary.classList.remove('heroHitComment','monsterHitComment','standOffComment','commentaryIn');
+ const monsterName=String(combat?.tile?.monster?.name||'').toLowerCase();
+ const heroHit=(
+  /you (?:hit|strike|damage|deal|score|defeat|kill)/.test(lower)||
+  /your .*?(?:deals|hits|strikes|defeats|kills)/.test(lower)||
+  /(?:ranged attack|fireball|ice staff|flying daggers|bow|skull|bomb|vine).*?(?:damage|defeat|kill)/.test(lower)
+ );
+ const monsterHit=(
+  /(?:hits|strikes|damages|deals).*?you/.test(lower)||
+  /you (?:take|lose) [0-9]+/.test(lower)||
+  (monsterName&&lower.includes(monsterName)&&/(?:hits|strikes|damages|deals)/.test(lower)&&!/you (?:hit|strike|damage|deal|score|defeat|kill)/.test(lower))
+ );
+ const standOff=/stand[- ]?off|standoff|both miss|draw|tie|tied|clash/.test(lower);
+ if(standOff)commentary.classList.add('standOffComment');
+ else if(monsterHit)commentary.classList.add('monsterHitComment');
+ else if(heroHit)commentary.classList.add('heroHitComment');
  void commentary.offsetWidth;
  commentary.classList.add('commentaryIn');
 }

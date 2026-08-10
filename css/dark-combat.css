@@ -326,3 +326,11 @@ body.combatActive .lethalBlowStatus{
  }
 }
 @media(max-width:900px){.combatLatestCommentary{display:none!important}}
+
+
+/* v13.35 — colour-code desktop combat commentary by outcome. */
+@media(min-width:901px){
+ body.combatActive .combatLatestCommentary.heroHitComment{color:#58d26f!important}
+ body.combatActive .combatLatestCommentary.monsterHitComment{color:#ef4050!important}
+ body.combatActive .combatLatestCommentary.standOffComment{color:#b8b8b8!important}
+}
