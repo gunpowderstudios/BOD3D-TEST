@@ -455,7 +455,30 @@ function requestRunAway(){
   ]
  );
 }
-function renderCombat(){if(!combat)return;const p=state.player,m=combat.tile.monster,c=state.charDef||CHARACTERS[0];document.getElementById('heroGlyph').innerHTML=iconHTML(c.name,c.glyph||'🧑');const heroNameEl=document.getElementById('heroCombatName');if(heroNameEl)heroNameEl.textContent=c.name;const firkinBonus=p.companionFirkin?'<div class="small">Firkin: +1 melee bonus included</div>':'';document.getElementById('heroCombatStats').innerHTML='<div class="hearts">'+heartLine(p.health,p.maxHealth)+'</div><div>HP '+p.health+'/'+p.maxHealth+'</div><div>Combat '+pDice()+'d6+'+pCombatMod()+'</div>'+firkinBonus+'<div>Damage reduction -'+pDamageReduction()+'</div><div>AP '+p.ap+'/'+p.maxAp+'</div>';document.getElementById('monsterGlyph').innerHTML=iconHTML(m.name,m.glyph||'👹');document.getElementById('monsterName').textContent=m.name;document.getElementById('monsterCombatStats').innerHTML='<div class="hearts combatHearts">'+heartLine(m.health,m.maxHealth)+'</div><div>HP '+m.health+'/'+m.maxHealth+'</div><div>Combat '+m.dice+'d6+'+m.mod+'</div><div class="small">Monsters never score critical hits.</div><div class="small">'+(m.special||'')+'</div>';const b=document.getElementById('combatBtns');b.innerHTML='';addBtn(b,combat.rolling?'Rolling...':'Fight','green',fightRound,combat.rolling);addBtn(
+function updateDesktopCombatCommentary(){
+ if(!combat||window.matchMedia('(max-width:900px)').matches)return;
+ const monsterStats=document.getElementById('monsterCombatStats');
+ if(!monsterStats)return;
+ const fighter=monsterStats.closest('.fighter');
+ if(!fighter)return;
+ let commentary=fighter.querySelector('.combatLatestCommentary');
+ if(!commentary){
+  commentary=document.createElement('div');
+  commentary.className='combatLatestCommentary';
+  fighter.appendChild(commentary);
+ }
+ const lines=document.querySelectorAll('#log .logline');
+ const latest=lines.length?String(lines[lines.length-1].textContent||'').trim():'';
+ if(!latest)return;
+ if(commentary.dataset.message===latest)return;
+ commentary.dataset.message=latest;
+ commentary.textContent=latest;
+ commentary.classList.remove('commentaryIn');
+ void commentary.offsetWidth;
+ commentary.classList.add('commentaryIn');
+}
+
+function renderCombat(){if(!combat)return;const p=state.player,m=combat.tile.monster,c=state.charDef||CHARACTERS[0];document.getElementById('heroGlyph').innerHTML=iconHTML(c.name,c.glyph||'🧑');const heroNameEl=document.getElementById('heroCombatName');if(heroNameEl)heroNameEl.textContent=c.name;const firkinBonus=p.companionFirkin?'<div class="small">Firkin: +1 melee bonus included</div>':'';document.getElementById('heroCombatStats').innerHTML='<div class="hearts">'+heartLine(p.health,p.maxHealth)+'</div><div>HP '+p.health+'/'+p.maxHealth+'</div><div>Combat '+pDice()+'d6+'+pCombatMod()+'</div>'+firkinBonus+'<div>Damage reduction -'+pDamageReduction()+'</div><div>AP '+p.ap+'/'+p.maxAp+'</div>';document.getElementById('monsterGlyph').innerHTML=iconHTML(m.name,m.glyph||'👹');document.getElementById('monsterName').textContent=m.name;document.getElementById('monsterCombatStats').innerHTML='<div class="hearts combatHearts">'+heartLine(m.health,m.maxHealth)+'</div><div>HP '+m.health+'/'+m.maxHealth+'</div><div>Combat '+m.dice+'d6+'+m.mod+'</div><div class="small">Monsters never score critical hits.</div><div class="small">'+(m.special||'')+'</div>';updateDesktopCombatCommentary();const b=document.getElementById('combatBtns');b.innerHTML='';addBtn(b,combat.rolling?'Rolling...':'Fight','green',fightRound,combat.rolling);addBtn(
  b,
  combat.noEscape
   ?'No Escape!'
