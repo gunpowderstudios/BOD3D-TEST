@@ -1,4 +1,4 @@
-// BOD3D TEST — Magic Sword click-to-view adjacent hidden monster
+// BOD3D — Magic Sword click-to-view adjacent hidden monster
 (function(){
   'use strict';
   if(window.__bodMagicSwordTargetInstalled)return;
@@ -108,13 +108,4 @@
   },true);
 
   window.BODMagicSwordCancel=function(){armed=false;};
-
-  // Load the shared visible-dice behaviour for item rolls.
-  if(!window.__bodItemDicePatchRequested){
-    window.__bodItemDicePatchRequested=true;
-    const script=document.createElement('script');
-    script.src='assets/item-dice-rolls.js?v=13.24c';
-    script.defer=true;
-    document.head.appendChild(script);
-  }
 })();

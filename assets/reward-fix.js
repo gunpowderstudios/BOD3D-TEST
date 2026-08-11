@@ -2,14 +2,12 @@
 (function(){
   const VERSION=document.documentElement.dataset.buildVersion||'development';
   window.BOD3D_BUILD_VERSION=VERSION;
-  // index.html owns the visible build label. This legacy reward helper must
-  // never overwrite it from a cached script URL.
-  function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';}
+  function syncVersion(){document.title='Play Bag of Dungeon 3D Free Online | Gunpowder Studios';const visible=document.getElementById('visibleBuildVersion');if(visible)visible.textContent=VERSION;}
   function loadMagicSwordPatch(){
     if(window.__bodMagicSwordPatchRequested)return;
     window.__bodMagicSwordPatchRequested=true;
     const script=document.createElement('script');
-    script.src='assets/magic-sword-target.js?v=13.24b';
+    script.src='assets/magic-sword-target.js?v=13.24';
     script.defer=true;
     document.head.appendChild(script);
   }
