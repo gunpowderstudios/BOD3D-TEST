@@ -2,6 +2,18 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
+// TEST v13.44 — expose this UI build so mobile testers can verify the fresh file loaded.
+(function(){
+  const version='v13.44';
+  function sync(){
+    document.documentElement.dataset.buildVersion=version;
+    const visible=document.getElementById('visibleBuildVersion');
+    if(visible)visible.textContent=version;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync,{once:true});else sync();
+  setTimeout(sync,500);
+})();
+
 // BOD3D-TEST v11.41 — mobile character drawer scroll/close behaviour
 (function(){
   function install(){
@@ -11,8 +23,6 @@
     if(sheet.dataset.buttonCloseOnly==='1')return true;
     sheet.dataset.buttonCloseOnly='1';
 
-    // Let the drawer content use native momentum scrolling without the legacy
-    // swipe-to-close gesture seeing the same touch/pointer events.
     const insideToggle=target=>!!target?.closest?.('#mobileSheetToggle');
     const stopDismissGesture=event=>{
       if(insideToggle(event.target))return;
@@ -29,8 +39,6 @@
       },{capture:true,passive:true});
     });
 
-    // Make the existing toggle the explicit open/close control and keep its
-    // label clear. Do not close the panel when its contents or backdrop are tapped.
     const syncLabel=()=>{
       const expanded=sheet.classList.contains('mobileExpanded');
       toggle.setAttribute('aria-expanded',expanded?'true':'false');
@@ -78,13 +86,19 @@
 })();
 
 // Consolidated in TEST v12.73: vertical health-heart HUD for desktop and mobile.
-// BOD3D-TEST: on mobile, hide this exploration HUD while combat is active because
-// the combat panel already displays both hero and monster health.
+// TEST v13.44: mobile exploration hearts are hidden whenever combatActive is present.
 (function () {
   'use strict';
 
   if (window.__bodHealthHudV1171Installed) return;
   window.__bodHealthHudV1171Installed = true;
+
+  // CSS is the primary combat hide so it wins even if another render/update writes
+  // an inline display value to the HUD while the combat transition is running.
+  const combatStyle=document.createElement('style');
+  combatStyle.id='bodMobileCombatHeartHideV1344';
+  combatStyle.textContent='@media(max-width:800px){body.combatActive #livesHud{display:none!important;}}';
+  document.head.appendChild(combatStyle);
 
   function ensureHud() {
     const main = document.getElementById('main');
@@ -110,7 +124,7 @@
     const mobileCombat = window.matchMedia('(max-width: 800px)').matches &&
       document.body.classList.contains('combatActive');
     if (mobileCombat) {
-      hud.style.display = 'none';
+      hud.style.setProperty('display','none','important');
       return;
     }
 
@@ -130,7 +144,8 @@
 
   function start() {
     update();
-    setInterval(update, 150);
+    setInterval(update, 100);
+    new MutationObserver(update).observe(document.body,{attributes:true,attributeFilter:['class']});
   }
 
   if (document.readyState === 'loading') {
@@ -139,4 +154,3 @@
     start();
   }
 })();
-
