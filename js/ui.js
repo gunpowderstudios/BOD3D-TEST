@@ -78,8 +78,8 @@
 })();
 
 // Consolidated in TEST v12.73: vertical health-heart HUD for desktop and mobile.
-// Behaviour remains identical to the verified standalone patch.
-// BOD3D-TEST v11.72 — vertical health-heart columns on desktop and mobile
+// BOD3D-TEST: on mobile, hide this exploration HUD while combat is active because
+// the combat panel already displays both hero and monster health.
 (function () {
   'use strict';
 
@@ -103,6 +103,13 @@
     const hud = ensureHud();
     if (!hud) return;
     if (typeof state === 'undefined' || !state?.player) {
+      hud.style.display = 'none';
+      return;
+    }
+
+    const mobileCombat = window.matchMedia('(max-width: 800px)').matches &&
+      document.body.classList.contains('combatActive');
+    if (mobileCombat) {
       hud.style.display = 'none';
       return;
     }
