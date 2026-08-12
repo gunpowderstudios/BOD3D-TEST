@@ -1,0 +1,71 @@
+name: BOD3D TEST v13.58 parchment gap
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set desktop parchment top gap to 40px only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s,encoding='utf-8')
+          def once(s,old,new,label):
+              n=s.count(old)
+              if n!=1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {n}')
+              return s.replace(old,new,1)
+
+          p='css/patches.css'; s=read(p)
+          s=once(s,'padding:20px 7.5% 6.5% 7.5%!important;','padding:40px 7.5% 6.5% 7.5%!important;','standard desktop parchment padding')
+          s=once(s,'padding:20px 7.5% 5.8% 7.5%!important;','padding:40px 7.5% 5.8% 7.5%!important;','short desktop parchment padding')
+          write(p,s)
+
+          p='index.html'; s=read(p)
+          s=once(s,'data-build-version="v13.57"','data-build-version="v13.58"','build version')
+          s=once(s,'css/patches.css?v=13.57','css/patches.css?v=13.58','patches css cache')
+          s=once(s,'js/ui.js?v=13.57','js/ui.js?v=13.58','ui js cache')
+          write(p,s)
+
+          p='js/ui.js'; s=read(p)
+          s=once(s,"// TEST v13.57 — desktop parchment top gap set to 20px; TEST-only version marker.","// TEST v13.58 — desktop parchment top gap set to 40px; TEST-only version marker.",'ui comment')
+          s=once(s,"const version='v13.57';","const version='v13.58';",'ui version')
+          write(p,s)
+
+          css=read('css/patches.css'); idx=read('index.html'); ui=read('js/ui.js')
+          assert css.count('padding:40px 7.5% 6.5% 7.5%!important;') == 1
+          assert css.count('padding:40px 7.5% 5.8% 7.5%!important;') == 1
+          assert 'padding:20px 7.5% 6.5% 7.5%!important;' not in css
+          assert 'padding:20px 7.5% 5.8% 7.5%!important;' not in css
+          assert 'padding:8.5% 12.5% 6.5% 14.5%!important;' in css
+          assert 'data-build-version="v13.58"' in idx
+          assert 'css/patches.css?v=13.58' in idx
+          assert 'js/ui.js?v=13.58' in idx
+          assert "const version='v13.58';" in ui
+          print('v13.58 validated: desktop parchment top gap changed from 20px to 40px only')
+          PY
+
+      - name: Commit validated update
+        shell: bash
+        run: |
+          rm -f .github/workflows/parchment-gap-v1358.yml
+          git config user.name "BOD3D TEST updater"
+          git config user.email "actions@users.noreply.github.com"
+          git add css/patches.css index.html js/ui.js .github/workflows/parchment-gap-v1358.yml
+          git diff --cached --check
+          git commit -m "v13.58: set desktop parchment top gap to 40px"
+          git push
