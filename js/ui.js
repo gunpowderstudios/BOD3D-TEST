@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.49 — intro parchment top text spacing reduced to 20px.
+// TEST v13.50 — opening parchment top spacing corrected at the parchment itself.
 (function(){
-  const version='v13.49';
+  const version='v13.50';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
@@ -14,12 +14,12 @@
   setTimeout(sync,500);
 })();
 
-// TEST v13.49 — keep the existing parchment layout; only reduce the space
-// between the top of the opening scroll and the first line of text.
+// TEST v13.50 — desktop opening parchment only.
+// The original .testerWarningScroll has 78–110px top padding; reduce that to 20px.
 (function(){
   const style=document.createElement('style');
-  style.id='bodIntroScrollTopPaddingV1349';
-  style.textContent='@media (min-width:901px){#modal.introScrollModal #modalBody{padding-top:20px!important;}}';
+  style.id='bodIntroScrollTopPaddingV1350';
+  style.textContent='@media (min-width:901px){#modal.introScrollModal .testerWarningScroll{padding-top:20px!important;}}';
   document.head.appendChild(style);
 })();
 
