@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.56 — quest objective wording refined; TEST-only version marker.
+// TEST v13.57 — desktop parchment top gap set to 20px; TEST-only version marker.
 (function(){
-  const version='v13.56';
+  const version='v13.57';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
