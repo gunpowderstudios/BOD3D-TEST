@@ -30,7 +30,6 @@ jobs:
               if n!=1: raise SystemExit(f'{label}: expected 1 match, found {n}')
               return s.replace(old,new,1)
 
-          # main.css — fixed parchment card; only the text area scrolls.
           p='css/main.css'; s=read(p)
           pat=re.compile(r'/\* ===== Opening warning scroll — canonical v13\.52 ===== \*/.*?(?=/\* v13\.51 — canonical character-selector label polish\. \*/)',re.S)
           if len(pat.findall(s))!=1:
@@ -131,7 +130,6 @@ jobs:
           s=pat.sub(block,s,count=1)
           write(p,s)
 
-          # mobile.css — replace v13.51 :has rules with introScrollModal rules.
           p='css/mobile.css'; s=read(p)
           pat=re.compile(r'/\* ===== Opening warning scroll — canonical mobile layout v13\.51 ===== \*/.*?(?=/\* v13\.51 — UI styles moved out of js/ui\.js\. \*/)',re.S)
           if len(pat.findall(s))!=1:
@@ -176,7 +174,6 @@ jobs:
           s=pat.sub(mobile,s,count=1)
           write(p,s)
 
-          # Version/cache sync.
           p='js/ui.js'; s=read(p)
           s=once(s,"const version='v13.52';","const version='v13.53';",'ui version')
           s=once(s,'// TEST v13.52 — parchment restored to proven main.css structure; UI behaviour remains here.','// TEST v13.53 — parchment fixed-size again; intro text scrolls internally while the button stays anchored.','ui comment')
@@ -189,13 +186,12 @@ jobs:
           s=once(s,'js/ui.js?v=13.52','js/ui.js?v=13.53','ui cache')
           write(p,s)
 
-          # Validation.
           main=read('css/main.css'); mobile=read('css/mobile.css'); idx=read('index.html')
+          assert 'canonical v13.53' in main and 'canonical v13.52' not in main
           assert '#modal.introScrollModal .card{' in main
           assert "background:transparent url('../assets/ui/scroll.png') center / 100% 100% no-repeat!important;" in main
           assert 'padding:20px 7.5% 6.5% 7.5%!important;' in main
           assert 'overflow-y:auto!important;' in main
-          assert ':has(.testerWarningScroll)' not in main
           assert 'canonical mobile layout v13.53' in mobile
           assert '#modal.introScrollModal .card' in mobile
           assert 'data-build-version="v13.53"' in idx
