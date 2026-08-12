@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.47 — restored pre-v13.46 intro layout + current UI build marker.
+// TEST v13.48 — unified desktop character-select layout + current UI build marker.
 (function(){
-  const version='v13.47';
+  const version='v13.48';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
