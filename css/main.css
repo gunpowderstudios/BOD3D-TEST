@@ -55,6 +55,7 @@ button:disabled{opacity:.45;cursor:not-allowed;}
     font-size:12px;
     line-height:1.15;
   }
+  body.combatActive #questObjective{display:none!important;}
 }
 #viewport{position:absolute;inset:0;overflow:hidden;cursor:grab;touch-action:none;perspective:1200px}#viewport.dragging{cursor:grabbing}
 #camera3d{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:50% 50%;pointer-events:none}
