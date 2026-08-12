@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.50 — opening parchment top spacing corrected at the parchment itself.
+// TEST v13.51 — cleanup: verified UI styling moved into CSS; this file now keeps behaviour only.
 (function(){
-  const version='v13.50';
+  const version='v13.51';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
@@ -14,43 +14,7 @@
   setTimeout(sync,500);
 })();
 
-// TEST v13.50 — desktop opening parchment only.
-// The original .testerWarningScroll has 78–110px top padding; reduce that to 20px.
-(function(){
-  const style=document.createElement('style');
-  style.id='bodIntroScrollTopPaddingV1350';
-  style.textContent='@media (min-width:901px){#modal.introScrollModal .testerWarningScroll{padding-top:20px!important;}}';
-  document.head.appendChild(style);
-})();
 
-// TEST v13.45 — remove the stray desktop divider beside Special Ability and
-// enlarge the small HEALTH / AP / COMBAT / SPECIAL ABILITY labels.
-(function(){
-  const style=document.createElement('style');
-  style.id='bodHeroSelectPolishV1345';
-  style.textContent=`
-    .heroStat small,
-    .heroSpecialBlock small{
-      font-size:13px!important;
-      line-height:1.05!important;
-      letter-spacing:.08em!important;
-      font-weight:800!important;
-    }
-    @media (min-width:901px){
-      .heroSpecialBlock{
-        border-left:0!important;
-        padding-left:0!important;
-      }
-    }
-    @media (max-width:900px){
-      .heroStat small,
-      .heroSpecialBlock small{
-        font-size:12px!important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-})();
 
 // BOD3D-TEST v11.41 — mobile character drawer scroll/close behaviour
 (function(){
@@ -86,32 +50,6 @@
     new MutationObserver(syncLabel).observe(sheet,{attributes:true,attributeFilter:['class']});
     syncLabel();
 
-    const style=document.createElement('style');
-    style.id='bodMobileSheetButtonOnlyStyles';
-    style.textContent=`
-      @media(max-width:800px){
-        #side{
-          overflow-y:auto!important;
-          overflow-x:hidden!important;
-          -webkit-overflow-scrolling:touch!important;
-          overscroll-behavior:contain!important;
-          touch-action:pan-y!important;
-          scroll-behavior:smooth;
-        }
-        #side.mobileExpanded{max-height:82dvh!important;}
-        #side #mobileSheetToggle{
-          position:sticky!important;
-          top:0!important;
-          z-index:30!important;
-          touch-action:manipulation!important;
-        }
-        #side.mobileExpanded #mobileSheetToggle::after{
-          content:'  Close';
-          font-size:13px;
-        }
-      }
-    `;
-    document.head.appendChild(style);
     return true;
   }
 
@@ -131,10 +69,6 @@
   if (window.__bodHealthHudV1171Installed) return;
   window.__bodHealthHudV1171Installed = true;
 
-  const combatStyle=document.createElement('style');
-  combatStyle.id='bodMobileCombatHeartHideV1344';
-  combatStyle.textContent='@media(max-width:800px){body.combatActive #livesHud{display:none!important;}}';
-  document.head.appendChild(combatStyle);
 
   function ensureHud() {
     const main = document.getElementById('main');
