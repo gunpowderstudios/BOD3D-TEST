@@ -508,106 +508,20 @@ body.threeMode.lightingOn #viewport::after{
 
 
 
-/* ===== Opening warning scroll — canonical desktop layout v13.51 ===== */
-#modal:has(.testerWarningScroll){
-  padding:clamp(8px,2vw,24px)!important;
-  overflow:auto!important;
-}
-#modal .card:has(.testerWarningScroll){
-  box-sizing:border-box!important;
-  width:min(900px,calc(100vw - 40px),calc((100dvh - 36px) * 1.58))!important;
-  max-width:none!important;
-  height:auto!important;
-  max-height:calc(100dvh - 36px)!important;
-  aspect-ratio:1.58 / 1!important;
-  margin:auto!important;
-  padding:20px 7.5% 6.5% 7.5%!important;
-  border:0!important;
-  background:transparent url('../assets/ui/scroll.png') center / 100% 100% no-repeat!important;
-  box-shadow:none!important;
-  overflow:visible!important;
-  display:grid!important;
-  grid-template-rows:minmax(0,1fr) auto!important;
-  gap:clamp(8px,1.2vh,14px)!important;
-  align-items:stretch!important;
-}
-#modal .card:has(.testerWarningScroll)>h2{display:none!important}
+/* ===== Opening warning scroll — canonical v13.52 ===== */
 .testerWarningScroll{
-  box-sizing:border-box!important;
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-  height:100%!important;
-  min-height:0!important;
-  margin:0!important;
-  padding:clamp(4px,.7vh,9px) 0!important;
-  background:none!important;
-  color:#000!important;
-  border:0!important;
-  box-shadow:none!important;
-  overflow:auto!important;
-  display:flex!important;
-  flex-direction:column!important;
-  justify-content:flex-start!important;
-  align-items:center!important;
-  text-align:center!important;
-  font-family:"Alegreya",Georgia,serif!important;
-  font-size:clamp(16px,1.55vw,21px)!important;
-  font-weight:400!important;
-  line-height:1.27!important;
-  scrollbar-width:none!important;
-}
-.testerWarningScroll::-webkit-scrollbar{display:none!important}
-.testerWarningScroll>*{
-  width:100%!important;
-  max-width:100%!important;
-  margin:.3em 0!important;
-  font-size:inherit!important;
-  line-height:inherit!important;
-  white-space:normal!important;
-  overflow-wrap:break-word!important;
-}
-.testerWarningScroll>div:first-child{
-  font-size:clamp(27px,3vw,42px)!important;
-  font-weight:700!important;
-  line-height:1.02!important;
-  margin:0 0 .55em!important;
-}
-.testerWarningScroll b,.testerWarningScroll strong{font-weight:700!important}
-#modal .card:has(.testerWarningScroll)>#modalButtons{
-  position:static!important;
-  inset:auto!important;
-  transform:none!important;
-  width:100%!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:0 8%!important;
-  display:flex!important;
-  justify-content:center!important;
-  align-items:center!important;
-  z-index:5!important;
-  pointer-events:auto!important;
-}
-#modal .card:has(.testerWarningScroll)>#modalButtons button{
-  width:min(420px,100%)!important;
-  min-width:0!important;
-  min-height:48px!important;
-  margin:0!important;
-  padding:10px 18px!important;
-  font-size:clamp(15px,1.35vw,19px)!important;
-  line-height:1.1!important;
-}
-@media(max-height:760px) and (min-width:901px){
-  #modal:has(.testerWarningScroll){padding:5px 12px!important}
-  #modal .card:has(.testerWarningScroll){
-    width:min(820px,calc(100vw - 28px),calc((100dvh - 12px) * 1.58))!important;
-    max-height:calc(100dvh - 12px)!important;
-    padding:20px 7.5% 5.8% 7.5%!important;
-    gap:5px!important;
-  }
-  .testerWarningScroll{font-size:clamp(14px,1.3vw,18px)!important;line-height:1.18!important;padding-top:2px!important}
-  .testerWarningScroll>div:first-child{font-size:clamp(24px,2.5vw,34px)!important;margin-bottom:.35em!important}
-  #modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:40px!important;padding:7px 14px!important;font-size:14px!important}
+  width:min(760px,94vw);
+  max-width:760px;
+  margin:0 auto;
+  background:transparent url('../assets/ui/scroll.png') center/100% 100% no-repeat;
+  color:#000;
+  border:0;
+  box-shadow:none;
+  padding:20px clamp(95px,12vw,125px) clamp(86px,10vw,120px);
+  font-family:"Alegreya",Georgia,serif;
+  font-size:18px;
+  line-height:1.35;
+  text-align:center;
 }
 
 /* v13.51 — canonical character-selector label polish. */

@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.51 — cleanup: verified UI styling moved into CSS; this file now keeps behaviour only.
+// TEST v13.52 — parchment restored to proven main.css structure; UI behaviour remains here.
 (function(){
-  const version='v13.51';
+  const version='v13.52';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
