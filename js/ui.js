@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.52 — parchment restored to proven main.css structure; UI behaviour remains here.
+// TEST v13.53 — parchment fixed-size again; intro text scrolls internally while the button stays anchored.
 (function(){
-  const version='v13.52';
+  const version='v13.53';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
