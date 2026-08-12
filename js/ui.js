@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.53 — parchment fixed-size again; intro text scrolls internally while the button stays anchored.
+// TEST v13.54 — clean working Live baseline; TEST-only version marker.
 (function(){
-  const version='v13.53';
+  const version='v13.54';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
@@ -14,9 +14,36 @@
   setTimeout(sync,500);
 })();
 
+// v13.45 — remove the stray desktop divider beside Special Ability and
+// enlarge the small HEALTH / AP / COMBAT / SPECIAL ABILITY labels.
+(function(){
+  const style=document.createElement('style');
+  style.id='bodHeroSelectPolishV1345';
+  style.textContent=`
+    .heroStat small,
+    .heroSpecialBlock small{
+      font-size:13px!important;
+      line-height:1.05!important;
+      letter-spacing:.08em!important;
+      font-weight:800!important;
+    }
+    @media (min-width:901px){
+      .heroSpecialBlock{
+        border-left:0!important;
+        padding-left:0!important;
+      }
+    }
+    @media (max-width:900px){
+      .heroStat small,
+      .heroSpecialBlock small{
+        font-size:12px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
 
-
-// BOD3D-TEST v11.41 — mobile character drawer scroll/close behaviour
+// Mobile character drawer scroll/close behaviour
 (function(){
   function install(){
     const sheet=document.getElementById('side');
@@ -50,6 +77,32 @@
     new MutationObserver(syncLabel).observe(sheet,{attributes:true,attributeFilter:['class']});
     syncLabel();
 
+    const style=document.createElement('style');
+    style.id='bodMobileSheetButtonOnlyStyles';
+    style.textContent=`
+      @media(max-width:800px){
+        #side{
+          overflow-y:auto!important;
+          overflow-x:hidden!important;
+          -webkit-overflow-scrolling:touch!important;
+          overscroll-behavior:contain!important;
+          touch-action:pan-y!important;
+          scroll-behavior:smooth;
+        }
+        #side.mobileExpanded{max-height:82dvh!important;}
+        #side #mobileSheetToggle{
+          position:sticky!important;
+          top:0!important;
+          z-index:30!important;
+          touch-action:manipulation!important;
+        }
+        #side.mobileExpanded #mobileSheetToggle::after{
+          content:'  Close';
+          font-size:13px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
     return true;
   }
 
@@ -61,14 +114,17 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
-// Consolidated in TEST v12.73: vertical health-heart HUD for desktop and mobile.
-// TEST v13.44: mobile exploration hearts are hidden whenever combatActive is present.
+// Vertical health-heart HUD. On mobile, hide exploration hearts during combat.
 (function () {
   'use strict';
 
   if (window.__bodHealthHudV1171Installed) return;
   window.__bodHealthHudV1171Installed = true;
 
+  const combatStyle=document.createElement('style');
+  combatStyle.id='bodMobileCombatHeartHideV1344';
+  combatStyle.textContent='@media(max-width:800px){body.combatActive #livesHud{display:none!important;}}';
+  document.head.appendChild(combatStyle);
 
   function ensureHud() {
     const main = document.getElementById('main');

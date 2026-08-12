@@ -508,108 +508,22 @@ body.threeMode.lightingOn #viewport::after{
 
 
 
-/* ===== Opening warning scroll — canonical v13.53 ===== */
-#modal.introScrollModal{
-  padding:clamp(8px,2vw,20px)!important;
-  overflow:hidden!important;
-}
-#modal.introScrollModal .card{
-  box-sizing:border-box!important;
-  width:min(900px,calc(100vw - 40px),calc((100dvh - 36px) * 1.58))!important;
-  max-width:none!important;
-  height:auto!important;
-  max-height:calc(100dvh - 36px)!important;
-  aspect-ratio:1.58 / 1!important;
-  margin:auto!important;
-  padding:20px 7.5% 6.5% 7.5%!important;
-  border:0!important;
-  background:transparent url('../assets/ui/scroll.png') center / 100% 100% no-repeat!important;
-  box-shadow:none!important;
-  display:grid!important;
-  grid-template-rows:minmax(0,1fr) auto!important;
-  gap:clamp(8px,1.2vh,14px)!important;
-  overflow:hidden!important;
-}
-#modal.introScrollModal .card>h2{display:none!important}
-#modal.introScrollModal .testerWarningScroll{
-  box-sizing:border-box!important;
-  width:100%!important;
-  max-width:100%!important;
-  min-width:0!important;
-  height:100%!important;
-  min-height:0!important;
-  margin:0!important;
-  padding:0!important;
-  background:none!important;
-  color:#000!important;
-  border:0!important;
-  box-shadow:none!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
-  -webkit-overflow-scrolling:touch!important;
-  overscroll-behavior:contain!important;
-  scrollbar-width:none!important;
-  font-family:"Alegreya",Georgia,serif!important;
-  font-size:clamp(16px,1.55vw,21px)!important;
-  font-weight:400!important;
-  line-height:1.27!important;
-  text-align:center!important;
-}
-#modal.introScrollModal .testerWarningScroll::-webkit-scrollbar{display:none!important}
-#modal.introScrollModal .testerWarningScroll>div:first-child{
-  font-size:clamp(27px,3vw,42px)!important;
-  font-weight:700!important;
-  line-height:1.02!important;
-  margin:0 0 .55em!important;
-}
-#modal.introScrollModal .testerWarningScroll b,
-#modal.introScrollModal .testerWarningScroll strong{font-weight:700!important}
-#modal.introScrollModal #modalButtons{
-  position:static!important;
-  inset:auto!important;
-  transform:none!important;
-  width:100%!important;
-  min-width:0!important;
-  margin:0!important;
-  padding:0 8%!important;
-  display:flex!important;
-  justify-content:center!important;
-  align-items:center!important;
-  z-index:5!important;
-  pointer-events:auto!important;
-}
-#modal.introScrollModal #modalButtons button{
-  width:min(420px,100%)!important;
-  min-width:0!important;
-  min-height:48px!important;
-  margin:0!important;
-  padding:10px 18px!important;
-  font-size:clamp(15px,1.35vw,19px)!important;
-  line-height:1.1!important;
-}
-@media(max-height:760px) and (min-width:901px){
-  #modal.introScrollModal{padding:5px 12px!important}
-  #modal.introScrollModal .card{
-    width:min(820px,calc(100vw - 28px),calc((100dvh - 12px) * 1.58))!important;
-    max-height:calc(100dvh - 12px)!important;
-    padding:20px 7.5% 5.8% 7.5%!important;
-    gap:5px!important;
-  }
-  #modal.introScrollModal .testerWarningScroll{font-size:clamp(14px,1.3vw,18px)!important;line-height:1.18!important}
-  #modal.introScrollModal .testerWarningScroll>div:first-child{font-size:clamp(24px,2.5vw,34px)!important;margin-bottom:.35em!important}
-  #modal.introScrollModal #modalButtons button{min-height:40px!important;padding:7px 14px!important;font-size:14px!important}
+/* ===== Tester warning scroll v11.18 ===== */
+.testerWarningScroll{
+  width:min(760px,94vw);
+  max-width:760px;
+  margin:0 auto;
+  background:transparent url('../assets/ui/scroll.png') center/100% 100% no-repeat;
+  color:#000;
+  border:0;
+  box-shadow:none;
+  padding:clamp(78px,9vw,110px) clamp(95px,12vw,125px) clamp(86px,10vw,120px);
+  font-family:"Alegreya",Georgia,serif;
+  font-size:18px;
+  line-height:1.35;
+  text-align:center;
 }
 
-/* v13.51 — canonical character-selector label polish. */
-.heroStat small,.heroSpecialBlock small{
-  font-size:13px!important;
-  line-height:1.05!important;
-  letter-spacing:.08em!important;
-  font-weight:800!important;
-}
-@media (min-width:901px){
-  .heroSpecialBlock{border-left:0!important;padding-left:0!important}
-}
 
 #mobileSheetToggle,#mobileStatus{display:none}
 #mobileDpad{display:grid}
@@ -744,7 +658,6 @@ body.threeMode.lightingOn #viewport::after{
   border-color:#fff;
   box-shadow:3px 3px 0 rgba(255,255,255,.35);
 }
-
 
 /* v12.81 — high-contrast standard game popups only.
    Intro and narrative ending scrolls retain their parchment treatment. */
