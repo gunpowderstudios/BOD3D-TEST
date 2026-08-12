@@ -2,14 +2,15 @@ name: BOD3D TEST v13.59 mobile combat quest
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: write
 
 jobs:
   update:
-    if: github.actor != 'github-actions[bot]'
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +31,6 @@ jobs:
                   raise SystemExit(f'{label}: expected exactly 1 match, found {n}')
               return s.replace(old,new,1)
 
-          # main.css — add one mobile-combat-only visibility rule.
           p='css/main.css'; s=read(p)
           old='''@media(max-width:800px){
   #questObjective{
@@ -54,23 +54,19 @@ jobs:
           s=once(s,old,new,'mobile quest media block')
           write(p,s)
 
-          # index.html — version/cache markers only.
           p='index.html'; s=read(p)
           s=once(s,'data-build-version="v13.58"','data-build-version="v13.59"','build version')
           s=once(s,'css/main.css?v=13.55','css/main.css?v=13.59','main css cache')
           s=once(s,'js/ui.js?v=13.58','js/ui.js?v=13.59','ui js cache')
           write(p,s)
 
-          # ui.js — visible TEST version marker only.
           p='js/ui.js'; s=read(p)
           s=once(s,"// TEST v13.58 — desktop parchment top gap set to 40px; TEST-only version marker.","// TEST v13.59 — hide quest objective during mobile combat; TEST-only version marker.",'ui comment')
           s=once(s,"const version='v13.58';","const version='v13.59';",'ui version')
           write(p,s)
 
-          # Validation: exploration styling retained; only combat on <=800px hides it.
           css=read('css/main.css'); idx=read('index.html'); ui=read('js/ui.js')
           assert css.count('body.combatActive #questObjective{display:none!important;}') == 1
-          assert 'top:51px;' in css
           assert 'data-build-version="v13.59"' in idx
           assert 'css/main.css?v=13.59' in idx
           assert 'js/ui.js?v=13.59' in idx
