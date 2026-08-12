@@ -2,15 +2,14 @@ name: BOD3D TEST v13.59 mobile combat quest
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 permissions:
   contents: write
 
 jobs:
   update:
-    if: ${{ github.actor != 'github-actions[bot]' }}
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,25 +31,8 @@ jobs:
               return s.replace(old,new,1)
 
           p='css/main.css'; s=read(p)
-          old='''@media(max-width:800px){
-  #questObjective{
-    top:51px;
-    width:calc(100% - 130px);
-    font-size:12px;
-    line-height:1.15;
-  }
-}
-'''
-          new='''@media(max-width:800px){
-  #questObjective{
-    top:51px;
-    width:calc(100% - 130px);
-    font-size:12px;
-    line-height:1.15;
-  }
-  body.combatActive #questObjective{display:none!important;}
-}
-'''
+          old="@media(max-width:800px){\n  #questObjective{\n    top:51px;\n    width:calc(100% - 130px);\n    font-size:12px;\n    line-height:1.15;\n  }\n}\n"
+          new="@media(max-width:800px){\n  #questObjective{\n    top:51px;\n    width:calc(100% - 130px);\n    font-size:12px;\n    line-height:1.15;\n  }\n  body.combatActive #questObjective{display:none!important;}\n}\n"
           s=once(s,old,new,'mobile quest media block')
           write(p,s)
 
