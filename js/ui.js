@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.46 — desktop opening-scroll layout + current UI build marker.
+// TEST v13.47 — restored pre-v13.46 intro layout + current UI build marker.
 (function(){
-  const version='v13.46';
+  const version='v13.47';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
@@ -12,102 +12,6 @@
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync,{once:true});else sync();
   setTimeout(sync,500);
-})();
-
-// TEST v13.46 — deeper desktop intro parchment, scroll-edge fades and button placement.
-(function(){
-  const style=document.createElement('style');
-  style.id='bodDesktopIntroScrollV1346';
-  style.textContent=`
-    @media (min-width:801px){
-      #modal.introScrollModal .card{
-        position:relative!important;
-        width:min(860px,88vw)!important;
-        max-width:860px!important;
-        overflow:visible!important;
-      }
-      #modal.introScrollModal #modalBody{
-        position:relative!important;
-        overflow:visible!important;
-      }
-      #modal.introScrollModal .testerWarningScroll{
-        width:min(860px,88vw)!important;
-        max-width:860px!important;
-        height:min(68vh,650px)!important;
-        min-height:500px!important;
-        margin:0 auto!important;
-        padding:20px 105px 126px!important;
-        display:flex!important;
-        flex-direction:column!important;
-        overflow:hidden!important;
-      }
-      #modal.introScrollModal .introScrollTextViewport{
-        flex:1 1 auto!important;
-        min-height:0!important;
-        overflow-y:auto!important;
-        overflow-x:hidden!important;
-        padding:2px 8px 20px!important;
-        -webkit-overflow-scrolling:touch;
-        scrollbar-width:thin;
-        overscroll-behavior:contain;
-      }
-      #modal.introScrollModal .introScrollTextViewport:not(.atTop):not(.atBottom){
-        -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
-        mask-image:linear-gradient(to bottom,transparent 0,#000 22px,#000 calc(100% - 22px),transparent 100%);
-      }
-      #modal.introScrollModal .introScrollTextViewport.atTop:not(.atBottom){
-        -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 22px),transparent 100%);
-        mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 22px),transparent 100%);
-      }
-      #modal.introScrollModal .introScrollTextViewport.atBottom:not(.atTop){
-        -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 22px,#000 100%);
-        mask-image:linear-gradient(to bottom,transparent 0,#000 22px,#000 100%);
-      }
-      #modal.introScrollModal .introScrollTextViewport.atTop.atBottom{
-        -webkit-mask-image:none;
-        mask-image:none;
-      }
-      #modal.introScrollModal #modalButtons{
-        position:absolute!important;
-        left:50%!important;
-        bottom:42px!important;
-        transform:translateX(-50%)!important;
-        width:min(365px,55%)!important;
-        margin:0!important;
-        z-index:5!important;
-      }
-      #modal.introScrollModal #modalButtons button{
-        width:100%!important;
-        margin:0!important;
-      }
-    }
-  `;
-  document.head.appendChild(style);
-
-  function enhance(){
-    const scroll=document.querySelector('#modal.introScrollModal .testerWarningScroll:not(.endingScroll)');
-    if(!scroll||scroll.dataset.desktopIntroEnhanced==='1')return false;
-    scroll.dataset.desktopIntroEnhanced='1';
-    const viewport=document.createElement('div');
-    viewport.className='introScrollTextViewport';
-    while(scroll.firstChild)viewport.appendChild(scroll.firstChild);
-    scroll.appendChild(viewport);
-    const syncFade=()=>{
-      const max=Math.max(0,viewport.scrollHeight-viewport.clientHeight);
-      viewport.classList.toggle('atTop',viewport.scrollTop<=2);
-      viewport.classList.toggle('atBottom',viewport.scrollTop>=max-2);
-    };
-    viewport.addEventListener('scroll',syncFade,{passive:true});
-    new ResizeObserver(syncFade).observe(viewport);
-    requestAnimationFrame(syncFade);
-    return true;
-  }
-
-  function start(){
-    enhance();
-    new MutationObserver(enhance).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
 // TEST v13.45 — remove the stray desktop divider beside Special Ability and
@@ -272,7 +176,7 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', start, { once:true });
+    document.addEventListener('DOMContentLoaded', start, { once: true });
   } else {
     start();
   }
