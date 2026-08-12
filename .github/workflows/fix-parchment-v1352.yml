@@ -1,0 +1,89 @@
+name: BOD3D TEST v13.52 parchment restore
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore known-working parchment rule
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s,encoding='utf-8')
+          def once(s,old,new,label):
+              n=s.count(old)
+              if n!=1: raise SystemExit(f'{label}: expected 1 match, found {n}')
+              return s.replace(old,new,1)
+
+          # main.css: replace only the v13.51 parchment block with the proven v13.50 structure.
+          p='css/main.css'; s=read(p)
+          pat=re.compile(r'/\* ===== Opening warning scroll — canonical desktop layout v13\.51 ===== \*/.*?(?=/\* v13\.51 — canonical character-selector label polish\. \*/)',re.S)
+          if len(pat.findall(s))!=1:
+              raise SystemExit('main.css: v13.51 parchment block not uniquely found')
+          block=r'''/* ===== Opening warning scroll — canonical v13.52 ===== */
+          .testerWarningScroll{
+            width:min(760px,94vw);
+            max-width:760px;
+            margin:0 auto;
+            background:transparent url('../assets/ui/scroll.png') center/100% 100% no-repeat;
+            color:#000;
+            border:0;
+            box-shadow:none;
+            padding:20px clamp(95px,12vw,125px) clamp(86px,10vw,120px);
+            font-family:"Alegreya",Georgia,serif;
+            font-size:18px;
+            line-height:1.35;
+            text-align:center;
+          }
+
+          '''
+          s=pat.sub(block,s,count=1)
+          write(p,s)
+
+          # ui.js + index.html: keep visible build/cache version in sync.
+          p='js/ui.js'; s=read(p)
+          s=once(s,"const version='v13.51';","const version='v13.52';",'ui version')
+          s=once(s,'// TEST v13.51 — cleanup: verified UI styling moved into CSS; this file now keeps behaviour only.','// TEST v13.52 — parchment restored to proven main.css structure; UI behaviour remains here.','ui comment')
+          write(p,s)
+
+          p='index.html'; s=read(p)
+          s=once(s,'data-build-version="v13.51"','data-build-version="v13.52"','index build')
+          s=once(s,'css/main.css?v=13.51','css/main.css?v=13.52','main cache')
+          s=once(s,'js/ui.js?v=13.51','js/ui.js?v=13.52','ui cache')
+          write(p,s)
+
+          # Verify the asset path and the one-place 20px desktop rule are present.
+          main=read('css/main.css')
+          assert "background:transparent url('../assets/ui/scroll.png') center/100% 100% no-repeat;" in main
+          assert 'padding:20px clamp(95px,12vw,125px) clamp(86px,10vw,120px);' in main
+          assert 'canonical desktop layout v13.51' not in main
+          assert 'data-build-version="v13.52"' in read('index.html')
+          assert "const version='v13.52'" in read('js/ui.js')
+          print('v13.52 parchment restore validated')
+          PY
+
+      - name: Commit validated fix
+        shell: bash
+        run: |
+          rm -f .github/workflows/fix-parchment-v1352.yml
+          git config user.name "BOD3D TEST fixer"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html css/main.css js/ui.js .github/workflows/fix-parchment-v1352.yml
+          git diff --cached --check
+          git commit -m "v13.52: restore parchment and keep 20px top spacing"
+          git push
