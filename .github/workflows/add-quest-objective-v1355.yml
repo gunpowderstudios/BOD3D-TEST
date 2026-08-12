@@ -1,0 +1,77 @@
+name: BOD3D TEST v13.55 quest objective
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add small quest objective to game screen
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s,encoding='utf-8')
+          def once(s,old,new,label):
+              n=s.count(old)
+              if n!=1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {n}')
+              return s.replace(old,new,1)
+
+          # index.html — add quest objective to game screen only and bump build/cache markers.
+          p='index.html'; s=read(p)
+          s=once(s,'data-build-version="v13.54"','data-build-version="v13.55"','build version')
+          s=once(s,'css/main.css?v=13.54','css/main.css?v=13.55','main css cache')
+          s=once(s,'js/ui.js?v=13.54','js/ui.js?v=13.55','ui js cache')
+          anchor='''    <div id="topbar">\n      <div class="cluster"><span class="badge" id="deckBadge">Tiles</span><span class="badge" id="monsterBadge">Monsters</span><span class="badge" id="itemBadge">Items</span></div>\n      <div class="cluster"><button id="zoomOut">−</button><button id="centreBtn">Centre</button><button id="zoomIn">+</button><button id="viewBtn">3D View</button><button id="northUpBtn">North Up</button><button id="questLogBtn">Quest Log</button><button id="menuBtn">☰ Menu</button></div>\n    </div>\n'''
+          replacement=anchor + '    <div id="questObjective">Your quest — Find the Ring, find Firkin and defeat the Red Dragon.</div>\n'
+          s=once(s,anchor,replacement,'topbar anchor')
+          write(p,s)
+
+          # main.css — one small unobtrusive game-screen label.
+          p='css/main.css'; s=read(p)
+          anchor='#topbar{right:52px}\n'
+          css='''#topbar{right:52px}\n#questObjective{\n  position:absolute;\n  left:50%;\n  top:56px;\n  z-index:19;\n  transform:translateX(-50%);\n  width:min(720px,calc(100% - 120px));\n  color:rgba(255,255,255,.82);\n  font-size:14px;\n  line-height:1.2;\n  font-weight:600;\n  letter-spacing:.02em;\n  text-align:center;\n  text-shadow:0 1px 4px #000,0 0 5px #000;\n  pointer-events:none;\n}\n@media(max-width:800px){\n  #questObjective{\n    top:51px;\n    width:calc(100% - 130px);\n    font-size:12px;\n    line-height:1.15;\n  }\n}\n'''
+          s=once(s,anchor,css,'topbar css anchor')
+          write(p,s)
+
+          # ui.js — keep visible version marker in sync.
+          p='js/ui.js'; s=read(p)
+          s=once(s,"// TEST v13.54 — clean working Live baseline; TEST-only version marker.","// TEST v13.55 — small in-game quest objective added; TEST-only version marker.",'ui comment')
+          s=once(s,"const version='v13.54';","const version='v13.55';",'ui version')
+          write(p,s)
+
+          # Validation.
+          idx=read('index.html'); css=read('css/main.css'); ui=read('js/ui.js')
+          assert 'Your quest — Find the Ring, find Firkin and defeat the Red Dragon.' in idx
+          assert idx.count('id="questObjective"') == 1
+          assert '#questObjective{' in css
+          assert 'data-build-version="v13.55"' in idx
+          assert 'css/main.css?v=13.55' in idx
+          assert 'js/ui.js?v=13.55' in idx
+          assert "const version='v13.55';" in ui
+          print('v13.55 quest objective validated')
+          PY
+
+      - name: Commit validated update
+        shell: bash
+        run: |
+          rm -f .github/workflows/add-quest-objective-v1355.yml
+          git config user.name "BOD3D TEST updater"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html css/main.css js/ui.js .github/workflows/add-quest-objective-v1355.yml
+          git diff --cached --check
+          git commit -m "v13.55: add small in-game quest objective"
+          git push
