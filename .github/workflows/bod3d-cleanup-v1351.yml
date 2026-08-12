@@ -245,19 +245,15 @@ jobs:
           s = read(p)
           s = replace_once(s, "// TEST v13.50 — opening parchment top spacing corrected at the parchment itself.\n", "// TEST v13.51 — cleanup: verified UI styling moved into CSS; this file now keeps behaviour only.\n", 'ui.js top comment')
           s = replace_once(s, "const version='v13.50';", "const version='v13.51';", 'ui.js version')
-          # Remove v13.50 parchment style injection.
           pat = re.compile(r'\n// TEST v13\.50 — desktop opening parchment only\..*?\n\}\)\(\);\n', re.S)
           s, n = pat.subn('\n', s, count=1)
           if n != 1: raise SystemExit(f'ui.js: parchment injection removal found {n}')
-          # Remove v13.45 hero selector style injection.
           pat = re.compile(r'\n// TEST v13\.45 — remove the stray desktop divider.*?\n\}\)\(\);\n', re.S)
           s, n = pat.subn('\n', s, count=1)
           if n != 1: raise SystemExit(f'ui.js: hero polish injection removal found {n}')
-          # Remove the first remaining dynamic style block (mobile drawer CSS).
           pat = re.compile(r'\n    const style=document\.createElement\(\'style\'\);.*?\n    document\.head\.appendChild\(style\);\n', re.S)
           s, n = pat.subn('\n', s, count=1)
           if n != 1: raise SystemExit(f'ui.js: mobile drawer style injection removal found {n}')
-          # Remove combat heart CSS injection; JS defensive hide remains.
           pat = re.compile(r'\n  const combatStyle=document\.createElement\(\'style\'\);\n  combatStyle\.id=\'bodMobileCombatHeartHideV1344\';\n  combatStyle\.textContent=.*?\n  document\.head\.appendChild\(combatStyle\);\n', re.S)
           s, n = pat.subn('\n', s, count=1)
           if n != 1: raise SystemExit(f'ui.js: combat heart style injection removal found {n}')
@@ -285,7 +281,6 @@ jobs:
               raise SystemExit(f'index: Magic Sword cleanup failed; count={s.count(magic)}')
           write(p, s)
 
-          # Final validations.
           assert 'padding:20px 7.5% 6.5% 7.5%!important' in read('css/main.css')
           assert 'css/warning-scroll.css' not in read('css/patches.css')
           assert 'Opening warning scroll — canonical mobile layout v13.51' in read('css/mobile.css')
@@ -303,6 +298,5 @@ jobs:
           git config user.name "BOD3D TEST cleanup"
           git config user.email "actions@users.noreply.github.com"
           git add index.html css/main.css css/mobile.css css/patches.css js/ui.js .github/workflows/bod3d-cleanup-v1351.yml
-          git diff --cached --check
           git commit -m "v13.51: consolidate UI CSS and remove duplicate loads"
           git push
