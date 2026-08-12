@@ -1,0 +1,308 @@
+name: BOD3D TEST v13.51 controlled cleanup
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Apply verified cleanup only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8')
+          def replace_once(text, old, new, label):
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {count}')
+              return text.replace(old, new, 1)
+
+          # 1) MAIN.CSS — one canonical desktop opening parchment + selector polish.
+          p = 'css/main.css'
+          s = read(p)
+          pattern = re.compile(r'/\* ===== Tester warning scroll v11\.18 ===== \*/.*?(?=#mobileSheetToggle,#mobileStatus\{display:none\})', re.S)
+          if len(pattern.findall(s)) != 1:
+              raise SystemExit('main.css: legacy tester warning scroll block not uniquely found')
+          canonical = r'''/* ===== Opening warning scroll — canonical desktop layout v13.51 ===== */
+          #modal:has(.testerWarningScroll){
+            padding:clamp(8px,2vw,24px)!important;
+            overflow:auto!important;
+          }
+          #modal .card:has(.testerWarningScroll){
+            box-sizing:border-box!important;
+            width:min(900px,calc(100vw - 40px),calc((100dvh - 36px) * 1.58))!important;
+            max-width:none!important;
+            height:auto!important;
+            max-height:calc(100dvh - 36px)!important;
+            aspect-ratio:1.58 / 1!important;
+            margin:auto!important;
+            padding:20px 7.5% 6.5% 7.5%!important;
+            border:0!important;
+            background:transparent url('../assets/ui/scroll.png') center / 100% 100% no-repeat!important;
+            box-shadow:none!important;
+            overflow:visible!important;
+            display:grid!important;
+            grid-template-rows:minmax(0,1fr) auto!important;
+            gap:clamp(8px,1.2vh,14px)!important;
+            align-items:stretch!important;
+          }
+          #modal .card:has(.testerWarningScroll)>h2{display:none!important}
+          .testerWarningScroll{
+            box-sizing:border-box!important;
+            width:100%!important;
+            max-width:100%!important;
+            min-width:0!important;
+            height:100%!important;
+            min-height:0!important;
+            margin:0!important;
+            padding:clamp(4px,.7vh,9px) 0!important;
+            background:none!important;
+            color:#000!important;
+            border:0!important;
+            box-shadow:none!important;
+            overflow:auto!important;
+            display:flex!important;
+            flex-direction:column!important;
+            justify-content:flex-start!important;
+            align-items:center!important;
+            text-align:center!important;
+            font-family:"Alegreya",Georgia,serif!important;
+            font-size:clamp(16px,1.55vw,21px)!important;
+            font-weight:400!important;
+            line-height:1.27!important;
+            scrollbar-width:none!important;
+          }
+          .testerWarningScroll::-webkit-scrollbar{display:none!important}
+          .testerWarningScroll>*{
+            width:100%!important;
+            max-width:100%!important;
+            margin:.3em 0!important;
+            font-size:inherit!important;
+            line-height:inherit!important;
+            white-space:normal!important;
+            overflow-wrap:break-word!important;
+          }
+          .testerWarningScroll>div:first-child{
+            font-size:clamp(27px,3vw,42px)!important;
+            font-weight:700!important;
+            line-height:1.02!important;
+            margin:0 0 .55em!important;
+          }
+          .testerWarningScroll b,.testerWarningScroll strong{font-weight:700!important}
+          #modal .card:has(.testerWarningScroll)>#modalButtons{
+            position:static!important;
+            inset:auto!important;
+            transform:none!important;
+            width:100%!important;
+            min-width:0!important;
+            margin:0!important;
+            padding:0 8%!important;
+            display:flex!important;
+            justify-content:center!important;
+            align-items:center!important;
+            z-index:5!important;
+            pointer-events:auto!important;
+          }
+          #modal .card:has(.testerWarningScroll)>#modalButtons button{
+            width:min(420px,100%)!important;
+            min-width:0!important;
+            min-height:48px!important;
+            margin:0!important;
+            padding:10px 18px!important;
+            font-size:clamp(15px,1.35vw,19px)!important;
+            line-height:1.1!important;
+          }
+          @media(max-height:760px) and (min-width:901px){
+            #modal:has(.testerWarningScroll){padding:5px 12px!important}
+            #modal .card:has(.testerWarningScroll){
+              width:min(820px,calc(100vw - 28px),calc((100dvh - 12px) * 1.58))!important;
+              max-height:calc(100dvh - 12px)!important;
+              padding:20px 7.5% 5.8% 7.5%!important;
+              gap:5px!important;
+            }
+            .testerWarningScroll{font-size:clamp(14px,1.3vw,18px)!important;line-height:1.18!important;padding-top:2px!important}
+            .testerWarningScroll>div:first-child{font-size:clamp(24px,2.5vw,34px)!important;margin-bottom:.35em!important}
+            #modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:40px!important;padding:7px 14px!important;font-size:14px!important}
+          }
+
+          /* v13.51 — canonical character-selector label polish. */
+          .heroStat small,.heroSpecialBlock small{
+            font-size:13px!important;
+            line-height:1.05!important;
+            letter-spacing:.08em!important;
+            font-weight:800!important;
+          }
+          @media (min-width:901px){
+            .heroSpecialBlock{border-left:0!important;padding-left:0!important}
+          }
+
+          '''
+          s = pattern.sub(canonical, s, count=1)
+          write(p, s)
+
+          # 2) PATCHES.CSS — remove the old warning-scroll section now promoted to main/mobile.
+          p = 'css/patches.css'
+          s = read(p)
+          pattern = re.compile(r'/\* ===== css/warning-scroll\.css ===== \*/.*?(?=/\* ===== css/desktop-hud\.css ===== \*/)', re.S)
+          if len(pattern.findall(s)) != 1:
+              raise SystemExit('patches.css: warning-scroll section not uniquely found')
+          s = pattern.sub('', s, count=1)
+          write(p, s)
+
+          # 3) MOBILE.CSS — remove legacy warning-scroll variants and add the final mobile rules + moved UI styles.
+          p = 'css/mobile.css'
+          s = read(p)
+          s, n = re.subn(r'@media\(max-width:800px\)\{\.testerWarningScroll\{padding:18px 16px;font-size:16px\}\}\n?', '', s, count=1)
+          if n != 1:
+              raise SystemExit(f'mobile.css: expected 1 compact legacy scroll rule, found {n}')
+          pattern = re.compile(r'@media\(max-width:800px\)\{\n  #modal:has\(\.testerWarningScroll\).*?(?=@media\(min-width:801px\)\{)', re.S)
+          if len(pattern.findall(s)) != 1:
+              raise SystemExit('mobile.css: large legacy warning-scroll block not uniquely found')
+          s = pattern.sub('', s, count=1)
+          mobile_canonical = r'''
+
+          /* ===== Opening warning scroll — canonical mobile layout v13.51 ===== */
+          @media(max-width:900px){
+            #modal:has(.testerWarningScroll){padding:8px!important;align-items:center!important}
+            #modal .card:has(.testerWarningScroll){
+              width:calc(100vw - 16px)!important;
+              height:min(76dvh,680px)!important;
+              max-height:calc(100dvh - 16px)!important;
+              aspect-ratio:auto!important;
+              padding:8.5% 12.5% 6.5% 14.5%!important;
+              gap:7px!important;
+            }
+            .testerWarningScroll{
+              font-size:clamp(15px,3.8vw,18px)!important;
+              line-height:1.24!important;
+              justify-content:center!important;
+              padding:0 1%!important;
+            }
+            .testerWarningScroll>div:first-child{
+              font-size:clamp(24px,6.3vw,32px)!important;
+              margin-bottom:.48em!important;
+            }
+            #modal .card:has(.testerWarningScroll)>#modalButtons{padding:0 4%!important}
+            #modal .card:has(.testerWarningScroll)>#modalButtons button{
+              width:min(360px,100%)!important;
+              min-height:50px!important;
+              padding:11px 14px!important;
+              font-size:clamp(16px,4vw,18px)!important;
+            }
+            .heroStat small,.heroSpecialBlock small{font-size:12px!important}
+          }
+          @media(max-width:420px) and (max-height:720px){
+            #modal .card:has(.testerWarningScroll){height:calc(100dvh - 12px)!important;padding:8% 12% 5.8% 14%!important;gap:4px!important}
+            .testerWarningScroll{font-size:clamp(13px,3.45vw,15px)!important;line-height:1.18!important}
+            .testerWarningScroll>div:first-child{font-size:clamp(21px,5.6vw,26px)!important;margin-bottom:.28em!important}
+            #modal .card:has(.testerWarningScroll)>#modalButtons button{min-height:44px!important;padding:8px 12px!important;font-size:15px!important}
+          }
+
+          /* v13.51 — UI styles moved out of js/ui.js. */
+          @media(max-width:800px){
+            #side{
+              overflow-y:auto!important;
+              overflow-x:hidden!important;
+              -webkit-overflow-scrolling:touch!important;
+              overscroll-behavior:contain!important;
+              touch-action:pan-y!important;
+              scroll-behavior:smooth;
+            }
+            #side.mobileExpanded{max-height:82dvh!important}
+            #side #mobileSheetToggle{
+              position:sticky!important;
+              top:0!important;
+              z-index:30!important;
+              touch-action:manipulation!important;
+            }
+            #side.mobileExpanded #mobileSheetToggle::after{content:'  Close';font-size:13px}
+            body.combatActive #livesHud{display:none!important}
+          }
+          '''
+          if 'Opening warning scroll — canonical mobile layout v13.51' in s:
+              raise SystemExit('mobile.css: v13.51 canonical block already exists unexpectedly')
+          s = s.rstrip() + mobile_canonical + '\n'
+          write(p, s)
+
+          # 4) UI.JS — behaviour only: retain version sync/drawer/heart logic, remove injected CSS.
+          p = 'js/ui.js'
+          s = read(p)
+          s = replace_once(s, "// TEST v13.50 — opening parchment top spacing corrected at the parchment itself.\n", "// TEST v13.51 — cleanup: verified UI styling moved into CSS; this file now keeps behaviour only.\n", 'ui.js top comment')
+          s = replace_once(s, "const version='v13.50';", "const version='v13.51';", 'ui.js version')
+          # Remove v13.50 parchment style injection.
+          pat = re.compile(r'\n// TEST v13\.50 — desktop opening parchment only\..*?\n\}\)\(\);\n', re.S)
+          s, n = pat.subn('\n', s, count=1)
+          if n != 1: raise SystemExit(f'ui.js: parchment injection removal found {n}')
+          # Remove v13.45 hero selector style injection.
+          pat = re.compile(r'\n// TEST v13\.45 — remove the stray desktop divider.*?\n\}\)\(\);\n', re.S)
+          s, n = pat.subn('\n', s, count=1)
+          if n != 1: raise SystemExit(f'ui.js: hero polish injection removal found {n}')
+          # Remove the first remaining dynamic style block (mobile drawer CSS).
+          pat = re.compile(r'\n    const style=document\.createElement\(\'style\'\);.*?\n    document\.head\.appendChild\(style\);\n', re.S)
+          s, n = pat.subn('\n', s, count=1)
+          if n != 1: raise SystemExit(f'ui.js: mobile drawer style injection removal found {n}')
+          # Remove combat heart CSS injection; JS defensive hide remains.
+          pat = re.compile(r'\n  const combatStyle=document\.createElement\(\'style\'\);\n  combatStyle\.id=\'bodMobileCombatHeartHideV1344\';\n  combatStyle\.textContent=.*?\n  document\.head\.appendChild\(combatStyle\);\n', re.S)
+          s, n = pat.subn('\n', s, count=1)
+          if n != 1: raise SystemExit(f'ui.js: combat heart style injection removal found {n}')
+          for forbidden in ['bodIntroScrollTopPaddingV1350','bodHeroSelectPolishV1345','bodMobileSheetButtonOnlyStyles','bodMobileCombatHeartHideV1344']:
+              if forbidden in s: raise SystemExit(f'ui.js: leftover injected style marker {forbidden}')
+          write(p, s)
+
+          # 5) INDEX.HTML — one build marker, fresh caches for changed files, one Magic Sword load.
+          p = 'index.html'
+          s = read(p)
+          s = replace_once(s, 'data-build-version="v13.50"', 'data-build-version="v13.51"', 'index build marker')
+          s = replace_once(s, 'css/main.css?v=13.50', 'css/main.css?v=13.51', 'index main.css cache')
+          s = replace_once(s, 'css/mobile.css?v=12.78', 'css/mobile.css?v=13.51', 'index mobile.css cache')
+          s = replace_once(s, 'css/patches.css?v=13.36', 'css/patches.css?v=13.51', 'index patches.css cache')
+          s = replace_once(s, 'js/ui.js?v=13.50', 'js/ui.js?v=13.51', 'index ui.js cache')
+          magic = '<script src="js/magic-sword-target.js?cache=20260807-v1324"></script>'
+          count = s.count(magic)
+          if count < 2:
+              raise SystemExit(f'index: expected duplicate Magic Sword loads, found {count}')
+          first = s.find(magic)
+          before, after = s[:first], s[first:]
+          after = after.replace(magic, '', count-1)
+          s = before + after
+          if s.count(magic) != 1:
+              raise SystemExit(f'index: Magic Sword cleanup failed; count={s.count(magic)}')
+          write(p, s)
+
+          # Final validations.
+          assert 'padding:20px 7.5% 6.5% 7.5%!important' in read('css/main.css')
+          assert 'css/warning-scroll.css' not in read('css/patches.css')
+          assert 'Opening warning scroll — canonical mobile layout v13.51' in read('css/mobile.css')
+          assert "const version='v13.51'" in read('js/ui.js')
+          idx = read('index.html')
+          assert 'data-build-version="v13.51"' in idx
+          assert idx.count(magic) == 1
+          print('Validated v13.51 cleanup successfully.')
+          PY
+
+      - name: Commit cleanup and remove one-shot workflow
+        shell: bash
+        run: |
+          rm -f .github/workflows/bod3d-cleanup-v1351.yml
+          git config user.name "BOD3D TEST cleanup"
+          git config user.email "actions@users.noreply.github.com"
+          git add index.html css/main.css css/mobile.css css/patches.css js/ui.js .github/workflows/bod3d-cleanup-v1351.yml
+          git diff --cached --check
+          git commit -m "v13.51: consolidate UI CSS and remove duplicate loads"
+          git push
