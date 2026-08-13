@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.68 — rename The Short Story menu item to A Short Story; TEST-only version marker.
+// TEST v13.69 — lower the intro Enter the Dungeon button on desktop; TEST-only version marker.
 (function(){
-  const version='v13.68';
+  const version='v13.69';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
