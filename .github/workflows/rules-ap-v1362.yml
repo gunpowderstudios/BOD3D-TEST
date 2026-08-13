@@ -31,9 +31,8 @@ jobs:
               return s.replace(old,new,1)
 
           p='js/game.js'; s=read(p)
-          fight='''      <div><b style="color:#E9BA00">Fight Monsters</b><br>Enter a tile containing a monster and combat begins. Roll your dice, use your weapons and items, and reduce the monster to <b>0 Health</b> before it does the same to you.</div>'''
-          ap='''      <div><b style="color:#E9BA00">Fight Monsters</b><br>Enter a tile containing a monster and combat begins. Roll your dice, use your weapons and items, and reduce the monster to <b>0 Health</b> before it does the same to you.</div>
-      <div><b style="color:#E9BA00">Action Points (AP)</b><br>AP are used <b>only during combat</b>. Some weapons, items and spells cost AP to use. If you run out of AP, you can still fight, but you’ll be limited to <b>melee attacks</b>.</div>'''
+          fight='      <div><b style="color:#E9BA00">Fight Monsters</b><br>Enter a tile containing a monster and combat begins. Roll your dice, use your weapons and items, and reduce the monster to <b>0 Health</b> before it does the same to you.</div>'
+          ap=fight+'\n      <div><b style="color:#E9BA00">Action Points (AP)</b><br>AP are used <b>only during combat</b>. Some weapons, items and spells cost AP to use. If you run out of AP, you can still fight, but you’ll be limited to <b>melee attacks</b>.</div>'
           s=once(s,fight,ap,'Action Points insertion')
           write(p,s)
 
