@@ -1,0 +1,79 @@
+name: BOD3D TEST v13.69 intro button spacing
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Move Enter the Dungeon button down on desktop
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s,encoding='utf-8')
+          def once(s,old,new,label):
+              n=s.count(old)
+              if n != 1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {n}')
+              return s.replace(old,new,1)
+
+          p='css/patches.css'; s=read(p)
+          marker='@media(max-height:760px) and (min-width:901px){'
+          block='\n'.join([
+              '@media(min-width:901px){',
+              '  #modal.introScrollModal .card:has(.testerWarningScroll)>#modalButtons{',
+              '    transform:translateY(clamp(24px,5vh,40px))!important;',
+              '  }',
+              '}',
+              '',
+          ])
+          s=once(s,marker,block+marker,'intro button desktop spacing')
+          write(p,s)
+
+          p='index.html'; s=read(p)
+          s=once(s,'data-build-version="v13.68"','data-build-version="v13.69"','build version')
+          s=once(s,'css/patches.css?v=13.58','css/patches.css?v=13.69','patches css cache')
+          s=once(s,'js/ui.js?v=13.68','js/ui.js?v=13.69','ui cache')
+          write(p,s)
+
+          p='js/ui.js'; s=read(p)
+          s=once(s,'// TEST v13.68 — rename The Short Story menu item to A Short Story; TEST-only version marker.','// TEST v13.69 — lower the intro Enter the Dungeon button on desktop; TEST-only version marker.','ui comment')
+          s=once(s,"const version='v13.68';","const version='v13.69';",'ui version')
+          write(p,s)
+
+          css=read('css/patches.css'); idx=read('index.html'); ui=read('js/ui.js')
+          assert '#modal.introScrollModal .card:has(.testerWarningScroll)>#modalButtons' in css
+          assert 'translateY(clamp(24px,5vh,40px))!important' in css
+          assert css.count('translateY(clamp(24px,5vh,40px))!important') == 1
+          assert 'data-build-version="v13.69"' in idx
+          assert 'css/patches.css?v=13.69' in idx
+          assert 'js/ui.js?v=13.69' in idx
+          assert "const version='v13.69';" in ui
+          assert "{text:'A Short Story',fn:()=>{closeModal();openShortStory();}}" in read('js/game.js')
+          assert 'backdropClose' not in read('js/game.js')[read('js/game.js').index('function showModal'):read('js/game.js').index('function closeModal')]
+          print('v13.69 validated: intro button moves down responsively on desktop only')
+          PY
+
+      - name: Commit validated TEST v13.69
+        shell: bash
+        run: |
+          rm -f .github/workflows/intro-button-v1369.yml
+          git config user.name "BOD3D TEST updater"
+          git config user.email "actions@users.noreply.github.com"
+          git add css/patches.css index.html js/ui.js .github/workflows/intro-button-v1369.yml
+          git diff --cached --check
+          git commit -m "v13.69: lower intro Enter button on desktop"
+          git push
