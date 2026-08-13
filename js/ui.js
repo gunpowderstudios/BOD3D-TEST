@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.64 — reliably close information popups by tapping outside the card; TEST-only version marker.
+// TEST v13.65 — fix menu item clicks while retaining outside-tap closing; TEST-only version marker.
 (function(){
-  const version='v13.64';
+  const version='v13.65';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
