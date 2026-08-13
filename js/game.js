@@ -1263,7 +1263,7 @@ function openMenu(){
   showModal('Menu','Game and display options.',[
     {text:'Resume',fn:closeModal},
     {text:'Rules',fn:()=>{closeModal();openRules();}},
-    {text:'The Short Story',fn:()=>{closeModal();openShortStory();}},
+    {text:'A Short Story',fn:()=>{closeModal();openShortStory();}},
     {text:'About',fn:()=>{closeModal();openAbout();}},
     {text:'New Game',cls:'red',fn:()=>{closeModal();if(confirm('Start a new dungeon?'))showCharSelect();}}
   ]);
