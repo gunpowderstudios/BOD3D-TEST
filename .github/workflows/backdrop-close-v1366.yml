@@ -43,7 +43,7 @@ jobs:
           write(p,s)
 
           p='js/ui.js'; s=read(p)
-          s=once(s,'// TEST v13.65 — fix menu clicks while keeping backdrop close; TEST-only version marker.','// TEST v13.66 — close simple popups using physical card bounds; TEST-only version marker.','ui comment')
+          s=once(s,'// TEST v13.65 — fix menu item clicks while retaining outside-tap closing; TEST-only version marker.','// TEST v13.66 — close simple popups using physical card bounds; TEST-only version marker.','ui comment')
           s=once(s,"const version='v13.65';","const version='v13.66';",'ui version')
           write(p,s)
 
