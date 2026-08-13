@@ -1,0 +1,80 @@
+name: BOD3D TEST v13.60 basic Rules menu
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add Rules and replace hamburger North Up
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def read(p): return Path(p).read_text(encoding='utf-8')
+          def write(p,s): Path(p).write_text(s,encoding='utf-8')
+          def once(s,old,new,label):
+              n=s.count(old)
+              if n!=1:
+                  raise SystemExit(f'{label}: expected exactly 1 match, found {n}')
+              return s.replace(old,new,1)
+
+          # game.js — add a compact, internally scrolling Rules popup before openMenu.
+          p='js/game.js'; s=read(p)
+          marker='}\nfunction openMenu(){'
+          rules="""}\nfunction openRules(){\n  showModal('HOW TO PLAY','',[{text:'Close',fn:closeModal}]);\n  document.getElementById('modalBody').innerHTML=`\n    <div style=\"max-height:min(62dvh,560px);overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;line-height:1.35;padding:2px 6px 4px\">\n      <p><b>Your Quest</b><br>Find the <b>Ring</b>, defeat the <b>Red Dragon</b> and exit the dungeon!</p>\n      <p><b>Explore the Dungeon</b><br>Use the <b>N, S, E and W</b> controls to move. When there is no dungeon tile in that direction, you will draw and place a new one. The dungeon is different every game.</p>\n      <p><b>Fight Monsters</b><br>Enter a tile containing a monster and combat begins. Roll your dice, use your weapons and items, and reduce the monster to <b>0 Health</b> before it does the same to you.</p>\n      <p><b>Find Treasure</b><br>Defeated monsters may reward you with weapons, armour, spells, potions and other useful items. Equip the ones that best suit your adventurer.</p>\n      <p><b>Find the Ring</b><br>Somewhere in the dungeon is the <b>Ring</b>. You must find and collect it before you can complete your quest.</p>\n      <p><b>Defeat the Red Dragon</b><br>The Dragon guards the Exit. Find the Ring, defeat the Dragon and reach the Exit to escape the dungeon.</p>\n      <p><b>Death</b><br>Lose all your Health and your adventure may be over — although a few special items might save your skin!</p>\n      <p style=\"text-align:center;margin-bottom:0\"><b>One life, one chance and one more forgotten hero!</b></p>\n    </div>`;\n}\nfunction openMenu(){"""
+          s=once(s,marker,rules,'openRules insertion point')
+
+          old="""    {text:'North Up',fn:()=>{\n      closeModal();\n      window.BOD3D?.northUp?.();\n      resetCameraHeroTracking();\n    }},"""
+          new="""    {text:'Rules',fn:()=>{closeModal();openRules();}},"""
+          s=once(s,old,new,'hamburger North Up item')
+          write(p,s)
+
+          # index.html — TEST version and cache-busting only.
+          p='index.html'; s=read(p)
+          s=once(s,'data-build-version="v13.59"','data-build-version="v13.60"','build version')
+          s=once(s,'js/game.js?cache=20260807-live-v1319','js/game.js?cache=20260813-v1360','game cache')
+          s=once(s,'js/ui.js?v=13.59','js/ui.js?v=13.60','ui cache')
+          write(p,s)
+
+          # ui.js — visible TEST build marker only.
+          p='js/ui.js'; s=read(p)
+          s=once(s,"// TEST v13.59 — hide quest objective during mobile combat; TEST-only version marker.","// TEST v13.60 — add basic Rules to hamburger menu; TEST-only version marker.",'ui comment')
+          s=once(s,"const version='v13.59';","const version='v13.60';",'ui version')
+          write(p,s)
+
+          # Validation: screen North Up remains; menu North Up is gone; Rules text/version present.
+          game=read('js/game.js'); idx=read('index.html'); ui=read('js/ui.js')
+          assert "function openRules()" in game
+          assert "{text:'Rules',fn:()=>{closeModal();openRules();}}," in game
+          assert "{text:'North Up',fn:()=>{" not in game
+          assert "document.getElementById('northUpBtn').onclick" in game
+          assert 'One life, one chance and one more forgotten hero!' in game
+          assert 'data-build-version="v13.60"' in idx
+          assert 'js/game.js?cache=20260813-v1360' in idx
+          assert 'js/ui.js?v=13.60' in idx
+          assert "const version='v13.60';" in ui
+          print('v13.60 validated: hamburger Rules added; on-screen North Up retained')
+          PY
+
+      - name: Commit validated TEST v13.60
+        shell: bash
+        run: |
+          rm -f .github/workflows/rules-menu-v1360.yml
+          git config user.name "BOD3D TEST updater"
+          git config user.email "actions@users.noreply.github.com"
+          git add js/game.js index.html js/ui.js .github/workflows/rules-menu-v1360.yml
+          git diff --cached --check
+          git commit -m "v13.60: add basic Rules to hamburger menu"
+          git push
