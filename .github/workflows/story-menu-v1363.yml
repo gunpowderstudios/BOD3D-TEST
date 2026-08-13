@@ -32,37 +32,36 @@ jobs:
 
           p='js/game.js'; s=read(p)
 
-          # Reuse the existing canonical story array rather than duplicating the text.
           story_marker='// Consolidated in TEST v12.74: Firkin quest introduction story and ending-scroll guard.'
           story_start=s.index(story_marker)
           array_start=s.index('  const paragraphs = [',story_start)
           array_end=s.index('\n  ];',array_start)+5
-          story_block=s[array_start:array_end]
           if 'window.BOD3D_SHORT_STORY' in s:
               raise SystemExit('Story array is already exposed')
           s=s[:array_end]+'\n  window.BOD3D_SHORT_STORY = paragraphs.slice();'+s[array_end:]
 
-          # Add a Rules-style story viewer immediately before the hamburger menu.
           menu_marker='\nfunction openMenu(){'
           if s.count(menu_marker) != 1:
               raise SystemExit(f'openMenu marker: expected 1, found {s.count(menu_marker)}')
-          story_fn='''
-function openShortStory(){
-  showModal('THE SHORT STORY','',[{text:'Close',fn:closeModal}]);
-  const body=document.getElementById('modalBody');
-  if(!body)return;
-  const wrap=document.createElement('div');
-  wrap.style.cssText='max-height:min(62dvh,560px);overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;line-height:1.4;padding:2px 6px 4px;white-space:normal;display:grid;gap:8px';
-  const paragraphs=Array.isArray(window.BOD3D_SHORT_STORY)?window.BOD3D_SHORT_STORY:[];
-  paragraphs.forEach(text=>{
-    const row=document.createElement('div');
-    row.textContent=text;
-    wrap.appendChild(row);
-  });
-  body.innerHTML='';
-  body.appendChild(wrap);
-}
-'''
+          story_fn="\n".join([
+              '',
+              'function openShortStory(){',
+              "  showModal('THE SHORT STORY','',[{text:'Close',fn:closeModal}]);",
+              "  const body=document.getElementById('modalBody');",
+              '  if(!body)return;',
+              "  const wrap=document.createElement('div');",
+              "  wrap.style.cssText='max-height:min(62dvh,560px);overflow-y:auto;-webkit-overflow-scrolling:touch;text-align:left;line-height:1.4;padding:2px 6px 4px;white-space:normal;display:grid;gap:8px';",
+              '  const paragraphs=Array.isArray(window.BOD3D_SHORT_STORY)?window.BOD3D_SHORT_STORY:[];',
+              '  paragraphs.forEach(text=>{',
+              "    const row=document.createElement('div');",
+              '    row.textContent=text;',
+              '    wrap.appendChild(row);',
+              '  });',
+              "  body.innerHTML='';",
+              '  body.appendChild(wrap);',
+              '}',
+              ''
+          ])
           s=s.replace(menu_marker,story_fn+menu_marker,1)
 
           s=once(
@@ -84,7 +83,6 @@ function openShortStory(){
           s=once(s,"const version='v13.62';","const version='v13.63';",'ui version')
           write(p,s)
 
-          # Validation: menu reuses canonical story and opening parchment behaviour remains present.
           game=read('js/game.js'); idx=read('index.html'); ui=read('js/ui.js')
           assert game.count('window.BOD3D_SHORT_STORY = paragraphs.slice();') == 1
           assert game.count('function openShortStory(){') == 1
