@@ -2,9 +2,9 @@
 // Started in TEST v12.68 with the proven mobile character drawer behaviour.
 // Additional UI patches will move here only after separate verification.
 
-// TEST v13.66 — close simple popups using physical card bounds; TEST-only version marker.
+// TEST v13.67 — remove outside-click popup closing; TEST-only version marker.
 (function(){
-  const version='v13.66';
+  const version='v13.67';
   function sync(){
     document.documentElement.dataset.buildVersion=version;
     const visible=document.getElementById('visibleBuildVersion');
