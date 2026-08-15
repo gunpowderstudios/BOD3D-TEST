@@ -1,0 +1,75 @@
+name: BOD3D TEST dark dropped items
+
+on:
+  push:
+    paths:
+      - '.github/workflows/dark-dropped-items-update.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Darken dropped-item popup cards
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          css = Path('css/patches.css')
+          s = css.read_text(encoding='utf-8')
+          marker = '/* v13.71 — dropped-item popup cards match the black/white modal theme. */'
+          if marker in s:
+              raise SystemExit('Dropped-item popup style already present')
+          block = '''\n\n/* v13.71 — dropped-item popup cards match the black/white modal theme. */
+#modal .tileItemCard{
+  background:#000!important;
+  color:#fff!important;
+  border-color:#fff!important;
+  box-shadow:none!important;
+}
+#modal .tileItemCard b,
+#modal .tileItemCard strong,
+#modal .tileItemCard .small{
+  color:#fff!important;
+}
+#modal .tileItemCard button{
+  background:#000!important;
+  color:#fff!important;
+  border-color:#fff!important;
+  box-shadow:2px 2px 0 #777!important;
+}
+#modal .tileItemCard button:hover:not(:disabled),
+#modal .tileItemCard button:focus-visible{
+  background:#fff!important;
+  color:#000!important;
+}
+'''
+          css.write_text(s.rstrip() + block + '\n', encoding='utf-8')
+
+          index = Path('index.html')
+          h = index.read_text(encoding='utf-8')
+          if 'data-build-version="v13.70"' not in h:
+              raise SystemExit('Expected TEST v13.70 build marker not found')
+          h = h.replace('data-build-version="v13.70"', 'data-build-version="v13.71"', 1)
+          if 'css/patches.css?v=13.69' in h:
+              h = h.replace('css/patches.css?v=13.69', 'css/patches.css?v=13.71', 1)
+          elif 'css/patches.css?v=13.70' in h:
+              h = h.replace('css/patches.css?v=13.70', 'css/patches.css?v=13.71', 1)
+          else:
+              raise SystemExit('Expected patches.css cache reference not found')
+          if 'js/ui.js?v=13.70' in h:
+              h = h.replace('js/ui.js?v=13.70', 'js/ui.js?v=13.71', 1)
+          index.write_text(h, encoding='utf-8')
+          PY
+      - name: Commit TEST popup fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html css/patches.css
+          git commit -m "Fix dropped item popup colours in TEST"
+          git push origin main
