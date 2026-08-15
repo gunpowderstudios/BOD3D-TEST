@@ -1,0 +1,50 @@
+name: BOD3D TEST version-source fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/test-version-source-update.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Make index the single TEST build-version source
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          index = Path('index.html')
+          h = index.read_text(encoding='utf-8')
+          replacements = {
+              'data-build-version="v13.69"': 'data-build-version="v13.70"',
+              'js/ui.js?v=13.69': 'js/ui.js?v=13.70',
+          }
+          for old, new in replacements.items():
+              if old not in h:
+                  raise SystemExit('Expected TEST index text not found: ' + old)
+              h = h.replace(old, new, 1)
+          index.write_text(h, encoding='utf-8')
+
+          ui = Path('js/ui.js')
+          u = ui.read_text(encoding='utf-8')
+          old = "// TEST v13.69 — lower the intro Enter the Dungeon button on desktop; TEST-only version marker.\n(function(){\n  const version='v13.69';"
+          new = "// TEST build version follows index.html so this module cannot overwrite a newer build number.\n(function(){\n  const version=document.documentElement.dataset.buildVersion||'development';"
+          if old not in u:
+              raise SystemExit('Expected TEST UI version block not found')
+          u = u.replace(old, new, 1)
+          ui.write_text(u, encoding='utf-8')
+          PY
+      - name: Commit TEST technical fix
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html js/ui.js
+          git commit -m "Fix TEST build version source"
+          git push origin main
