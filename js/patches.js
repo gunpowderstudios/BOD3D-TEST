@@ -159,16 +159,18 @@ window.RESPAWN_CAMERA_DELAY_MS=2000;window.RESPAWN_CENTER_ON_START=true;
  document.getElementById('desktopDungeonRadio')?.remove();
 })();
 
-// ==================== TEST tile mix: 3 Crossroads become Corners (v13.49) ====================
+// ==================== TEST tile mix: maximum 2 Crossroads; all others become Corners (v13.49) ====================
 (function(){
  if(typeof createTileDeck!=='function'||window.__bodTestTileMixV1349)return;
  window.__bodTestTileMixV1349=true;
  const originalCreateTileDeck=createTileDeck;
  createTileDeck=function(){
   const deck=originalCreateTileDeck.apply(this,arguments);
-  let changed=0;
+  let crossroadsKept=0;
   for(const tile of deck){
-   if(tile?.kind==='cross'&&changed<3){tile.kind='corner';changed++;}
+   if(tile?.kind!=='cross')continue;
+   if(crossroadsKept<2){crossroadsKept++;continue;}
+   tile.kind='corner';
   }
   return deck;
  };
