@@ -16,7 +16,7 @@
 (function(){
  const buttons=[...document.querySelectorAll('.fullscreenControl')];if(!buttons.length)return;
  const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement;
- const toggleFullscreen=async()=>{try{if(fullscreenElement()){if(document.exitFullscreen)await document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}else{const root=document.documentElement;if(root.requestFullscreen)await root.requestFullscreen();else if(root.webkitRequestFullscreen)document.webkitRequestFullscreen();else toast('Full screen is not supported by this browser.');}}catch(error){console.warn('Full screen request failed:',error);}};
+ const toggleFullscreen=async()=>{try{if(fullscreenElement()){if(document.exitFullscreen)await document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();}else{const root=document.documentElement;if(root.requestFullscreen)await root.requestFullscreen();else if(root.webkitRequestFullscreen)root.webkitRequestFullscreen();else toast('Full screen is not supported by this browser.');}}catch(error){console.warn('Full screen request failed:',error);}};
  buttons.forEach(button=>button.addEventListener('click',toggleFullscreen));
  const fullscreenIcon=active=>active?'<svg class="controlIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4m11-5v5h5M9 20v-5H4m11 5v-5h5"/></svg>':'<svg class="controlIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5M9 20H4v-5m11 5h5v-5"/></svg>';
  const syncFullscreenButtons=()=>{const active=!!fullscreenElement();buttons.forEach(button=>{button.innerHTML=fullscreenIcon(active);button.title=active?'Exit full screen (or press Esc)':'Full screen — press Esc to exit';button.setAttribute('aria-label',active?'Exit full screen':'Enter full screen');});};
@@ -157,4 +157,19 @@ window.RESPAWN_CAMERA_DELAY_MS=2000;window.RESPAWN_CENTER_ON_START=true;
 `;
  document.head.appendChild(style);
  document.getElementById('desktopDungeonRadio')?.remove();
+})();
+
+// ==================== TEST tile mix: 3 Crossroads become Corners (v13.49) ====================
+(function(){
+ if(typeof createTileDeck!=='function'||window.__bodTestTileMixV1349)return;
+ window.__bodTestTileMixV1349=true;
+ const originalCreateTileDeck=createTileDeck;
+ createTileDeck=function(){
+  const deck=originalCreateTileDeck.apply(this,arguments);
+  let changed=0;
+  for(const tile of deck){
+   if(tile?.kind==='cross'&&changed<3){tile.kind='corner';changed++;}
+  }
+  return deck;
+ };
 })();
