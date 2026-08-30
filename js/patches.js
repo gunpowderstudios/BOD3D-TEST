@@ -175,3 +175,60 @@ window.RESPAWN_CAMERA_DELAY_MS=2000;window.RESPAWN_CENTER_ON_START=true;
   return deck;
  };
 })();
+
+// ==================== First dungeon roll: touch camera hint (v13.72) ====================
+(function(){
+ if(window.__bodTouchCameraHintInstalled)return;
+ window.__bodTouchCameraHintInstalled=true;
+ let waitingForFirstRoll=false;
+ let shownThisGame=false;
+
+ function removeHint(){document.getElementById('bodTouchCameraHint')?.remove();}
+ function showHint(){
+  if(shownThisGame)return;
+  shownThisGame=true;
+  removeHint();
+  const hint=document.createElement('div');
+  hint.id='bodTouchCameraHint';
+  hint.setAttribute('role','status');
+  hint.style.cssText='position:absolute;left:50%;top:22%;transform:translateX(-50%);z-index:9999;max-width:min(88vw,460px);padding:10px 34px 10px 14px;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.35);border-radius:8px;color:#fff;font-size:16px;line-height:1.3;text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.45);pointer-events:auto;';
+  hint.innerHTML='<span>Zoom, pan or rotate with two fingers to view.</span><button type="button" aria-label="Close camera hint" style="position:absolute;right:5px;top:3px;width:28px;height:28px;border:0;background:transparent;color:#fff;font-size:22px;line-height:26px;cursor:pointer;padding:0;">×</button>';
+  hint.querySelector('button')?.addEventListener('click',removeHint);
+  const host=document.getElementById('viewport')||document.getElementById('threeBoard')||document.body;
+  if(getComputedStyle(host).position==='static')host.style.position='relative';
+  host.appendChild(hint);
+ }
+
+ function installDiceHook(){
+  const dice=window.BODDice3D;
+  if(!dice||typeof dice.roll!=='function'||dice.__bodTouchHintWrapped)return false;
+  dice.__bodTouchHintWrapped=true;
+  const originalRoll=dice.roll;
+  dice.roll=function(){
+   const result=originalRoll.apply(this,arguments);
+   if(waitingForFirstRoll&&!shownThisGame){
+    waitingForFirstRoll=false;
+    if(result&&typeof result.then==='function')result.then(()=>setTimeout(showHint,120)).catch(()=>setTimeout(showHint,120));
+    else setTimeout(showHint,1250);
+   }
+   return result;
+  };
+  return true;
+ }
+
+ const originalNewGame=typeof newGame==='function'?newGame:null;
+ if(originalNewGame){
+  newGame=function(){
+   removeHint();
+   shownThisGame=false;
+   waitingForFirstRoll=true;
+   const result=originalNewGame.apply(this,arguments);
+   installDiceHook();
+   return result;
+  };
+ }
+ if(!installDiceHook()){
+  let tries=0;
+  const timer=setInterval(()=>{if(installDiceHook()||++tries>100)clearInterval(timer);},50);
+ }
+})();
