@@ -121,3 +121,21 @@
 
  window.BODStoryMode={get mode(){return mode;},get nextPart(){return nextPart;},parts:STORY_PARTS};
 })();
+
+// Match LIVE: keep only one visible Enter the Dungeon button.
+(function(){
+ function removeDuplicateIntroButton(){
+  const modal=document.getElementById('modal');
+  if(!modal||!modal.classList.contains('introScrollModal')||!modal.querySelector('.testerWarningScroll'))return;
+  const buttons=[...modal.querySelectorAll('button')].filter(button=>{
+   if((button.textContent||'').trim().toLowerCase()!=='enter the dungeon')return false;
+   const style=getComputedStyle(button);
+   return style.display!=='none'&&style.visibility!=='hidden'&&button.getClientRects().length>0;
+  });
+  if(buttons.length<2)return;
+  buttons.sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);
+  buttons.slice(1).forEach(button=>button.remove());
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeDuplicateIntroButton,{once:true});else removeDuplicateIntroButton();
+ new MutationObserver(removeDuplicateIntroButton).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class']});
+})();
