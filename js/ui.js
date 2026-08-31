@@ -188,3 +188,63 @@
   script.defer=true;
   document.body.appendChild(script);
 })();
+
+// TEST — replace parchment-style intro/end screens with plain white text on black.
+(function(){
+  if(document.getElementById('bodPlainStoryPanels'))return;
+  const style=document.createElement('style');
+  style.id='bodPlainStoryPanels';
+  style.textContent=`
+    #modal.introScrollModal .card:has(.testerWarningScroll),
+    #modal.endingScrollModal .card{
+      width:min(760px,calc(100vw - 30px))!important;
+      max-width:760px!important;
+      height:auto!important;
+      max-height:min(82dvh,760px)!important;
+      aspect-ratio:auto!important;
+      padding:28px 30px 24px!important;
+      border:1px solid rgba(255,255,255,.65)!important;
+      border-radius:6px!important;
+      background:#000!important;
+      background-image:none!important;
+      box-shadow:0 12px 36px rgba(0,0,0,.72)!important;
+      color:#fff!important;
+      overflow:auto!important;
+    }
+    #modal.introScrollModal .testerWarningScroll,
+    #modal.endingScrollModal #modalBody,
+    #modal.endingScrollModal #modalBody *{
+      background:transparent!important;
+      color:#fff!important;
+      font-family:"Alegreya Sans",Arial,sans-serif!important;
+      text-shadow:none!important;
+    }
+    #modal.introScrollModal .testerWarningScroll{
+      height:auto!important;
+      min-height:0!important;
+      padding:0!important;
+      color:#fff!important;
+      overflow:auto!important;
+    }
+    #modal.introScrollModal .testerWarningScroll>div:first-child{
+      color:#fff!important;
+    }
+    #modal.introScrollModal .card:has(.testerWarningScroll)>#modalButtons,
+    #modal.endingScrollModal #modalButtons{
+      position:static!important;
+      transform:none!important;
+      width:100%!important;
+      margin-top:18px!important;
+      padding:0!important;
+    }
+    @media(max-width:900px){
+      #modal.introScrollModal .card:has(.testerWarningScroll),
+      #modal.endingScrollModal .card{
+        width:calc(100vw - 20px)!important;
+        max-height:calc(100dvh - 20px)!important;
+        padding:22px 18px 18px!important;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+})();
