@@ -180,3 +180,11 @@
     start();
   }
 })();
+
+// TEST v13.74 — load the experimental Story Mode after the core game scripts are ready.
+(function(){
+  const script=document.createElement('script');
+  script.src='js/story-mode.js?v=13.74';
+  script.defer=true;
+  document.body.appendChild(script);
+})();
