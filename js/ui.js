@@ -189,7 +189,7 @@
   document.body.appendChild(script);
 })();
 
-// TEST — replace parchment-style intro/end screens with plain white text on black.
+// Synced from LIVE — plain white intro/end text on black panel.
 (function(){
   if(document.getElementById('bodPlainStoryPanels'))return;
   const style=document.createElement('style');
@@ -226,7 +226,8 @@
       color:#fff!important;
       overflow:auto!important;
     }
-    #modal.introScrollModal .testerWarningScroll>div:first-child{
+    #modal.introScrollModal .testerWarningScroll>div:first-child,
+    #modal.introScrollModal .testerWarningScroll span[style*="color"]{
       color:#fff!important;
     }
     #modal.introScrollModal .card:has(.testerWarningScroll)>#modalButtons,
@@ -247,4 +248,51 @@
     }
   `;
   document.head.appendChild(style);
+})();
+
+// Synced from LIVE — enter immediately or continue reading the short story.
+(function(){
+  if(window.__bodInlineDungeonEntryInstalled)return;
+  window.__bodInlineDungeonEntryInstalled=true;
+
+  const style=document.createElement('style');
+  style.id='bodInlineDungeonEntryStyles';
+  style.textContent=`
+    #modal.introScrollModal #modalButtons{display:none!important;}
+    .testerWarningScroll .introEnterDungeonButton{
+      display:block;width:100%;margin:20px 0 26px;padding:13px 18px;
+      border:2px solid #fff;border-radius:4px;background:#a62020;color:#fff;
+      box-shadow:none;font-size:20px;line-height:1.15;font-weight:800;
+      text-align:center;cursor:pointer;
+    }
+    .testerWarningScroll .introEnterDungeonButton:hover,
+    .testerWarningScroll .introEnterDungeonButton:focus-visible{background:#741515;color:#fff;}
+  `;
+  document.head.appendChild(style);
+
+  function installButton(){
+    const modal=document.getElementById('modal');
+    if(!modal?.classList.contains('introScrollModal'))return;
+    const scroll=modal.querySelector('.testerWarningScroll');
+    if(!scroll||scroll.querySelector('.introEnterDungeonButton'))return;
+    const storyHeading=scroll.querySelector('.testerStoryHeading');
+    if(!storyHeading)return;
+    const button=document.createElement('button');
+    button.type='button';
+    button.className='introEnterDungeonButton';
+    button.textContent='Enter the Dungeon';
+    button.setAttribute('aria-label','Enter the Dungeon and skip the short story');
+    button.addEventListener('click',()=>{
+      if(typeof closeModal==='function')closeModal();
+      else modal.classList.remove('open');
+    });
+    storyHeading.before(button);
+  }
+
+  function start(){
+    installButton();
+    new MutationObserver(installButton).observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});
+  else start();
 })();
