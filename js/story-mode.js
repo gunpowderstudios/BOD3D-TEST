@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.79
+// BOD3D TEST — Story Mode prototype v13.80
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -78,9 +78,14 @@
   host().appendChild(el);
  }
 
+ // TEST v13.80 — the character selector is z-index 500 while normal modals are z-index 100.
+ // Hide the selector before opening the Story/Hack chooser, otherwise the chooser exists
+ // behind the selector and Enter the Dungeon appears to do nothing on desktop.
  const originalStartGame=startGame;
  startGame=function(c){
   pendingHero=c;audio();
+  if(window.BODHeroPreview)window.BODHeroPreview.pause();
+  document.getElementById('charSelect')?.classList.add('hidden');
   showModal('CHOOSE YOUR ADVENTURE','How do you want to enter the dungeon?',[{
    text:'STORY MODE',cls:'green',fn:()=>{mode='story';nextPart=1;closeModal();originalStartGame(pendingHero);}
   },{
