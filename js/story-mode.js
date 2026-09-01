@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.78
+// BOD3D TEST — Story Mode prototype v13.79
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -35,20 +35,22 @@
  function removeNearby(){document.getElementById('bodStoryNearby')?.remove();}
  function removeCounter(){document.getElementById('bodStoryCounter')?.remove();}
 
+ // A discovered scroll remains on its dungeon tile like a dropped item.
+ // If the player is standing on it, or next to it, the floating scroll can be opened again.
  function storyTileInReach(){
   if(mode!=='story'||typeof state==='undefined'||!state?.player)return null;
   const p=state.player;
   const current=getTile(p.x,p.y);
-  if(current?.storyPart&&!current.storyRead)return current;
+  if(current?.storyPart)return current;
   for(const d of Object.values(DIRS||{})){
    const t=getTile(p.x+d.dx,p.y+d.dy);
-   if(t?.storyPart&&!t.storyRead)return t;
+   if(t?.storyPart)return t;
   }
   return null;
  }
 
- function storyPopup(part){
-  showModal('YOU HAVE FOUND PART '+part,'',[{text:'Continue',cls:'green',fn:closeModal}]);
+ function storyPopup(part,alreadyRead=false){
+  showModal(alreadyRead?'STORY PART '+part:'YOU HAVE FOUND PART '+part,'',[{text:'Continue',cls:'green',fn:closeModal}]);
   const body=document.getElementById('modalBody');
   if(body)body.innerHTML='<div class="bodStoryPaper">'+STORY_PARTS[part-1]+'</div>';
  }
@@ -56,12 +58,13 @@
   showModal('STORY SCROLL '+part,'You have found Part '+part+', but the story must be uncovered in order. Find the previous scroll'+(nextPart>1?' — Part '+nextPart+' is next.':'s first — Part 1 is still missing.')+'',[{text:'Keep Searching',fn:closeModal}]);
  }
  function readStoryTile(tile){
-  if(!tile?.storyPart||tile.storyRead)return;
+  if(!tile?.storyPart)return;
   const part=Number(tile.storyPart);
+  if(tile.storyRead){storyPopup(part,true);return;}
   if(part!==nextPart){wrongOrderPopup(part);return;}
   tile.storyRead=true;nextPart++;
   log('Story scroll Part '+part+' discovered.','loot');
-  storyPopup(part);updateNearby();
+  storyPopup(part,false);updateNearby();
  }
  function updateNearby(){
   removeNearby();removeCounter();
@@ -69,8 +72,8 @@
   if(!tile)return;
   const part=Number(tile.storyPart);
   const el=document.createElement('button');
-  el.type='button';el.id='bodStoryNearby';el.textContent='📜';el.title='Open story scroll';
-  el.setAttribute('aria-label','Open story scroll Part '+part);
+  el.type='button';el.id='bodStoryNearby';el.textContent='📜';el.title=tile.storyRead?'Read story scroll again':'Open story scroll';
+  el.setAttribute('aria-label',(tile.storyRead?'Read again story scroll Part ':'Open story scroll Part ')+part);
   el.addEventListener('click',()=>readStoryTile(tile));
   host().appendChild(el);
  }
