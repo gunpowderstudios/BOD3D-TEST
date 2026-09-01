@@ -120,7 +120,7 @@
 
   wrap('win',function(){
     const gameState=currentState();
-    const player=gameState()?.player;
+    const player=gameState?.player;
     track('game_completed',{
       character_id:gameState?.charDef?.id||'unknown',
       firkin_rescued:!!player?.companionFirkin,
