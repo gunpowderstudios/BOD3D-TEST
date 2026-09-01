@@ -135,90 +135,17 @@
   });
 })();
 
-// TEST desktop safety patch — character loading/selection screen Enter button.
-// Captures pointer coordinates at window level so an invisible overlay cannot swallow the click.
-(function installDesktopDungeonEntrySafety(){
-  let entering=false;
-
-  function enterDungeon(){
-    if(entering)return;
-    const select=document.getElementById('charSelect');
-    if(!select||select.classList.contains('hidden'))return;
-    entering=true;
-    try{
-      if(typeof setHeroSelectorBusy==='function')setHeroSelectorBusy(false);
-      if(typeof startGame==='function'&&typeof selectedCharacter==='function'){
-        startGame(selectedCharacter());
-        return;
-      }
-      const button=document.getElementById('chooseHeroBtn');
-      if(button&&typeof button.onclick==='function')button.onclick();
-    }catch(error){
-      console.warn('Enter the Dungeon safety patch:',error);
-      entering=false;
-    }
-  }
-
-  function install(){
-    const button=document.getElementById('chooseHeroBtn');
-    const panel=document.getElementById('heroInfoPanel');
-    const canvas=document.getElementById('heroPreviewCanvas');
-    if(!button)return false;
-
-    if(panel){
-      panel.style.setProperty('position','relative','important');
-      panel.style.setProperty('z-index','9000','important');
-      panel.style.setProperty('pointer-events','auto','important');
-    }
-    if(canvas)canvas.style.setProperty('pointer-events','none','important');
-    button.style.setProperty('position','relative','important');
-    button.style.setProperty('z-index','10000','important');
-    button.style.setProperty('pointer-events','auto','important');
-    button.style.setProperty('cursor','pointer','important');
-
-    if(button.dataset.desktopEntrySafety==='2')return true;
-    button.dataset.desktopEntrySafety='2';
-    button.addEventListener('click',event=>{
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      enterDungeon();
-    },true);
-    return true;
-  }
-
-  function pointerIsOverEnter(event){
-    const select=document.getElementById('charSelect');
-    const button=document.getElementById('chooseHeroBtn');
-    if(!select||select.classList.contains('hidden')||!button)return false;
-    const r=button.getBoundingClientRect();
-    if(r.width<20||r.height<20)return false;
-    return event.clientX>=r.left&&event.clientX<=r.right&&event.clientY>=r.top&&event.clientY<=r.bottom;
-  }
-
-  window.addEventListener('pointerdown',event=>{
-    if(!pointerIsOverEnter(event))return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    enterDungeon();
-  },true);
-
-  window.addEventListener('mousedown',event=>{
-    if(!pointerIsOverEnter(event))return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    enterDungeon();
-  },true);
-
-  document.addEventListener('keydown',event=>{
-    const select=document.getElementById('charSelect');
-    if(event.key!=='Enter'||!select||select.classList.contains('hidden'))return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    enterDungeon();
-  },true);
-
-  if(!install()){
-    let tries=0;
-    const timer=setInterval(()=>{if(install()||++tries>200)clearInterval(timer);},50);
-  }
+// TEST: use the exact verified LIVE patches.css presentation layer.
+// This keeps TEST gameplay/scripts intact while making the character/loading screen
+// and other late interface rules match the working LIVE build.
+(function useLiveVerifiedPatchStyles(){
+  if(!location.pathname.toUpperCase().includes('/BOD3D-TEST'))return;
+  const local=[...document.querySelectorAll('link[rel="stylesheet"]')].find(link=>/css\/patches\.css/i.test(link.getAttribute('href')||''));
+  if(local)local.disabled=true;
+  if(document.getElementById('bodLiveVerifiedPatches'))return;
+  const live=document.createElement('link');
+  live.id='bodLiveVerifiedPatches';
+  live.rel='stylesheet';
+  live.href='https://gunpowderstudios.github.io/BOD3D/css/patches.css?v=13.73-live-character-screen';
+  document.head.appendChild(live);
 })();
