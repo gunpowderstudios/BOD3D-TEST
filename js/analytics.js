@@ -120,7 +120,7 @@
 
   wrap('win',function(){
     const gameState=currentState();
-    const player=gameState?.player;
+    const player=gameState()?.player;
     track('game_completed',{
       character_id:gameState?.charDef?.id||'unknown',
       firkin_rescued:!!player?.companionFirkin,
@@ -133,4 +133,42 @@
   document.getElementById('buyBodButton')?.addEventListener('click',()=>{
     track('buy_bod_clicked',{link_url:'https://www.gunpowderstudios.co.uk/'});
   });
+})();
+
+// TEST desktop safety patch — keep the character-select Enter button clickable
+// even if the 3D hero preview leaves the selector busy or an overlay catches pointers.
+(function installDesktopDungeonEntrySafety(){
+  function install(){
+    const button=document.getElementById('chooseHeroBtn');
+    const panel=document.getElementById('heroInfoPanel');
+    const canvas=document.getElementById('heroPreviewCanvas');
+    if(!button)return false;
+
+    if(panel)panel.style.setProperty('pointer-events','auto','important');
+    if(canvas)canvas.style.setProperty('pointer-events','none','important');
+    button.style.setProperty('position','relative','important');
+    button.style.setProperty('z-index','10000','important');
+    button.style.setProperty('pointer-events','auto','important');
+    button.style.setProperty('cursor','pointer','important');
+
+    if(button.dataset.desktopEntrySafety==='1')return true;
+    button.dataset.desktopEntrySafety='1';
+    button.addEventListener('click',event=>{
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      try{
+        if(typeof setHeroSelectorBusy==='function')setHeroSelectorBusy(false);
+        if(typeof startGame==='function'&&typeof selectedCharacter==='function'){
+          startGame(selectedCharacter());
+          return;
+        }
+      }catch(error){console.warn('Enter the Dungeon safety patch:',error);}
+    },true);
+    return true;
+  }
+
+  if(!install()){
+    let tries=0;
+    const timer=setInterval(()=>{if(install()||++tries>100)clearInterval(timer);},50);
+  }
 })();
