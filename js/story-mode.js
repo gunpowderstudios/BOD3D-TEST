@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.82
+// BOD3D TEST — Story Mode prototype v13.83
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -154,6 +154,11 @@
    }
   });
 
+  const seeded=drawOrder.filter(tile=>tile?.storyPart).map(tile=>Number(tile.storyPart)).sort((a,b)=>a-b);
+  if(seeded.length!==6||seeded.some((part,index)=>part!==index+1)){
+   console.error('Story Mode setup failed: expected scrolls 1–6, got',seeded);
+  }
+
   return [exit,...drawOrder.reverse()];
  };
 
@@ -194,19 +199,30 @@
   }
  };
 
+ // Wrap the real Place handler so storyPart is copied onto the laid tile synchronously.
+ // This avoids relying on event-order timing between the core onclick and a delayed listener.
  const placeBtn=document.getElementById('placeBtn');
- if(placeBtn){
-  placeBtn.addEventListener('click',()=>{
-   if(mode!=='story'||!placement?.raw?.storyPart)return;
-   const dir=placement.dir,part=placement.raw.storyPart,d=DIRS[dir];
-   // Capture destination coordinates before the core placement click runs.
-   const targetX=state.player.x+d.dx,targetY=state.player.y+d.dy;
-   setTimeout(()=>{
-    const t=getTile(targetX,targetY);
-    if(t){t.storyPart=part;t.storyRead=false;}
-    renderStoryMarkers();
-   },0);
-  },true);
+ if(placeBtn&&placeBtn.onclick&&!placeBtn.dataset.storyPlaceWrapped){
+  placeBtn.dataset.storyPlaceWrapped='1';
+  const corePlaceHandler=placeBtn.onclick;
+  placeBtn.onclick=function(event){
+   const storyPart=mode==='story'?Number(placement?.raw?.storyPart||0):0;
+   const dir=placement?.dir;
+   const d=dir?DIRS[dir]:null;
+   const targetX=d&&state?.player?state.player.x+d.dx:null;
+   const targetY=d&&state?.player?state.player.y+d.dy:null;
+   const result=corePlaceHandler.call(this,event);
+   if(storyPart&&targetX!==null&&targetY!==null){
+    const tile=getTile(targetX,targetY);
+    if(tile){
+     tile.storyPart=storyPart;
+     tile.storyRead=false;
+     log('A story scroll lies on this tile — Part '+storyPart+'.','loot');
+     render();
+    }
+   }
+   return result;
+  };
  }
 
  // Re-add story markers after the normal 2D renderer rebuilds the tile DOM.
@@ -237,7 +253,25 @@
  };
 
  const originalNewGame=newGame;
- newGame=function(){nextPart=1;removeNearby();removeCounter();const result=originalNewGame.apply(this,arguments);setTimeout(()=>{removeCounter();renderStoryMarkers();},300);return result;};
+ newGame=function(){
+  nextPart=1;removeNearby();removeCounter();
+  const result=originalNewGame.apply(this,arguments);
+  setTimeout(()=>{
+   removeCounter();renderStoryMarkers();
+   if(mode==='story'){
+    const seeded=(state?.tileDeck||[]).filter(tile=>tile?.storyPart).map(tile=>Number(tile.storyPart)).sort((a,b)=>a-b);
+    const valid=seeded.length===6&&seeded.every((part,index)=>part===index+1);
+    if(valid){
+     log('Story Mode ready — 6 story scrolls seeded. Part 1 will appear early in the dungeon.','system');
+     toast('Story Mode: 6 scrolls seeded');
+    }else{
+     log('STORY MODE ERROR — scroll setup failed ('+seeded.join(', ')+').','combat');
+     toast('Story Mode scroll setup error');
+    }
+   }
+  },300);
+  return result;
+ };
 
  window.BODStoryMode={
   get mode(){return mode;},
