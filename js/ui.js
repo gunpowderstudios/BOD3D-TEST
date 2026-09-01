@@ -181,12 +181,136 @@
   }
 })();
 
-// TEST v13.83 — force-load the current Story Mode after the core scripts are ready.
+// TEST v13.86 — force-load the current Story Mode after the core scripts are ready.
 (function(){
   const script=document.createElement('script');
-  script.src='js/story-mode.js?v=13.83';
+  script.src='js/story-mode.js?v=13.84';
   script.defer=true;
   document.body.appendChild(script);
+})();
+
+// TEST v13.86 — Story Mode Journal uses the existing Quest Log control.
+// Hack 'n' Slash keeps the original Quest Log unchanged.
+(function(){
+  if(window.__bodStoryJournalInstalled)return;
+  window.__bodStoryJournalInstalled=true;
+
+  const style=document.createElement('style');
+  style.id='bodStoryJournalStyles';
+  style.textContent=`
+    .bodJournalWrap{display:grid;gap:16px;text-align:left;}
+    .bodJournalSection{border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:12px;background:#080808;}
+    .bodJournalHeading{font-size:18px;font-weight:800;color:#f2c94c;margin-bottom:9px;letter-spacing:.03em;}
+    .bodJournalScrolls{display:grid;gap:8px;}
+    .bodJournalScroll{width:100%;padding:10px 12px;border:1px solid rgba(242,201,76,.55);border-radius:6px;background:#18140b;color:#fff;text-align:left;cursor:pointer;}
+    .bodJournalScroll:hover,.bodJournalScroll:focus-visible{background:#29200d;}
+    .bodJournalScroll.locked{opacity:.5;border-color:rgba(255,255,255,.22);background:#111;cursor:default;}
+    .bodJournalScrollTitle{display:flex;align-items:center;gap:8px;font-weight:800;}
+    .bodJournalScrollPreview{margin-top:4px;font-size:13px;opacity:.78;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .bodJournalLog{max-height:34dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+    .bodJournalLogLine{padding:5px 2px;border-bottom:1px solid rgba(255,255,255,.15);}
+  `;
+  document.head.appendChild(style);
+
+  function inStoryMode(){return window.BODStoryMode?.mode==='story';}
+
+  function readParts(){
+    const found=new Set();
+    if(typeof state!=='undefined'&&state?.tiles){
+      Object.values(state.tiles).forEach(tile=>{
+        if(tile?.storyRead&&tile?.storyPart)found.add(Number(tile.storyPart));
+      });
+    }
+    return found;
+  }
+
+  function reopenJournalPart(part){
+    const parts=window.BODStoryMode?.parts||[];
+    if(!readParts().has(part)||!parts[part-1])return;
+    showModal('STORY PART '+part,'',[{text:'Back to Journal',cls:'green',fn:openStoryJournal}]);
+    const body=document.getElementById('modalBody');
+    if(body)body.innerHTML='<div class="bodStoryPaper">'+parts[part-1]+'</div>';
+  }
+
+  function questLogHTML(){
+    const source=document.getElementById('log');
+    const lines=source?Array.from(source.children):[];
+    if(!lines.length)return '<div style="color:#fff;opacity:.7">No quest entries recorded.</div>';
+    return lines.map(line=>{
+      const colour=line.classList.contains('combat')?'#ff6b6b':line.classList.contains('loot')?'#f2c94c':line.classList.contains('heal')?'#7ee081':'#ffffff';
+      const div=document.createElement('div');
+      div.textContent=line.textContent||'';
+      return '<div class="bodJournalLogLine" style="color:'+colour+'">'+div.innerHTML+'</div>';
+    }).join('');
+  }
+
+  function openStoryJournal(){
+    if(!inStoryMode()){
+      if(typeof showQuestLogViewer==='function')showQuestLogViewer(false);
+      return;
+    }
+    const parts=window.BODStoryMode?.parts||[];
+    const found=readParts();
+    showModal('JOURNAL','',[{text:'Close',fn:closeModal}]);
+    const modal=document.getElementById('modal');
+    modal?.classList.remove('modalEdge');
+    modal?.classList.add('questLogModal');
+    const body=document.getElementById('modalBody');
+    if(!body)return;
+
+    const scrolls=Array.from({length:6},(_,index)=>{
+      const part=index+1;
+      const unlocked=found.has(part);
+      const preview=unlocked&&parts[index]
+        ?String(parts[index]).replace(/<[^>]*>/g,'').slice(0,95)
+        :'???';
+      return '<button type="button" class="bodJournalScroll'+(unlocked?'':' locked')+'" data-journal-part="'+part+'"'+(unlocked?'':' disabled')+'>'+
+        '<div class="bodJournalScrollTitle"><span>📜</span><span>Part '+part+(unlocked?'':' — ???')+'</span></div>'+
+        '<div class="bodJournalScrollPreview">'+preview+'</div></button>';
+    }).join('');
+
+    body.innerHTML='<div class="bodJournalWrap">'+
+      '<section class="bodJournalSection"><div class="bodJournalHeading">Story Scrolls</div><div class="bodJournalScrolls">'+scrolls+'</div></section>'+
+      '<section class="bodJournalSection"><div class="bodJournalHeading">Quest Log</div><div class="bodJournalLog">'+questLogHTML()+'</div></section>'+
+      '</div>';
+
+    body.querySelectorAll('[data-journal-part]:not([disabled])').forEach(button=>{
+      button.addEventListener('click',()=>reopenJournalPart(Number(button.dataset.journalPart)));
+    });
+  }
+  window.BODOpenStoryJournal=openStoryJournal;
+
+  function installButton(){
+    const button=document.getElementById('questLogBtn');
+    if(!button)return false;
+    if(!button.dataset.storyJournalWired){
+      button.dataset.storyJournalWired='1';
+      button.addEventListener('click',event=>{
+        if(!inStoryMode())return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        openStoryJournal();
+      },true);
+    }
+    return true;
+  }
+
+  function syncLabel(){
+    const button=document.getElementById('questLogBtn');
+    if(!button)return;
+    const story=inStoryMode();
+    const desired=story?'Journal':'Quest Log';
+    if((button.textContent||'').trim()!==desired)button.textContent=desired;
+    button.setAttribute('aria-label',desired);
+    button.title=desired;
+  }
+
+  function start(){
+    installButton();
+    syncLabel();
+    setInterval(()=>{installButton();syncLabel();},200);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 
 // Synced from LIVE — plain white intro/end text on black panel.
