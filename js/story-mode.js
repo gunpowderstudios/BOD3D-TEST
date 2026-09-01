@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.81
+// BOD3D TEST — Story Mode prototype v13.82
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -71,9 +71,8 @@
   storyPopup(part,false);renderStoryMarkers();
  }
 
- // v13.81 — Story scrolls are children of the actual dungeon tile instead of
- // a fixed viewport overlay. They therefore stay where they were discovered
- // when the hero moves. Only scrolls on the current or an adjacent tile can be opened.
+ // Story markers stay attached to the actual 2D dungeon tile. In true 3D the
+ // 2D board layer is hidden, so entering a story tile also opens it automatically.
  function renderStoryMarkers(){
   removeNearby();removeCounter();
   if(mode!=='story'||typeof state==='undefined'||!state?.tiles)return;
@@ -100,9 +99,8 @@
   });
  }
 
- // TEST v13.80 — the character selector is z-index 500 while normal modals are z-index 100.
- // Hide the selector before opening the Story/Hack chooser, otherwise the chooser exists
- // behind the selector and Enter the Dungeon appears to do nothing on desktop.
+ // The character selector sits above normal modals. Hide it before opening
+ // the Story/Hack chooser so the choice panel cannot appear behind it.
  const originalStartGame=startGame;
  startGame=function(c){
   pendingHero=c;audio();
@@ -115,8 +113,9 @@
   }]);
  };
 
- // Story Mode: 90–100 tiles total, 20–24 ordinary monster locations, six story scrolls.
- // It deliberately removes the standard M2–M12 numbering; Hack 'n' Slash remains unchanged.
+ // Story Mode: 90–100 total tiles, 20–24 ordinary monster locations, six story scrolls.
+ // Scrolls are deliberately paced through the dungeon rather than being fully random.
+ // Part 1 arrives around tile 10–13, then Parts 2–6 are spaced through the remaining run.
  const originalCreateTileDeck=createTileDeck;
  createTileDeck=function(){
   let deck=originalCreateTileDeck.apply(this,arguments);
@@ -133,15 +132,33 @@
   const monsterCount=20+Math.floor(Math.random()*5);
   shuffle(ordinary).slice(0,monsterCount).forEach(t=>{t.monsterMarker=true;});
 
-  // Six story scrolls live on otherwise ordinary floor tiles and do not overlap monsters/items/traps/pool.
-  const storyCandidates=shuffle(floors.filter(t=>!t.monsterMarker&&!t.itemMarker&&!['spike','pool'].includes(t.kind))).slice(0,6);
-  storyCandidates.forEach((t,i)=>{t.storyPart=i+1;});
-  return [exit,...shuffle(floors)];
+  // Work in actual draw order. startPlace() draws with pop(), so the array stored in
+  // state.tileDeck is the reverse of the order the player will uncover.
+  const drawOrder=[...shuffle(floors)].reverse();
+  const eligible=(tile)=>tile&&!tile.monsterMarker&&!tile.itemMarker&&!['spike','pool'].includes(tile.kind)&&!tile.storyPart;
+  const targetFractions=[.12,.28,.44,.60,.76,.90];
+  const used=new Set();
+
+  targetFractions.forEach((fraction,index)=>{
+   const target=Math.max(0,Math.min(drawOrder.length-1,Math.round((drawOrder.length-1)*fraction)));
+   let best=-1,bestDistance=Infinity;
+   for(let i=0;i<drawOrder.length;i++){
+    if(used.has(i)||!eligible(drawOrder[i]))continue;
+    const distance=Math.abs(i-target);
+    if(distance<bestDistance){best=i;bestDistance=distance;}
+   }
+   if(best>=0){
+    used.add(best);
+    drawOrder[best].storyPart=index+1;
+    drawOrder[best].storyRead=false;
+   }
+  });
+
+  return [exit,...drawOrder.reverse()];
  };
 
  // Story Mode no longer rolls M2–M12 for the Ring when the Exit appears.
  // Instead, after the Exit is laid the Ring is placed on a random previously-laid ordinary monster tile.
- // This keeps the Ring as a physical dungeon objective while freeing Story Mode from numbered M tiles.
  const originalPlaceExitAndRing=placeExitAndRing;
  placeExitAndRing=function(x,y,fromTile){
   if(mode!=='story')return originalPlaceExitAndRing.apply(this,arguments);
@@ -182,7 +199,7 @@
   placeBtn.addEventListener('click',()=>{
    if(mode!=='story'||!placement?.raw?.storyPart)return;
    const dir=placement.dir,part=placement.raw.storyPart,d=DIRS[dir];
-   // Capture the destination coordinates before the core placement click moves the hero.
+   // Capture destination coordinates before the core placement click runs.
    const targetX=state.player.x+d.dx,targetY=state.player.y+d.dy;
    setTimeout(()=>{
     const t=getTile(targetX,targetY);
@@ -192,7 +209,7 @@
   },true);
  }
 
- // Re-add story markers after the normal renderer rebuilds the tile DOM.
+ // Re-add story markers after the normal 2D renderer rebuilds the tile DOM.
  const originalRenderWorld=renderWorld;
  renderWorld=function(){
   const result=originalRenderWorld.apply(this,arguments);
@@ -200,12 +217,39 @@
   return result;
  };
 
+ // In true 3D the 2D tile DOM is hidden. Automatically open a newly entered story
+ // scroll so the player cannot unknowingly walk over it. Read scrolls remain on the tile
+ // and can still be reopened from the 2D map when nearby.
  const originalMove=move;
- move=function(dir){const result=originalMove.apply(this,arguments);setTimeout(renderStoryMarkers,60);return result;};
+ move=function(dir){
+  const result=originalMove.apply(this,arguments);
+  setTimeout(()=>{
+   renderStoryMarkers();
+   if(mode!=='story'||!state?.player)return;
+   const tile=getTile(state.player.x,state.player.y);
+   if(tile?.storyPart&&!tile.storyRead){
+    const part=Number(tile.storyPart);
+    if(part===nextPart)readStoryTile(tile);
+    else wrongOrderPopup(part);
+   }
+  },80);
+  return result;
+ };
+
  const originalNewGame=newGame;
  newGame=function(){nextPart=1;removeNearby();removeCounter();const result=originalNewGame.apply(this,arguments);setTimeout(()=>{removeCounter();renderStoryMarkers();},300);return result;};
 
- window.BODStoryMode={get mode(){return mode;},get nextPart(){return nextPart;},parts:STORY_PARTS,refresh:renderStoryMarkers};
+ window.BODStoryMode={
+  get mode(){return mode;},
+  get nextPart(){return nextPart;},
+  parts:STORY_PARTS,
+  refresh:renderStoryMarkers,
+  status(){
+   const laid=Object.values(state?.tiles||{}).filter(t=>t?.storyPart).map(t=>Number(t.storyPart)).sort((a,b)=>a-b);
+   const remaining=(state?.tileDeck||[]).filter(t=>t?.storyPart).map(t=>Number(t.storyPart)).sort((a,b)=>a-b);
+   return {mode,nextPart,laid,remaining};
+  }
+ };
 })();
 
 // Match LIVE: keep only one visible Enter the Dungeon button, with the same spacing.
