@@ -181,10 +181,10 @@
   }
 })();
 
-// TEST v13.80 — load the experimental Story Mode after the core game scripts are ready.
+// TEST v13.83 — force-load the current Story Mode after the core scripts are ready.
 (function(){
   const script=document.createElement('script');
-  script.src='js/story-mode.js?v=13.80';
+  script.src='js/story-mode.js?v=13.83';
   script.defer=true;
   document.body.appendChild(script);
 })();
