@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.80
+// BOD3D TEST — Story Mode prototype v13.81
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -18,35 +18,39 @@
 
  const style=document.createElement('style');
  style.textContent=`
- #bodStoryNearby{
-  position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:70;
-  pointer-events:auto;cursor:pointer;border:0;background:transparent;padding:8px;
+ .bodStoryTileScroll{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:18;
+  width:56px;height:56px;padding:0;border:0;background:transparent;box-shadow:none;
+  display:flex;align-items:center;justify-content:center;
   font-size:44px;line-height:1;filter:drop-shadow(0 3px 5px #000);
-  animation:bodStoryFloat 1.5s ease-in-out infinite;text-shadow:0 0 12px #e8c878;
-  touch-action:manipulation;
+  text-shadow:0 0 12px #e8c878;pointer-events:none;cursor:default;
+  opacity:.92;touch-action:manipulation;
  }
- #bodStoryNearby:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:8px;}
- @keyframes bodStoryFloat{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-8px)}}
+ .bodStoryTileScroll.inReach{
+  pointer-events:auto;cursor:pointer;
+  animation:bodStoryTileFloat 1.5s ease-in-out infinite;
+ }
+ .bodStoryTileScroll.storyRead{opacity:.72;}
+ .bodStoryTileScroll.inReach:hover{filter:drop-shadow(0 3px 5px #000) drop-shadow(0 0 8px #f0d98f);}
+ .bodStoryTileScroll.inReach:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px;}
+ @keyframes bodStoryTileFloat{
+  0%,100%{transform:translate(-50%,-50%) translateY(0)}
+  50%{transform:translate(-50%,-50%) translateY(-7px)}
+ }
  .bodStoryPaper{font-family:Georgia,serif;font-size:17px;line-height:1.55;text-align:left;padding:12px 8px;color:#f2e2b8;}
  `;
  document.head.appendChild(style);
 
- function host(){return document.getElementById('viewport')||document.getElementById('threeBoard')||document.body;}
- function removeNearby(){document.getElementById('bodStoryNearby')?.remove();}
+ function removeNearby(){
+  document.getElementById('bodStoryNearby')?.remove();
+  document.querySelectorAll('.bodStoryTileScroll').forEach(el=>el.remove());
+ }
  function removeCounter(){document.getElementById('bodStoryCounter')?.remove();}
-
- // A discovered scroll remains on its dungeon tile like a dropped item.
- // If the player is standing on it, or next to it, the floating scroll can be opened again.
- function storyTileInReach(){
-  if(mode!=='story'||typeof state==='undefined'||!state?.player)return null;
+ function tileKeyInReach(tileKey){
+  if(mode!=='story'||typeof state==='undefined'||!state?.player)return false;
+  const [x,y]=String(tileKey).split(',').map(Number);
   const p=state.player;
-  const current=getTile(p.x,p.y);
-  if(current?.storyPart)return current;
-  for(const d of Object.values(DIRS||{})){
-   const t=getTile(p.x+d.dx,p.y+d.dy);
-   if(t?.storyPart)return t;
-  }
-  return null;
+  return Math.abs(x-p.x)+Math.abs(y-p.y)<=1;
  }
 
  function storyPopup(part,alreadyRead=false){
@@ -64,18 +68,36 @@
   if(part!==nextPart){wrongOrderPopup(part);return;}
   tile.storyRead=true;nextPart++;
   log('Story scroll Part '+part+' discovered.','loot');
-  storyPopup(part,false);updateNearby();
+  storyPopup(part,false);renderStoryMarkers();
  }
- function updateNearby(){
+
+ // v13.81 — Story scrolls are children of the actual dungeon tile instead of
+ // a fixed viewport overlay. They therefore stay where they were discovered
+ // when the hero moves. Only scrolls on the current or an adjacent tile can be opened.
+ function renderStoryMarkers(){
   removeNearby();removeCounter();
-  const tile=storyTileInReach();
-  if(!tile)return;
-  const part=Number(tile.storyPart);
-  const el=document.createElement('button');
-  el.type='button';el.id='bodStoryNearby';el.textContent='📜';el.title=tile.storyRead?'Read story scroll again':'Open story scroll';
-  el.setAttribute('aria-label',(tile.storyRead?'Read again story scroll Part ':'Open story scroll Part ')+part);
-  el.addEventListener('click',()=>readStoryTile(tile));
-  host().appendChild(el);
+  if(mode!=='story'||typeof state==='undefined'||!state?.tiles)return;
+  Object.entries(state.tiles).forEach(([tileKey,tile])=>{
+   if(!tile?.storyPart)return;
+   const tileEl=document.querySelector('.tile[data-tile-key="'+tileKey+'"]');
+   if(!tileEl)return;
+   const inReach=tileKeyInReach(tileKey);
+   const part=Number(tile.storyPart);
+   const el=document.createElement('button');
+   el.type='button';
+   el.className='bodStoryTileScroll'+(inReach?' inReach':'')+(tile.storyRead?' storyRead':'');
+   el.textContent='📜';
+   el.title=inReach?(tile.storyRead?'Read story scroll again':'Open story scroll'):'Story scroll Part '+part;
+   el.setAttribute('aria-label',(tile.storyRead?'Story scroll Part '+part+', already read':'Story scroll Part '+part)+(inReach?', open scroll':', move closer to read'));
+   if(inReach){
+    el.addEventListener('click',event=>{
+     event.preventDefault();event.stopPropagation();readStoryTile(tile);
+    });
+   }else{
+    el.tabIndex=-1;
+   }
+   tileEl.appendChild(el);
+  });
  }
 
  // TEST v13.80 — the character selector is z-index 500 while normal modals are z-index 100.
@@ -159,17 +181,31 @@
  if(placeBtn){
   placeBtn.addEventListener('click',()=>{
    if(mode!=='story'||!placement?.raw?.storyPart)return;
-   const dir=placement.dir,part=placement.raw.storyPart,p=state.player,d=DIRS[dir];
-   setTimeout(()=>{const t=getTile(p.x+d.dx,p.y+d.dy);if(t){t.storyPart=part;t.storyRead=false;}updateNearby();},0);
+   const dir=placement.dir,part=placement.raw.storyPart,d=DIRS[dir];
+   // Capture the destination coordinates before the core placement click moves the hero.
+   const targetX=state.player.x+d.dx,targetY=state.player.y+d.dy;
+   setTimeout(()=>{
+    const t=getTile(targetX,targetY);
+    if(t){t.storyPart=part;t.storyRead=false;}
+    renderStoryMarkers();
+   },0);
   },true);
  }
 
- const originalMove=move;
- move=function(dir){const result=originalMove.apply(this,arguments);setTimeout(updateNearby,60);return result;};
- const originalNewGame=newGame;
- newGame=function(){nextPart=1;removeNearby();removeCounter();const result=originalNewGame.apply(this,arguments);setTimeout(()=>{removeCounter();updateNearby();},300);return result;};
+ // Re-add story markers after the normal renderer rebuilds the tile DOM.
+ const originalRenderWorld=renderWorld;
+ renderWorld=function(){
+  const result=originalRenderWorld.apply(this,arguments);
+  setTimeout(renderStoryMarkers,0);
+  return result;
+ };
 
- window.BODStoryMode={get mode(){return mode;},get nextPart(){return nextPart;},parts:STORY_PARTS};
+ const originalMove=move;
+ move=function(dir){const result=originalMove.apply(this,arguments);setTimeout(renderStoryMarkers,60);return result;};
+ const originalNewGame=newGame;
+ newGame=function(){nextPart=1;removeNearby();removeCounter();const result=originalNewGame.apply(this,arguments);setTimeout(()=>{removeCounter();renderStoryMarkers();},300);return result;};
+
+ window.BODStoryMode={get mode(){return mode;},get nextPart(){return nextPart;},parts:STORY_PARTS,refresh:renderStoryMarkers};
 })();
 
 // Match LIVE: keep only one visible Enter the Dungeon button, with the same spacing.
