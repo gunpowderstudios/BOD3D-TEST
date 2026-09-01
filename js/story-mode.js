@@ -1,4 +1,4 @@
-// BOD3D TEST — Story Mode prototype v13.83
+// BOD3D TEST — Story Mode prototype v13.84
 (function(){
  'use strict';
  if(window.__bodStoryModeInstalled)return;
@@ -33,9 +33,24 @@
  .bodStoryTileScroll.storyRead{opacity:.72;}
  .bodStoryTileScroll.inReach:hover{filter:drop-shadow(0 3px 5px #000) drop-shadow(0 0 8px #f0d98f);}
  .bodStoryTileScroll.inReach:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px;}
+ #bodStory3DScroll{
+  position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);z-index:76;
+  width:64px;height:64px;padding:0;border:0;background:transparent;box-shadow:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:50px;line-height:1;filter:drop-shadow(0 4px 6px #000);
+  text-shadow:0 0 14px #e8c878;cursor:pointer;pointer-events:auto;
+  animation:bodStory3DFloat 1.5s ease-in-out infinite;touch-action:manipulation;
+ }
+ #bodStory3DScroll.storyRead{opacity:.78;}
+ #bodStory3DScroll:hover{filter:drop-shadow(0 4px 6px #000) drop-shadow(0 0 9px #f0d98f);}
+ #bodStory3DScroll:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px;}
  @keyframes bodStoryTileFloat{
   0%,100%{transform:translate(-50%,-50%) translateY(0)}
   50%{transform:translate(-50%,-50%) translateY(-7px)}
+ }
+ @keyframes bodStory3DFloat{
+  0%,100%{transform:translate(-50%,-50%) translateY(0)}
+  50%{transform:translate(-50%,-50%) translateY(-10px)}
  }
  .bodStoryPaper{font-family:Georgia,serif;font-size:17px;line-height:1.55;text-align:left;padding:12px 8px;color:#f2e2b8;}
  `;
@@ -43,6 +58,7 @@
 
  function removeNearby(){
   document.getElementById('bodStoryNearby')?.remove();
+  document.getElementById('bodStory3DScroll')?.remove();
   document.querySelectorAll('.bodStoryTileScroll').forEach(el=>el.remove());
  }
  function removeCounter(){document.getElementById('bodStoryCounter')?.remove();}
@@ -71,8 +87,31 @@
   storyPopup(part,false);renderStoryMarkers();
  }
 
+ // True 3D centres the camera on the hero's current tile. Show a floating scroll only
+ // while the hero is actually standing on a story tile. Moving away removes it, so the
+ // old problem where a viewport marker followed the hero around cannot recur.
+ function renderCurrent3DScroll(){
+  document.getElementById('bodStory3DScroll')?.remove();
+  if(mode!=='story'||!document.body.classList.contains('threeMode')||!state?.player)return;
+  const tile=getTile(state.player.x,state.player.y);
+  if(!tile?.storyPart)return;
+  const viewport=document.getElementById('viewport');
+  if(!viewport)return;
+  const part=Number(tile.storyPart);
+  const el=document.createElement('button');
+  el.type='button';el.id='bodStory3DScroll';
+  if(tile.storyRead)el.classList.add('storyRead');
+  el.textContent='📜';
+  el.title=tile.storyRead?'Read story scroll again':'Open story scroll';
+  el.setAttribute('aria-label',(tile.storyRead?'Read again story scroll Part ':'Open story scroll Part ')+part);
+  el.addEventListener('click',event=>{
+   event.preventDefault();event.stopPropagation();readStoryTile(tile);
+  });
+  viewport.appendChild(el);
+ }
+
  // Story markers stay attached to the actual 2D dungeon tile. In true 3D the
- // 2D board layer is hidden, so entering a story tile also opens it automatically.
+ // matching current-tile marker above restores the floating scroll without letting it follow.
  function renderStoryMarkers(){
   removeNearby();removeCounter();
   if(mode!=='story'||typeof state==='undefined'||!state?.tiles)return;
@@ -97,6 +136,7 @@
    }
    tileEl.appendChild(el);
   });
+  renderCurrent3DScroll();
  }
 
  // The character selector sits above normal modals. Hide it before opening
@@ -233,9 +273,9 @@
   return result;
  };
 
- // In true 3D the 2D tile DOM is hidden. Automatically open a newly entered story
- // scroll so the player cannot unknowingly walk over it. Read scrolls remain on the tile
- // and can still be reopened from the 2D map when nearby.
+ // In true 3D the current story tile gets the floating marker above. Automatically open
+ // a newly entered scroll so it cannot be missed; after closing it, the scroll remains
+ // floating while the hero stays on that tile, and disappears as soon as the hero leaves.
  const originalMove=move;
  move=function(dir){
   const result=originalMove.apply(this,arguments);
