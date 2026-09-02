@@ -624,7 +624,7 @@
   function githubHeaders(token = '') {
     const headers = {
       'Accept':'application/vnd.github+json',
-      'X-GitHub-Api-Version':'2022-11-28'
+      'X-GitHub-Api-Version':'2026-03-10'
     };
     if (token) headers.Authorization = `Bearer ${token}`;
     return headers;
