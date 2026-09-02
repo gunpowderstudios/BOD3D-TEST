@@ -10,7 +10,7 @@
   <header class="toolbar">
     <div class="brand">
       <strong>Book of Dungeon Story Mapper</strong>
-      <span>prototype</span>
+      <span id="saveStatus">Local save ready</span>
     </div>
     <div class="tools">
       <button id="addNodeBtn">+ Story Node</button>
@@ -22,9 +22,11 @@
       <button id="deleteLineBtn" class="secondary danger" disabled>Delete Line</button>
       <button id="deleteModeBtn" class="mode danger">Delete Box</button>
       <span class="divider"></span>
-      <button id="saveBtn" class="secondary">Save</button>
-      <button id="exportBtn" class="secondary">Export JSON</button>
-      <label class="fileBtn secondary">Import JSON<input id="importInput" type="file" accept="application/json,.json"></label>
+      <button id="saveBtn" class="savePrimary">Save</button>
+      <button id="loadGithubBtn" class="secondary">Load GitHub</button>
+      <button id="githubBtn" class="secondary">GitHub Setup</button>
+      <button id="exportBtn" class="secondary">Download Backup</button>
+      <label class="fileBtn secondary">Import Backup<input id="importInput" type="file" accept="application/json,.json"></label>
       <button id="clearBtn" class="secondary danger">Clear</button>
     </div>
   </header>
@@ -54,6 +56,29 @@
     </label>
     <label class="check"><input id="mapNode" type="checkbox" /> Printed on dungeon map</label>
     <button id="applyNodeBtn">Apply</button>
+  </aside>
+
+  <aside id="githubPanel" class="githubPanel hidden" aria-live="polite">
+    <div class="editorTop">
+      <strong>GitHub cloud save</strong>
+      <button id="closeGithubBtn" aria-label="Close GitHub setup">×</button>
+    </div>
+    <p id="githubPanelStatus" class="panelStatus">Not connected.</p>
+    <p class="smallCopy">The mapper saves to <strong>gunpowderstudios/BOD3D-TEST</strong> as <code>story-mapper/story-map.json</code>.</p>
+    <ol class="setupSteps">
+      <li>Create a <strong>fine-grained personal access token</strong> on GitHub.</li>
+      <li>Give it access to <strong>BOD3D-TEST only</strong>.</li>
+      <li>Repository permission: <strong>Contents → Read and write</strong>. No other permission is needed.</li>
+    </ol>
+    <a class="githubLink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Create fine-grained token on GitHub ↗</a>
+    <label>Fine-grained token
+      <input id="githubToken" type="password" autocomplete="off" placeholder="github_pat_…" />
+    </label>
+    <div class="githubActions">
+      <button id="connectGithubBtn">Connect GitHub</button>
+      <button id="disconnectGithubBtn" class="secondary danger">Disconnect</button>
+    </div>
+    <p class="securityNote">The token is never written into the public mapper files or browser storage. It stays only in memory while this page is open, so after a full refresh you will need to paste it again.</p>
   </aside>
 
   <script src="app.js"></script>
