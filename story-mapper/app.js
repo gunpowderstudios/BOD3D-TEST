@@ -76,6 +76,21 @@
     });
     renderLinks(); updateLineButtons();
   }
+
+  function getEdgePoint(fromRect, toRect, workspaceRect) {
+    const fx = fromRect.left - workspaceRect.left + fromRect.width / 2;
+    const fy = fromRect.top - workspaceRect.top + fromRect.height / 2;
+    const tx = toRect.left - workspaceRect.left + toRect.width / 2;
+    const ty = toRect.top - workspaceRect.top + toRect.height / 2;
+    const dx = tx - fx;
+    const dy = ty - fy;
+    const halfW = fromRect.width / 2;
+    const halfH = fromRect.height / 2;
+    if (dx === 0 && dy === 0) return { x: fx, y: fy };
+    const scale = 1 / Math.max(Math.abs(dx) / halfW, Math.abs(dy) / halfH);
+    return { x: fx + dx * scale, y: fy + dy * scale };
+  }
+
   function renderLinks() {
     svg.innerHTML = `<defs><marker id="arrowChoice" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#e2ddd3"></path></marker><marker id="arrowRead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 z" fill="#b8b1a6"></path></marker></defs>`;
     const workspaceRect = workspace.getBoundingClientRect();
@@ -83,10 +98,21 @@
       const aEl = nodesLayer.querySelector(`[data-id="${l.from}"]`); const bEl = nodesLayer.querySelector(`[data-id="${l.to}"]`);
       if (!aEl || !bEl) return;
       const a = aEl.getBoundingClientRect(); const b = bEl.getBoundingClientRect();
-      const x1 = a.left - workspaceRect.left + a.width/2; const y1 = a.top - workspaceRect.top + a.height/2;
-      const x2 = b.left - workspaceRect.left + b.width/2; const y2 = b.top - workspaceRect.top + b.height/2;
-      const dx = Math.max(70, Math.abs(x2-x1)*0.45); const dir = x2 >= x1 ? 1 : -1;
-      const d = `M ${x1} ${y1} C ${x1 + dx*dir} ${y1}, ${x2 - dx*dir} ${y2}, ${x2} ${y2}`;
+      const start = getEdgePoint(a, b, workspaceRect);
+      const end = getEdgePoint(b, a, workspaceRect);
+      const x1 = start.x; const y1 = start.y; const x2 = end.x; const y2 = end.y;
+      const deltaX = x2 - x1;
+      const deltaY = y2 - y1;
+      const distance = Math.hypot(deltaX, deltaY);
+      const dir = deltaX >= 0 ? 1 : -1;
+      const pull = Math.max(55, Math.min(180, Math.abs(deltaX) * 0.38 + distance * 0.08));
+      const sag = Math.max(28, Math.min(110, distance * 0.18));
+      const curveDown = deltaY < -120 ? -sag * 0.35 : sag;
+      const c1x = x1 + pull * dir;
+      const c1y = y1 + curveDown;
+      const c2x = x2 - pull * dir;
+      const c2y = y2 + curveDown;
+      const d = `M ${x1} ${y1} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${x2} ${y2}`;
       const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       hit.setAttribute('d', d); hit.setAttribute('class', 'linkHit'); hit.dataset.linkId = l.id;
       hit.addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); selectLink(l.id); });
@@ -152,7 +178,11 @@
     drag = null;
   }
   function addNode() {
-    recordUndo(); const nums = state.nodes.map(n => Number(n.number)||0); const number = nums.length ? Math.max(...nums)+1 : 1; const id = state.nextId++;
+    recordUndo();
+    const used = new Set(state.nodes.map(n => Number(n.number)).filter(Number.isFinite));
+    let number = 1;
+    while (used.has(number)) number++;
+    const id = state.nextId++;
     state.nodes.push({id, number, title:'New story node', text:'Double-click to edit this entry.', x:180+(state.nodes.length%4)*45, y:130+(state.nodes.length%5)*60, map:false});
     setMode('move'); render(); openEditor(id);
   }
@@ -166,10 +196,21 @@
     document.getElementById('editor').classList.remove('hidden');
   }
   function applyEditor() {
-    const n = state.nodes.find(n => n.id === editingId); if (!n) return; const num = Number(document.getElementById('nodeNumber').value);
-    const next = { number:Number.isFinite(num)&&num>0?Math.floor(num):n.number, title:document.getElementById('nodeTitle').value.trim()||'Untitled', text:document.getElementById('nodeText').value.trim(), map:document.getElementById('mapNode').checked };
+    const n = state.nodes.find(n => n.id === editingId); if (!n) return;
+    const input = document.getElementById('nodeNumber');
+    const num = Number(input.value);
+    const chosenNumber = Number.isFinite(num) && num > 0 ? Math.floor(num) : n.number;
+    const duplicate = state.nodes.find(other => other.id !== n.id && Number(other.number) === chosenNumber);
+    if (duplicate) {
+      input.focus();
+      input.select();
+      flash(`Number ${chosenNumber} is already used by “${duplicate.title || 'Untitled'}”. Choose another number.`);
+      return;
+    }
+    const next = { number:chosenNumber, title:document.getElementById('nodeTitle').value.trim()||'Untitled', text:document.getElementById('nodeText').value.trim(), map:document.getElementById('mapNode').checked };
     if (next.number===n.number && next.title===n.title && next.text===n.text && next.map===!!n.map) return;
     recordUndo(); n.number=next.number; n.title=next.title; n.text=next.text; n.map=next.map; render();
+    flash(`Saved story ${n.number}.`);
   }
   function setMode(next) { mode=next; linkStartId=null; selectedLinkId=null; updateModes(); render(); }
   function updateModes() {
