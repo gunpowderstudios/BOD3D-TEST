@@ -1,8 +1,8 @@
 {
   "format": "bod-story-map-v1",
-  "savedAt": "2026-09-02T16:25:42.450Z",
+  "savedAt": "2026-09-02T16:43:01.343Z",
   "state": {
-    "nextId": 7,
+    "nextId": 9,
     "nodes": [
       {
         "id": 1,
@@ -18,8 +18,8 @@
         "number": 13,
         "title": "Door - Kitchen",
         "text": "Three goblins sit around a cooking pot.",
-        "x": 461.11328125,
-        "y": 130.12109375,
+        "x": 514.90625,
+        "y": 270.546875,
         "map": false
       },
       {
@@ -27,8 +27,8 @@
         "number": 27,
         "title": "Stairs",
         "text": "Cold air rises from the darkness below.",
-        "x": 748.21875,
-        "y": 132.71875,
+        "x": 774.515625,
+        "y": 228.2109375,
         "map": true
       },
       {
@@ -36,8 +36,8 @@
         "number": 61,
         "title": "Secret Room",
         "text": "Only accessible if you have the Iron Key.",
-        "x": 249.8671875,
-        "y": 129.16796875,
+        "x": 387.4375,
+        "y": 205.0625,
         "map": false
       },
       {
@@ -45,24 +45,30 @@
         "number": 62,
         "title": "Troll Bridge",
         "text": "Before you spans an ancient and very unsafe-looking bridge; you cannot really see what is on the other side, but you think you can see a slight glow, maybe a torch? Halfway across the bridge is a lever.",
-        "x": 837.82421875,
-        "y": 230.859375,
+        "x": 1063.71484375,
+        "y": 56.51953125,
+        "map": true
+      },
+      {
+        "id": 7,
+        "number": 1,
+        "title": "Troll Den",
+        "text": "You peer into the dark cave, which slowley becomes wide and forks off into 2 forections. Bones littler the floors and there is the smell of something boiling down the right tunnel.",
+        "x": 1118.64453125,
+        "y": 151.46484375,
+        "map": false
+      },
+      {
+        "id": 8,
+        "number": 2,
+        "title": "Junction",
+        "text": "You finally reach a junction after the long corridore entrance which twisted and turned for what seemed a long walk? To you left is a short tunnel with a lit torch and a door. You may inspect the door if you have intelligence above 4.\n\nTo the right are some steps, hewn out of the rock, but clearly an ascending route to a higher ledge.\n\nYou may...\nListen at the door #\nOpen the door, turn to 13\nHead up the stairs; turn to 27",
+        "x": 605.3515625,
+        "y": 147.02734375,
         "map": true
       }
     ],
     "links": [
-      {
-        "id": "l1",
-        "from": 1,
-        "to": 2,
-        "type": "choice"
-      },
-      {
-        "id": "l2",
-        "from": 1,
-        "to": 3,
-        "type": "choice"
-      },
       {
         "id": "l3",
         "from": 2,
@@ -73,6 +79,30 @@
         "id": "l17883361417600.2676145086113947",
         "from": 5,
         "to": 3,
+        "type": "choice"
+      },
+      {
+        "id": "l17883672380460.2576312460476856",
+        "from": 8,
+        "to": 1,
+        "type": "choice"
+      },
+      {
+        "id": "l17883672490790.5655815051608248",
+        "from": 3,
+        "to": 8,
+        "type": "choice"
+      },
+      {
+        "id": "l17883672892450.750684318115403",
+        "from": 8,
+        "to": 2,
+        "type": "choice"
+      },
+      {
+        "id": "l17883673101620.0021755762874531293",
+        "from": 5,
+        "to": 7,
         "type": "choice"
       }
     ]
