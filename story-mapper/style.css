@@ -46,11 +46,12 @@ button.secondary, .fileBtn.secondary { background: transparent; }
 #links { overflow:visible; pointer-events:auto; }
 #nodes { pointer-events:none; }
 .linkHit { fill:none; stroke:transparent; stroke-width:18; pointer-events:stroke; cursor:pointer; }
-.link { fill:none; stroke:var(--line); stroke-width:3; opacity:.9; pointer-events:none; }
-.link.read { stroke-dasharray:6 9; stroke-width:2.5; }
-.link.choice { marker-end:url(#arrowChoice); }
-.link.read { marker-end:url(#arrowRead); }
-.link.selectedLink { stroke:#fff; stroke-width:5; opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.45)); }
+.link {
+  fill:none; stroke:var(--line); stroke-width:2.6; opacity:.9; pointer-events:none;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.link.read { stroke-dasharray:5 8; stroke-width:2.4; }
+.link.selectedLink { stroke:#fff; stroke-width:4.5; opacity:1; filter:drop-shadow(0 0 3px rgba(255,255,255,.45)); }
 .link.read.selectedLink { stroke-width:4; }
 .node {
   position:absolute; width:240px; min-height:84px; height:auto; border:2px solid #d3cdc4;
