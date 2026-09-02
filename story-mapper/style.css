@@ -120,6 +120,10 @@ code { color:#f2d7a1; }
   }
   .node .title { font-size:14px; }
   .node.mobileSelected { outline:3px solid rgba(199,71,57,.9); outline-offset:2px; }
+  .node.mobileMoveArmed {
+    outline:4px solid #f2d7a1; outline-offset:3px; box-shadow:0 0 0 5px rgba(242,215,161,.16), 0 3px 9px rgba(0,0,0,.25);
+    touch-action:none !important;
+  }
   body.mobile-drag-mode .node,
   body.mobile-linking .node { touch-action:none; }
   body.mobile-drag-mode #workspace,
