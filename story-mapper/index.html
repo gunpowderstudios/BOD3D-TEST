@@ -29,26 +29,28 @@
     </div>
   </header>
 
-  <div class="hint" id="hint">Move mode: drag boxes freely. Double-click a box to edit it. Click a line to select/change it.</div>
+  <div class="hint" id="hint">Move mode: drag boxes freely. Double-click a title box to edit its full story.</div>
 
-  <main id="workspace" aria-label="Story map workspace">
-    <svg id="links" aria-label="Story connections"></svg>
-    <div id="nodes"></div>
+  <main id="workspace" aria-label="Scrollable story map workspace">
+    <div id="canvas">
+      <svg id="links" aria-label="Story connections"></svg>
+      <div id="nodes"></div>
+    </div>
   </main>
 
   <aside id="editor" class="editor hidden" aria-live="polite">
     <div class="editorTop">
-      <strong>Edit node</strong>
+      <strong id="editorHeading">Edit story node</strong>
       <button id="closeEditorBtn" aria-label="Close editor">×</button>
     </div>
     <label>Number
       <input id="nodeNumber" type="number" min="1" step="1" />
     </label>
     <label>Title
-      <input id="nodeTitle" type="text" placeholder="Old corridor" />
+      <input id="nodeTitle" type="text" placeholder="Troll Bridge" />
     </label>
     <label>Story text / note
-      <textarea id="nodeText" rows="5" placeholder="You hear a lock click behind you..."></textarea>
+      <textarea id="nodeText" rows="12" placeholder="A large bridge stands before you..."></textarea>
     </label>
     <label class="check"><input id="mapNode" type="checkbox" /> Printed on dungeon map</label>
     <button id="applyNodeBtn">Apply</button>
