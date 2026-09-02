@@ -11,7 +11,6 @@
   let armedNode = null;
   let nodeTapStart = null;
   let blankTapStart = null;
-  let lastNodeTap = null;
   let lastBlankTap = null;
   let linkingTaps = 0;
   let draggingArmedNode = false;
@@ -31,6 +30,7 @@
   function clearArmed() {
     if (armedNode) armedNode.classList.remove('mobileMoveArmed');
     armedNode = null;
+    document.body.classList.remove('mobile-drag-mode');
   }
 
   function selectNode(el) {
@@ -43,15 +43,19 @@
     quick.classList.remove('hidden');
   }
 
-  function armNode(el) {
-    clearSelection();
+  function armSelectedNode() {
+    if (!selectedNode) return;
     clearArmed();
-    armedNode = el;
-    el.classList.add('mobileMoveArmed');
+    armedNode = selectedNode;
+    armedNode.classList.remove('mobileSelected');
+    armedNode.classList.add('mobileMoveArmed');
+    selectedNode = null;
     quick.classList.add('hidden');
     lineMenu.classList.add('hidden');
+    document.body.classList.add('mobile-drag-mode');
+    document.getElementById('resetModeBtn').click();
     const hint = document.getElementById('hint');
-    if (hint) hint.textContent = 'Ready to move — touch this box again and drag it.';
+    if (hint) hint.textContent = 'Move ready — touch the glowing box and drag it.';
   }
 
   function firePointerDown(el) {
@@ -103,23 +107,19 @@
 
   document.addEventListener('pointerdown', e => {
     if (!isMobile() || syntheticGesture) return;
-
     const node = e.target.closest && e.target.closest('.node');
+
     if (node) {
       if (document.body.classList.contains('mobile-linking')) {
         linkingTaps += 1;
         return;
       }
-
       if (armedNode === node) {
         draggingArmedNode = true;
-        document.body.classList.add('mobile-drag-mode');
-        document.getElementById('resetModeBtn').click();
-        return; // allow the event to bubble into the desktop drag handler
+        return;
       }
-
       e.stopPropagation();
-      nodeTapStart = {el:node, id:node.dataset.id, x:e.clientX, y:e.clientY, t:Date.now()};
+      nodeTapStart = {el:node, x:e.clientX, y:e.clientY, t:Date.now()};
       blankTapStart = null;
       return;
     }
@@ -135,9 +135,7 @@
 
     if (draggingArmedNode) {
       draggingArmedNode = false;
-      document.body.classList.remove('mobile-drag-mode');
       clearArmed();
-      lastNodeTap = null;
       return;
     }
 
@@ -149,17 +147,8 @@
       nodeTapStart = null;
       if (wasTap) {
         e.preventDefault();
-        const now = Date.now();
-        const isDouble = lastNodeTap && lastNodeTap.id === start.id && now - lastNodeTap.t <= DOUBLE_TAP_MS;
-        if (isDouble) {
-          lastNodeTap = null;
-          armNode(start.el);
-        } else {
-          lastNodeTap = {id:start.id, t:now};
-          selectNode(start.el);
-        }
-      } else {
-        lastNodeTap = null;
+        clearArmed();
+        selectNode(start.el);
       }
       return;
     }
@@ -191,11 +180,8 @@
   document.addEventListener('pointercancel', () => {
     nodeTapStart = null;
     blankTapStart = null;
-    if (draggingArmedNode) {
-      draggingArmedNode = false;
-      document.body.classList.remove('mobile-drag-mode');
-      clearArmed();
-    }
+    draggingArmedNode = false;
+    clearArmed();
   }, true);
 
   document.addEventListener('dblclick', e => {
@@ -218,7 +204,8 @@
   document.getElementById('mobileAddBtn').addEventListener('click', () => document.getElementById('addNodeBtn').click());
   document.getElementById('mobileSaveBtn').addEventListener('click', () => document.getElementById('saveBtn').click());
   document.getElementById('mobileMoveBtn').addEventListener('click', () => {
-    clearSelection(); clearArmed();
+    clearSelection();
+    clearArmed();
     document.body.classList.add('mobile-drag-mode');
     document.getElementById('mobileMoveBtn').classList.add('active');
     document.getElementById('resetModeBtn').click();
@@ -234,7 +221,7 @@
     finally { syntheticGesture = false; }
     quick.classList.add('hidden');
   });
-
+  document.getElementById('mobileMoveNodeBtn').addEventListener('click', armSelectedNode);
   document.getElementById('mobileSolidBtn').addEventListener('click', () => beginConnection('choice'));
   document.getElementById('mobileDottedBtn').addEventListener('click', () => beginConnection('read'));
   document.getElementById('mobileDeleteBtn').addEventListener('click', () => {
@@ -261,13 +248,5 @@
     clearArmed(); lineMenu.classList.add('hidden'); linkingTaps = 0;
     document.body.classList.add('mobile-linking');
     document.getElementById('readModeBtn').click();
-  });
-
-  document.addEventListener('pointerup', () => {
-    if (!isMobile()) return;
-    if (document.body.classList.contains('mobile-drag-mode') && !draggingArmedNode) {
-      document.body.classList.remove('mobile-drag-mode');
-      document.getElementById('mobileMoveBtn').classList.remove('active');
-    }
   });
 })();
