@@ -1,8 +1,8 @@
 {
   "format": "bod-story-map-v1",
-  "savedAt": "2026-09-02T16:55:55.262Z",
+  "savedAt": "2026-09-02T17:24:22.477Z",
   "state": {
-    "nextId": 10,
+    "nextId": 9,
     "nodes": [
       {
         "id": 1,
@@ -45,36 +45,27 @@
         "number": 62,
         "title": "Troll Bridge",
         "text": "Before you spans an ancient and very unsafe-looking bridge; you cannot really see what is on the other side, but you think you can see a slight glow, maybe a torch? Halfway across the bridge is a lever.",
-        "x": 1063.71484375,
-        "y": 56.51953125,
+        "x": 975.0104166666666,
+        "y": 49.104166666666686,
         "map": true
       },
       {
         "id": 7,
-        "number": 37,
+        "number": 1,
         "title": "Troll Den",
         "text": "You peer into the dark cave, which slowley becomes wide and forks off into 2 forections. Bones littler the floors and there is the smell of something boiling down the right tunnel.",
-        "x": 1118.64453125,
-        "y": 151.46484375,
+        "x": 1027.5364583333335,
+        "y": 155.265625,
         "map": false
       },
       {
         "id": 8,
-        "number": 72,
+        "number": 2,
         "title": "Junction",
         "text": "You finally reach a junction after the long corridore entrance which twisted and turned for what seemed a long walk? To you left is a short tunnel with a lit torch and a door. You may inspect the door if you have intelligence above 4.\n\nTo the right are some steps, hewn out of the rock, but clearly an ascending route to a higher ledge.\n\nYou may...\nListen at the door #\nOpen the door, turn to 13\nHead up the stairs; turn to 27",
         "x": 605.3515625,
-        "y": 146.90625,
+        "y": 147.02734375,
         "map": true
-      },
-      {
-        "id": 9,
-        "number": 56,
-        "title": "New story node",
-        "text": "",
-        "x": 306.671875,
-        "y": 123.7421875,
-        "map": false
       }
     ],
     "links": [
