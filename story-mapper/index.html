@@ -15,10 +15,12 @@
     <div class="tools">
       <button id="addNodeBtn">+ Story Node</button>
       <button id="undoBtn" class="secondary" disabled title="Ctrl/Cmd + Z">Undo</button>
-      <button id="choiceModeBtn" class="mode active">Solid: Choice</button>
-      <button id="readModeBtn" class="mode">Dotted: Read</button>
-      <button id="deleteModeBtn" class="mode danger">Delete</button>
-      <button id="resetModeBtn" class="secondary">Move</button>
+      <button id="resetModeBtn" class="mode active">Move</button>
+      <button id="choiceModeBtn" class="mode">+ Solid Line</button>
+      <button id="readModeBtn" class="mode">+ Dotted Line</button>
+      <button id="toggleLineBtn" class="secondary" disabled>Change Line</button>
+      <button id="deleteLineBtn" class="secondary danger" disabled>Delete Line</button>
+      <button id="deleteModeBtn" class="mode danger">Delete Box</button>
       <span class="divider"></span>
       <button id="saveBtn" class="secondary">Save</button>
       <button id="exportBtn" class="secondary">Export JSON</button>
@@ -27,10 +29,10 @@
     </div>
   </header>
 
-  <div class="hint" id="hint">Choice mode: click one node, then another to draw a solid route.</div>
+  <div class="hint" id="hint">Move mode: drag boxes freely. Double-click a box to edit it. Click a line to select/change it.</div>
 
   <main id="workspace" aria-label="Story map workspace">
-    <svg id="links" aria-hidden="true"></svg>
+    <svg id="links" aria-label="Story connections"></svg>
     <div id="nodes"></div>
   </main>
 
