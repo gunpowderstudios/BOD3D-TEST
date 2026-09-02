@@ -7,9 +7,9 @@
   const lineMenu = document.getElementById('mobileLineMenu');
   let selectedNode = null;
   let touchStart = null;
+  let linkingTaps = 0;
 
   function isMobile() { return mobile.matches; }
-  function getNode(id) { return nodesLayer.querySelector(`[data-id="${id}"]`); }
   function clearSelection() {
     if (selectedNode) selectedNode.classList.remove('mobileSelected');
     selectedNode = null;
@@ -33,6 +33,7 @@
   }
   function beginConnection(type) {
     if (!selectedNode) return;
+    linkingTaps = 0;
     document.body.classList.add('mobile-linking');
     document.getElementById(type === 'choice' ? 'choiceModeBtn' : 'readModeBtn').click();
     firePointerDown(selectedNode);
@@ -44,7 +45,11 @@
     if (!isMobile()) return;
     const node = e.target.closest && e.target.closest('.node');
     if (!node) return;
-    if (document.body.classList.contains('mobile-drag-mode') || document.body.classList.contains('mobile-linking')) return;
+    if (document.body.classList.contains('mobile-linking')) {
+      linkingTaps += 1;
+      return;
+    }
+    if (document.body.classList.contains('mobile-drag-mode')) return;
     e.stopPropagation();
     touchStart = {el:node, x:e.clientX, y:e.clientY, t:Date.now(), pointerId:e.pointerId};
   }, true);
@@ -66,8 +71,11 @@
       document.body.classList.remove('mobile-drag-mode');
       document.getElementById('mobileMoveBtn').classList.remove('active');
     }
-    if (document.body.classList.contains('mobile-linking')) {
-      setTimeout(() => document.body.classList.remove('mobile-linking'), 100);
+    if (document.body.classList.contains('mobile-linking') && linkingTaps >= 2) {
+      setTimeout(() => {
+        document.body.classList.remove('mobile-linking');
+        linkingTaps = 0;
+      }, 120);
     }
   }, true);
 
@@ -94,20 +102,24 @@
     if (!selectedNode) return;
     if (!confirm('Delete this story box and its connections?')) return;
     document.body.classList.add('mobile-linking');
+    linkingTaps = 0;
     document.getElementById('deleteModeBtn').click();
     firePointerDown(selectedNode);
     document.getElementById('resetModeBtn').click();
     document.body.classList.remove('mobile-linking');
+    linkingTaps = 0;
     clearSelection();
   });
   document.getElementById('mobileCloseQuick').addEventListener('click', clearSelection);
   document.getElementById('mobileSolidNew').addEventListener('click', () => {
     lineMenu.classList.add('hidden');
+    linkingTaps = 0;
     document.body.classList.add('mobile-linking');
     document.getElementById('choiceModeBtn').click();
   });
   document.getElementById('mobileDottedNew').addEventListener('click', () => {
     lineMenu.classList.add('hidden');
+    linkingTaps = 0;
     document.body.classList.add('mobile-linking');
     document.getElementById('readModeBtn').click();
   });
