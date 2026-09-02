@@ -1,8 +1,11 @@
 (() => {
   const workspace = document.getElementById('workspace');
+  const canvas = document.getElementById('canvas');
   const nodesLayer = document.getElementById('nodes');
   const svg = document.getElementById('links');
   const hint = document.getElementById('hint');
+  const editor = document.getElementById('editor');
+  const editorHeading = document.getElementById('editorHeading');
 
   let state = { nodes: [], links: [], nextId: 1 };
   let mode = 'move';
@@ -13,11 +16,16 @@
   const undoStack = [];
   const MAX_UNDOS = 20;
 
+  const MIN_CANVAS_WIDTH = 3200;
+  const MIN_CANVAS_HEIGHT = 2400;
+  const CANVAS_GROW = 900;
   const ROUTE_CLEARANCE = 14;
-  const ROUTE_EXIT = 22;
-  const CORNER_RADIUS = 10;
+  const ROUTE_EXIT = 26;
+  const CORNER_RADIUS = 9;
 
-  function cloneState(value = state) { return JSON.parse(JSON.stringify(value)); }
+  function cloneState(value = state) {
+    return JSON.parse(JSON.stringify(value));
+  }
 
   function recordUndo() {
     undoStack.push(cloneState());
@@ -26,13 +34,16 @@
   }
 
   function undo() {
-    if (!undoStack.length) { flash('Nothing to undo.'); return; }
+    if (!undoStack.length) {
+      flash('Nothing to undo.');
+      return;
+    }
     state = undoStack.pop();
     linkStartId = null;
     selectedLinkId = null;
     drag = null;
     editingId = null;
-    document.getElementById('editor').classList.add('hidden');
+    editor.classList.add('hidden');
     render();
     updateUndoButton();
     flash(`Undone. ${undoStack.length} undo${undoStack.length === 1 ? '' : 's'} remaining.`);
@@ -50,7 +61,9 @@
     const deleteBtn = document.getElementById('deleteLineBtn');
     const selected = state.links.find(l => l.id === selectedLinkId);
     toggleBtn.disabled = !selected;
-    toggleBtn.textContent = selected ? (selected.type === 'choice' ? 'Make Dotted' : 'Make Solid') : 'Change Line';
+    toggleBtn.textContent = selected
+      ? (selected.type === 'choice' ? 'Make Dotted' : 'Make Solid')
+      : 'Change Line';
     deleteBtn.disabled = !selected;
   }
 
@@ -83,40 +96,81 @@
       const parsed = JSON.parse(raw);
       if (!Array.isArray(parsed.nodes) || !Array.isArray(parsed.links)) return false;
       state = parsed;
+      state.nextId = Math.max(
+        Number(state.nextId) || 1,
+        ...state.nodes.map(n => Number(n.id) || 0)
+      ) + 1;
       return true;
     } catch {
       return false;
     }
   }
 
+  function ensureCanvasSize(extraX = 0, extraY = 0) {
+    const maxNodeX = state.nodes.reduce((m, n) => Math.max(m, Number(n.x) || 0), 0);
+    const maxNodeY = state.nodes.reduce((m, n) => Math.max(m, Number(n.y) || 0), 0);
+    const wantedWidth = Math.max(MIN_CANVAS_WIDTH, maxNodeX + 800, extraX + 450);
+    const wantedHeight = Math.max(MIN_CANVAS_HEIGHT, maxNodeY + 700, extraY + 350);
+    const currentWidth = parseFloat(canvas.style.width) || MIN_CANVAS_WIDTH;
+    const currentHeight = parseFloat(canvas.style.height) || MIN_CANVAS_HEIGHT;
+    canvas.style.width = Math.max(currentWidth, wantedWidth) + 'px';
+    canvas.style.height = Math.max(currentHeight, wantedHeight) + 'px';
+  }
+
+  function growCanvasIfNeeded(x, y, width, height) {
+    let w = canvas.clientWidth;
+    let h = canvas.clientHeight;
+    let changed = false;
+    if (x + width > w - 260) {
+      w += CANVAS_GROW;
+      changed = true;
+    }
+    if (y + height > h - 220) {
+      h += CANVAS_GROW;
+      changed = true;
+    }
+    if (changed) {
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+    }
+  }
+
   function render() {
+    ensureCanvasSize();
     nodesLayer.innerHTML = '';
     state.nodes.forEach(n => {
       const el = document.createElement('div');
       el.className = 'node' + (n.map ? ' map' : '') + (n.id === linkStartId ? ' selected' : '');
       el.dataset.id = n.id;
-      el.style.left = n.x + 'px';
-      el.style.top = n.y + 'px';
-      el.innerHTML = `<div class="bubble">${escapeHtml(String(n.number))}</div><div class="title">${escapeHtml(n.title || 'Untitled')}</div><div class="text">${escapeHtml(n.text || '')}</div><div class="mapTag">ON DUNGEON MAP</div>`;
+      el.style.left = (Number(n.x) || 0) + 'px';
+      el.style.top = (Number(n.y) || 0) + 'px';
+      el.title = 'Double-click to edit the full story';
+      el.innerHTML = `
+        <div class="bubble">${escapeHtml(String(n.number))}</div>
+        <div class="title">${escapeHtml(n.title || 'Untitled')}</div>`;
       el.addEventListener('pointerdown', onNodePointerDown);
-      el.addEventListener('dblclick', () => openEditor(n.id));
+      el.addEventListener('dblclick', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        openEditor(n.id);
+      });
       nodesLayer.appendChild(el);
     });
     renderLinks();
     updateLineButtons();
   }
 
-  function rectForElement(el, workspaceRect, inflate = 0) {
+  function rectForElement(el, canvasRect, inflate = 0) {
     const r = el.getBoundingClientRect();
     return {
-      left: r.left - workspaceRect.left - inflate,
-      top: r.top - workspaceRect.top - inflate,
-      right: r.right - workspaceRect.left + inflate,
-      bottom: r.bottom - workspaceRect.top + inflate,
+      left: r.left - canvasRect.left - inflate,
+      top: r.top - canvasRect.top - inflate,
+      right: r.right - canvasRect.left + inflate,
+      bottom: r.bottom - canvasRect.top + inflate,
       width: r.width + inflate * 2,
       height: r.height + inflate * 2,
-      cx: r.left - workspaceRect.left + r.width / 2,
-      cy: r.top - workspaceRect.top + r.height / 2
+      cx: r.left - canvasRect.left + r.width / 2,
+      cy: r.top - canvasRect.top + r.height / 2
     };
   }
 
@@ -136,11 +190,7 @@
     const maxX = Math.max(a.x, b.x);
     const minY = Math.min(a.y, b.y);
     const maxY = Math.max(a.y, b.y);
-
     if (maxX <= r.left || minX >= r.right || maxY <= r.top || minY >= r.bottom) return false;
-
-    if (Math.abs(a.x - b.x) < 0.01) return a.x > r.left && a.x < r.right && maxY > r.top && minY < r.bottom;
-    if (Math.abs(a.y - b.y) < 0.01) return a.y > r.top && a.y < r.bottom && maxX > r.left && minX < r.right;
 
     const dx = b.x - a.x;
     const dy = b.y - a.y;
@@ -183,7 +233,9 @@
 
   function pathLength(points) {
     let total = 0;
-    for (let i = 0; i < points.length - 1; i++) total += Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+    for (let i = 0; i < points.length - 1; i++) {
+      total += Math.hypot(points[i + 1].x - points[i].x, points[i + 1].y - points[i].y);
+    }
     return total;
   }
 
@@ -191,13 +243,17 @@
     const deduped = [];
     for (const p of points) {
       const last = deduped[deduped.length - 1];
-      if (!last || Math.abs(last.x - p.x) > 0.5 || Math.abs(last.y - p.y) > 0.5) deduped.push({x:p.x, y:p.y});
+      if (!last || Math.abs(last.x - p.x) > 0.5 || Math.abs(last.y - p.y) > 0.5) {
+        deduped.push({x:p.x, y:p.y});
+      }
     }
     let changed = true;
     while (changed && deduped.length > 2) {
       changed = false;
       for (let i = 1; i < deduped.length - 1; i++) {
-        const a = deduped[i - 1], b = deduped[i], c = deduped[i + 1];
+        const a = deduped[i - 1];
+        const b = deduped[i];
+        const c = deduped[i + 1];
         const vertical = Math.abs(a.x - b.x) < 0.5 && Math.abs(b.x - c.x) < 0.5;
         const horizontal = Math.abs(a.y - b.y) < 0.5 && Math.abs(b.y - c.y) < 0.5;
         if (vertical || horizontal) {
@@ -225,8 +281,14 @@
         d += ` L ${cur.x} ${cur.y}`;
         continue;
       }
-      const inPoint = { x:cur.x + (prev.x - cur.x) * radius / len1, y:cur.y + (prev.y - cur.y) * radius / len1 };
-      const outPoint = { x:cur.x + (next.x - cur.x) * radius / len2, y:cur.y + (next.y - cur.y) * radius / len2 };
+      const inPoint = {
+        x:cur.x + (prev.x - cur.x) * radius / len1,
+        y:cur.y + (prev.y - cur.y) * radius / len1
+      };
+      const outPoint = {
+        x:cur.x + (next.x - cur.x) * radius / len2,
+        y:cur.y + (next.y - cur.y) * radius / len2
+      };
       d += ` L ${inPoint.x} ${inPoint.y} Q ${cur.x} ${cur.y} ${outPoint.x} ${outPoint.y}`;
     }
     const last = pts[pts.length - 1];
@@ -237,55 +299,55 @@
   function preferredSidePenalty(side, fromRect, toRect) {
     const dx = toRect.cx - fromRect.cx;
     const dy = toRect.cy - fromRect.cy;
-    const preferred = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
-    return side === preferred ? 0 : 35;
+    const preferred = Math.abs(dx) >= Math.abs(dy)
+      ? (dx >= 0 ? 'right' : 'left')
+      : (dy >= 0 ? 'bottom' : 'top');
+    return side === preferred ? 0 : 42;
   }
 
-  function routeBetween(start, end, obstacles, workspaceRect) {
-    const width = workspaceRect.width;
-    const height = workspaceRect.height;
+  function routeBetween(start, end, obstacles) {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
     const candidates = [];
 
-    const addCandidate = points => {
+    const add = points => {
       const p = simplifyPoints(points);
       if (!pathClear(p, obstacles)) return;
       const bends = Math.max(0, p.length - 2);
-      candidates.push({ points:p, cost:pathLength(p) + bends * 18 });
+      candidates.push({points:p, cost:pathLength(p) + bends * 22});
     };
 
-    addCandidate([start, end]);
+    add([start, end]);
     if (candidates.length) return candidates[0].points;
 
-    addCandidate([start, {x:end.x, y:start.y}, end]);
-    addCandidate([start, {x:start.x, y:end.y}, end]);
-    if (candidates.length) {
-      candidates.sort((a,b) => a.cost - b.cost);
-      return candidates[0].points;
-    }
+    add([start, {x:end.x, y:start.y}, end]);
+    add([start, {x:start.x, y:end.y}, end]);
 
-    const xLanes = [8, width - 8];
-    const yLanes = [8, height - 8];
+    const xLanes = [10, width - 10];
+    const yLanes = [10, height - 10];
     obstacles.forEach(r => {
-      xLanes.push(Math.max(6, r.left - 6));
-      xLanes.push(Math.min(width - 6, r.right + 6));
-      yLanes.push(Math.max(6, r.top - 6));
-      yLanes.push(Math.min(height - 6, r.bottom + 6));
+      xLanes.push(Math.max(8, r.left - 8), Math.min(width - 8, r.right + 8));
+      yLanes.push(Math.max(8, r.top - 8), Math.min(height - 8, r.bottom + 8));
     });
 
-    const uniqX = [...new Set(xLanes.map(v => Math.round(v)))].sort((a,b) => Math.abs(a - (start.x + end.x) / 2) - Math.abs(b - (start.x + end.x) / 2)).slice(0, 24);
-    const uniqY = [...new Set(yLanes.map(v => Math.round(v)))].sort((a,b) => Math.abs(a - (start.y + end.y) / 2) - Math.abs(b - (start.y + end.y) / 2)).slice(0, 24);
+    const midX = (start.x + end.x) / 2;
+    const midY = (start.y + end.y) / 2;
+    const uniqX = [...new Set(xLanes.map(Math.round))]
+      .sort((a,b) => Math.abs(a - midX) - Math.abs(b - midX))
+      .slice(0, 30);
+    const uniqY = [...new Set(yLanes.map(Math.round))]
+      .sort((a,b) => Math.abs(a - midY) - Math.abs(b - midY))
+      .slice(0, 30);
 
-    for (const x of uniqX) addCandidate([start, {x, y:start.y}, {x, y:end.y}, end]);
-    for (const y of uniqY) addCandidate([start, {x:start.x, y}, {x:end.x, y}, end]);
-    if (candidates.length) {
-      candidates.sort((a,b) => a.cost - b.cost);
-      return candidates[0].points;
-    }
+    for (const x of uniqX) add([start, {x, y:start.y}, {x, y:end.y}, end]);
+    for (const y of uniqY) add([start, {x:start.x, y}, {x:end.x, y}, end]);
 
-    for (const x of uniqX.slice(0, 8)) {
-      for (const y of uniqY.slice(0, 8)) {
-        addCandidate([start, {x, y:start.y}, {x, y}, {x:end.x, y}, end]);
-        addCandidate([start, {x:start.x, y}, {x, y}, {x, y:end.y}, end]);
+    if (!candidates.length) {
+      for (const x of uniqX.slice(0, 10)) {
+        for (const y of uniqY.slice(0, 10)) {
+          add([start, {x, y:start.y}, {x, y}, {x:end.x, y}, end]);
+          add([start, {x:start.x, y}, {x, y}, {x, y:end.y}, end]);
+        }
       }
     }
 
@@ -294,30 +356,33 @@
     return candidates[0].points;
   }
 
-  function getBestRoute(aRect, bRect, obstacles, workspaceRect) {
+  function getBestRoute(aRect, bRect, obstacles) {
     const sides = ['left','right','top','bottom'];
+    const otherObstacles = obstacles.filter(r => r.nodeId !== aRect.nodeId && r.nodeId !== bRect.nodeId);
     let best = null;
 
     for (const aSide of sides) {
       const aPort = getPort(aRect, aSide);
       for (const bSide of sides) {
         const bPort = getPort(bRect, bSide);
-
-        const otherObstacles = obstacles.filter(r => r.nodeId !== aRect.nodeId && r.nodeId !== bRect.nodeId);
         if (!segmentClear(aPort.edge, aPort.outside, otherObstacles)) continue;
         if (!segmentClear(bPort.edge, bPort.outside, otherObstacles)) continue;
         if (otherObstacles.some(r => pointInsideRect(aPort.outside, r) || pointInsideRect(bPort.outside, r))) continue;
 
-        const routingObstacles = obstacles;
-        const middle = routeBetween(aPort.outside, bPort.outside, routingObstacles, workspaceRect);
-        if (!pathClear(middle, routingObstacles)) continue;
+        const middle = routeBetween(aPort.outside, bPort.outside, otherObstacles);
+        if (!pathClear(middle, otherObstacles)) continue;
 
-        const points = simplifyPoints([aPort.edge, aPort.outside, ...middle.slice(1, -1), bPort.outside, bPort.edge]);
+        const points = simplifyPoints([
+          aPort.edge,
+          aPort.outside,
+          ...middle.slice(1, -1),
+          bPort.outside,
+          bPort.edge
+        ]);
         const cost = pathLength(points)
-          + Math.max(0, points.length - 2) * 10
+          + Math.max(0, points.length - 2) * 12
           + preferredSidePenalty(aSide, aRect, bRect)
           + preferredSidePenalty(bSide, bRect, aRect);
-
         if (!best || cost < best.cost) best = {points, cost};
       }
     }
@@ -326,24 +391,28 @@
 
     const dx = bRect.cx - aRect.cx;
     const dy = bRect.cy - aRect.cy;
-    const aSide = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
-    const bSide = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'left' : 'right') : (dy >= 0 ? 'top' : 'bottom');
+    const aSide = Math.abs(dx) >= Math.abs(dy)
+      ? (dx >= 0 ? 'right' : 'left')
+      : (dy >= 0 ? 'bottom' : 'top');
+    const bSide = Math.abs(dx) >= Math.abs(dy)
+      ? (dx >= 0 ? 'left' : 'right')
+      : (dy >= 0 ? 'top' : 'bottom');
     return [getPort(aRect, aSide).edge, getPort(bRect, bSide).edge];
   }
 
   function renderLinks() {
     svg.innerHTML = '';
-    const workspaceRect = workspace.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     const rectMap = new Map();
     const obstacles = [];
 
     state.nodes.forEach(n => {
       const el = nodesLayer.querySelector(`[data-id="${n.id}"]`);
       if (!el) return;
-      const base = rectForElement(el, workspaceRect, 0);
+      const base = rectForElement(el, canvasRect, 0);
       base.nodeId = n.id;
       rectMap.set(n.id, base);
-      const inflated = rectForElement(el, workspaceRect, ROUTE_CLEARANCE);
+      const inflated = rectForElement(el, canvasRect, ROUTE_CLEARANCE);
       inflated.nodeId = n.id;
       obstacles.push(inflated);
     });
@@ -352,8 +421,7 @@
       const a = rectMap.get(l.from);
       const b = rectMap.get(l.to);
       if (!a || !b) return;
-
-      const route = getBestRoute(a, b, obstacles, workspaceRect);
+      const route = getBestRoute(a, b, obstacles);
       const d = roundedPath(route);
 
       const hit = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -381,8 +449,13 @@
     renderLinks();
     updateLineButtons();
     const selected = state.links.find(l => l.id === selectedLinkId);
-    if (selected) flash(selected.type === 'choice' ? 'Solid line selected. Click “Make Dotted” to change it.' : 'Dotted line selected. Click “Make Solid” to change it.');
-    else updateModes();
+    if (selected) {
+      flash(selected.type === 'choice'
+        ? 'Solid line selected. Click “Make Dotted” to change it.'
+        : 'Dotted line selected. Click “Make Solid” to change it.');
+    } else {
+      updateModes();
+    }
   }
 
   function toggleSelectedLine() {
@@ -420,10 +493,12 @@
       e.preventDefault();
       if (linkStartId == null) {
         linkStartId = id;
-        flash(`Now click the destination node for the ${mode === 'choice' ? 'solid choice' : 'dotted read'} link.`);
+        flash(`Now click the destination box for the ${mode === 'choice' ? 'solid' : 'dotted'} line.`);
+        render();
       } else if (linkStartId === id) {
         linkStartId = null;
-        flash('Link cancelled.');
+        flash('Line cancelled.');
+        render();
       } else {
         const exists = state.links.some(l => l.from === linkStartId && l.to === id && l.type === mode);
         if (!exists) {
@@ -435,20 +510,19 @@
         updateModes();
         render();
       }
-      render();
       return;
     }
 
     const node = state.nodes.find(n => n.id === id);
     if (!node) return;
     e.preventDefault();
-    const rect = workspace.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     drag = {
       id,
       before:cloneState(),
       moved:false,
-      offsetX:e.clientX - rect.left - node.x,
-      offsetY:e.clientY - rect.top - node.y,
+      offsetX:e.clientX - canvasRect.left - node.x,
+      offsetY:e.clientY - canvasRect.top - node.y,
       pointerId:e.pointerId,
       el:e.currentTarget
     };
@@ -462,14 +536,17 @@
   function onDragMove(e) {
     if (!drag || e.pointerId !== drag.pointerId) return;
     e.preventDefault();
-    const rect = workspace.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     const node = state.nodes.find(n => n.id === drag.id);
     if (!node) return;
     const nodeRect = drag.el.getBoundingClientRect();
-    const maxX = Math.max(0, rect.width - nodeRect.width);
-    const maxY = Math.max(0, rect.height - nodeRect.height);
-    const nextX = Math.max(0, Math.min(maxX, e.clientX - rect.left - drag.offsetX));
-    const nextY = Math.max(0, Math.min(maxY, e.clientY - rect.top - drag.offsetY));
+    let nextX = Math.max(0, e.clientX - canvasRect.left - drag.offsetX);
+    let nextY = Math.max(0, e.clientY - canvasRect.top - drag.offsetY);
+
+    growCanvasIfNeeded(nextX, nextY, nodeRect.width, nodeRect.height);
+    nextX = Math.min(canvas.clientWidth - nodeRect.width, nextX);
+    nextY = Math.min(canvas.clientHeight - nodeRect.height, nextY);
+
     if (Math.abs(nextX - node.x) > 0.5 || Math.abs(nextY - node.y) > 0.5) drag.moved = true;
     node.x = nextX;
     node.y = nextY;
@@ -490,13 +567,30 @@
     drag = null;
   }
 
-  function addNode() {
-    recordUndo();
+  function nextUnusedNumber() {
     const used = new Set(state.nodes.map(n => Number(n.number)).filter(Number.isFinite));
     let number = 1;
     while (used.has(number)) number++;
+    return number;
+  }
+
+  function addNode() {
+    recordUndo();
     const id = state.nextId++;
-    state.nodes.push({id, number, title:'New story node', text:'Double-click to edit this entry.', x:180 + (state.nodes.length % 4) * 45, y:130 + (state.nodes.length % 5) * 60, map:false});
+    const number = nextUnusedNumber();
+    const stagger = state.nodes.length % 5;
+    const x = workspace.scrollLeft + 170 + stagger * 26;
+    const y = workspace.scrollTop + 130 + stagger * 58;
+    ensureCanvasSize(x, y);
+    state.nodes.push({
+      id,
+      number,
+      title:'New story node',
+      text:'Double-click to edit this entry.',
+      x,
+      y,
+      map:false
+    });
     setMode('move');
     render();
     openEditor(id);
@@ -507,6 +601,10 @@
     state.nodes = state.nodes.filter(n => n.id !== id);
     state.links = state.links.filter(l => l.from !== id && l.to !== id);
     if (linkStartId === id) linkStartId = null;
+    if (editingId === id) {
+      editingId = null;
+      editor.classList.add('hidden');
+    }
     selectedLinkId = null;
     render();
   }
@@ -515,11 +613,12 @@
     const n = state.nodes.find(n => n.id === id);
     if (!n) return;
     editingId = id;
+    editorHeading.textContent = `Edit: ${n.title || 'Untitled'}`;
     document.getElementById('nodeNumber').value = n.number;
     document.getElementById('nodeTitle').value = n.title;
     document.getElementById('nodeText').value = n.text;
     document.getElementById('mapNode').checked = !!n.map;
-    document.getElementById('editor').classList.remove('hidden');
+    editor.classList.remove('hidden');
   }
 
   function applyEditor() {
@@ -535,18 +634,21 @@
       flash(`Number ${chosenNumber} is already used by “${duplicate.title || 'Untitled'}”. Choose another number.`);
       return;
     }
+
     const next = {
-      number:chosenNumber,
-      title:document.getElementById('nodeTitle').value.trim() || 'Untitled',
-      text:document.getElementById('nodeText').value.trim(),
-      map:document.getElementById('mapNode').checked
+      number: chosenNumber,
+      title: document.getElementById('nodeTitle').value.trim() || 'Untitled',
+      text: document.getElementById('nodeText').value.trim(),
+      map: document.getElementById('mapNode').checked
     };
     if (next.number === n.number && next.title === n.title && next.text === n.text && next.map === !!n.map) return;
+
     recordUndo();
     n.number = next.number;
     n.title = next.title;
     n.text = next.text;
     n.map = next.map;
+    editorHeading.textContent = `Edit: ${n.title}`;
     render();
     flash(`Saved story ${n.number}.`);
   }
@@ -566,10 +668,10 @@
       if (btn) btn.classList.toggle('active', mode === m);
     });
     const messages = {
-      choice:'Solid link: click the starting box, then the destination box. It returns to Move afterwards.',
-      read:'Dotted link: click the starting box, then the destination box. It returns to Move afterwards.',
-      delete:'Delete mode: click a box to remove it and its links.',
-      move:'Move mode: drag boxes freely. Connections automatically route around other boxes. Double-click a box to edit it.'
+      choice:'Solid line: click the starting title box, then the destination box.',
+      read:'Dotted line: click the starting title box, then the destination box.',
+      delete:'Delete mode: click a title box to remove it and its connections.',
+      move:'Move mode: drag compact title boxes. Scroll the map to reach more space. Double-click a box to edit the full story.'
     };
     hint.textContent = messages[mode];
   }
@@ -593,6 +695,11 @@
         recordUndo();
         state = obj;
         state.nextId = Math.max(Number(state.nextId) || 1, ...state.nodes.map(n => Number(n.id) || 0)) + 1;
+        state.nodes.forEach(n => {
+          n.x = Math.max(0, Number(n.x) || 0);
+          n.y = Math.max(0, Number(n.y) || 0);
+        });
+        ensureCanvasSize();
         setMode('move');
         render();
         flash('Story map imported.');
@@ -611,7 +718,9 @@
       if (selectedLinkId) {
         const selected = state.links.find(l => l.id === selectedLinkId);
         if (selected) {
-          hint.textContent = selected.type === 'choice' ? 'Solid line selected. Click “Make Dotted” to change it.' : 'Dotted line selected. Click “Make Solid” to change it.';
+          hint.textContent = selected.type === 'choice'
+            ? 'Solid line selected. Click “Make Dotted” to change it.'
+            : 'Dotted line selected. Click “Make Solid” to change it.';
           return;
         }
       }
@@ -620,7 +729,9 @@
   }
 
   function escapeHtml(str) {
-    return str.replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#039;','"':'&quot;'}[c]));
+    return String(str).replace(/[&<>'"]/g, c => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#039;', '"':'&quot;'
+    }[c]));
   }
 
   document.getElementById('addNodeBtn').addEventListener('click', addNode);
@@ -643,14 +754,19 @@
       state = {nodes:[], links:[], nextId:1};
       localStorage.removeItem('bodStoryMapper');
       selectedLinkId = null;
+      editingId = null;
+      editor.classList.add('hidden');
+      canvas.style.width = MIN_CANVAS_WIDTH + 'px';
+      canvas.style.height = MIN_CANVAS_HEIGHT + 'px';
+      workspace.scrollTo(0, 0);
       render();
     }
   });
-  document.getElementById('closeEditorBtn').addEventListener('click', () => document.getElementById('editor').classList.add('hidden'));
+  document.getElementById('closeEditorBtn').addEventListener('click', () => editor.classList.add('hidden'));
   document.getElementById('applyNodeBtn').addEventListener('click', applyEditor);
 
-  workspace.addEventListener('pointerdown', e => {
-    if (e.target === workspace || e.target === nodesLayer || e.target === svg) {
+  canvas.addEventListener('pointerdown', e => {
+    if (e.target === canvas || e.target === nodesLayer || e.target === svg) {
       if (selectedLinkId) {
         selectedLinkId = null;
         renderLinks();
@@ -676,6 +792,7 @@
   });
 
   if (!loadLocal()) seed();
+  ensureCanvasSize();
   updateModes();
   render();
   updateUndoButton();
