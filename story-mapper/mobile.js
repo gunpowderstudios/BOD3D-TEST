@@ -134,7 +134,7 @@
         lineMenu.classList.add('hidden');
         document.body.classList.add('mobile-drag-mode');
         document.getElementById('resetModeBtn').click();
-        return; // allow this second pointerdown to bubble into the mapper drag code
+        return;
       }
 
       e.stopPropagation();
@@ -207,9 +207,8 @@
     }
   }, true);
 
-  // Prevent the browser/app's normal double-click action from opening the editor on mobile.
   document.addEventListener('dblclick', e => {
-    if (!isMobile()) return;
+    if (!isMobile() || syntheticGesture) return;
     if (e.target.closest && e.target.closest('.node')) {
       e.preventDefault();
       e.stopPropagation();
