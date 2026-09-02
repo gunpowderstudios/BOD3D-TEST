@@ -13,7 +13,7 @@
   let blankTapStart = null;
   let lastBlankTap = null;
   let linkingTaps = 0;
-  let draggingArmedNode = false;
+  let mobileDrag = null;
   let syntheticGesture = false;
 
   const DOUBLE_TAP_MS = 420;
@@ -53,9 +53,8 @@
     quick.classList.add('hidden');
     lineMenu.classList.add('hidden');
     document.body.classList.add('mobile-drag-mode');
-    document.getElementById('resetModeBtn').click();
     const hint = document.getElementById('hint');
-    if (hint) hint.textContent = 'Move ready — touch the glowing box and drag it.';
+    if (hint) hint.textContent = 'Move ready — drag the glowing box.';
   }
 
   function firePointerDown(el) {
@@ -105,6 +104,71 @@
     clearSelection();
   }
 
+  function startMobileDrag(e, node) {
+    e.preventDefault();
+    e.stopPropagation();
+    const nodeRect = node.getBoundingClientRect();
+    mobileDrag = {
+      node,
+      id:Number(node.dataset.id),
+      pointerId:e.pointerId,
+      offsetX:e.clientX - nodeRect.left,
+      offsetY:e.clientY - nodeRect.top,
+      x:parseFloat(node.style.left) || 0,
+      y:parseFloat(node.style.top) || 0,
+      moved:false
+    };
+    node.classList.add('dragging');
+    try { node.setPointerCapture(e.pointerId); } catch (_) {}
+  }
+
+  function moveMobileDrag(e) {
+    if (!mobileDrag || e.pointerId !== mobileDrag.pointerId) return;
+    e.preventDefault();
+    const canvasRect = canvas.getBoundingClientRect();
+    const x = Math.max(0, e.clientX - canvasRect.left - mobileDrag.offsetX);
+    const y = Math.max(0, e.clientY - canvasRect.top - mobileDrag.offsetY);
+    if (Math.abs(x - mobileDrag.x) > 0.5 || Math.abs(y - mobileDrag.y) > 0.5) mobileDrag.moved = true;
+    mobileDrag.x = x;
+    mobileDrag.y = y;
+    mobileDrag.node.style.left = `${x}px`;
+    mobileDrag.node.style.top = `${y}px`;
+  }
+
+  function commitMobileDrag() {
+    if (!mobileDrag) return;
+    const finished = mobileDrag;
+    mobileDrag = null;
+    finished.node.classList.remove('dragging');
+    clearArmed();
+
+    if (!finished.moved) return;
+
+    try {
+      const raw = localStorage.getItem('bodStoryMapper');
+      if (!raw) throw new Error('No local map');
+      const state = JSON.parse(raw);
+      const node = Array.isArray(state.nodes) ? state.nodes.find(n => Number(n.id) === finished.id) : null;
+      if (!node) throw new Error('Story node not found');
+      node.x = finished.x;
+      node.y = finished.y;
+
+      const file = new File([JSON.stringify(state)], 'mobile-move.json', {type:'application/json'});
+      const input = document.getElementById('importInput');
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      input.files = dt.files;
+      input.dispatchEvent(new Event('change', {bubbles:true}));
+
+      const hint = document.getElementById('hint');
+      if (hint) hint.textContent = 'Box moved.';
+    } catch (err) {
+      console.error('Could not save mobile move', err);
+      const hint = document.getElementById('hint');
+      if (hint) hint.textContent = 'Could not save that move — try again.';
+    }
+  }
+
   document.addEventListener('pointerdown', e => {
     if (!isMobile() || syntheticGesture) return;
     const node = e.target.closest && e.target.closest('.node');
@@ -115,7 +179,7 @@
         return;
       }
       if (armedNode === node) {
-        draggingArmedNode = true;
+        startMobileDrag(e, node);
         return;
       }
       e.stopPropagation();
@@ -130,12 +194,18 @@
     }
   }, true);
 
+  document.addEventListener('pointermove', e => {
+    if (!isMobile() || syntheticGesture) return;
+    moveMobileDrag(e);
+  }, {capture:true, passive:false});
+
   document.addEventListener('pointerup', e => {
     if (!isMobile() || syntheticGesture) return;
 
-    if (draggingArmedNode) {
-      draggingArmedNode = false;
-      clearArmed();
+    if (mobileDrag && e.pointerId === mobileDrag.pointerId) {
+      e.preventDefault();
+      e.stopPropagation();
+      commitMobileDrag();
       return;
     }
 
@@ -175,13 +245,12 @@
         clearArmed();
       }
     }
-  }, true);
+  }, {capture:true, passive:false});
 
-  document.addEventListener('pointercancel', () => {
+  document.addEventListener('pointercancel', e => {
     nodeTapStart = null;
     blankTapStart = null;
-    draggingArmedNode = false;
-    clearArmed();
+    if (mobileDrag && e.pointerId === mobileDrag.pointerId) commitMobileDrag();
   }, true);
 
   document.addEventListener('dblclick', e => {
@@ -206,9 +275,8 @@
   document.getElementById('mobileMoveBtn').addEventListener('click', () => {
     clearSelection();
     clearArmed();
-    document.body.classList.add('mobile-drag-mode');
-    document.getElementById('mobileMoveBtn').classList.add('active');
-    document.getElementById('resetModeBtn').click();
+    const hint = document.getElementById('hint');
+    if (hint) hint.textContent = 'Tap a box first, then use Move from its menu.';
   });
   document.getElementById('mobileLineBtn').addEventListener('click', () => lineMenu.classList.toggle('hidden'));
   document.getElementById('mobileMoreBtn').addEventListener('click', () => document.getElementById('githubBtn').click());
