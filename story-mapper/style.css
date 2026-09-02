@@ -163,8 +163,8 @@ code { color:#f2d7a1; }
   .mobileQuickHead { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
   .mobileQuickHead strong { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .mobileQuickHead button { border:0; background:transparent; padding:1px 7px; font-size:22px; }
-  .mobileQuickActions { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
-  .mobileQuickActions button { min-height:42px; padding:7px 4px; font-size:12px; }
+  .mobileQuickActions { display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+  .mobileQuickActions button { min-height:42px; padding:7px 2px; font-size:11px; }
 
   .mobileLineMenu {
     display:grid; grid-template-columns:1fr 1fr; gap:8px; position:absolute; left:74px; right:74px;
