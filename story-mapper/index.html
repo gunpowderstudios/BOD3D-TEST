@@ -65,10 +65,10 @@
       <button id="closeGithubBtn" aria-label="Close GitHub setup">×</button>
     </div>
     <p id="githubPanelStatus" class="panelStatus">Not connected.</p>
-    <p class="smallCopy">The mapper saves to <strong>gunpowderstudios/BOD3D-TEST</strong> as <code>story-mapper/story-map.json</code>.</p>
+    <p class="smallCopy">Your story saves privately to <strong>gunpowderstudios/story-mapper</strong> as <code>story-mapper/story-map.json</code>.</p>
     <ol class="setupSteps">
       <li>Create a <strong>fine-grained personal access token</strong> on GitHub.</li>
-      <li>Give it access to <strong>BOD3D-TEST only</strong>.</li>
+      <li>Give it access to <strong>story-mapper only</strong>.</li>
       <li>Repository permission: <strong>Contents → Read and write</strong>. No other permission is needed.</li>
     </ol>
     <a class="githubLink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Create fine-grained token on GitHub ↗</a>
@@ -108,6 +108,7 @@
 
   <button id="mobileMoveBtn" type="button" hidden aria-hidden="true"></button>
 
+  <script src="private-storage.js"></script>
   <script src="app.js"></script>
   <script src="mobile.js"></script>
   <script src="mobile-undo.js"></script>
